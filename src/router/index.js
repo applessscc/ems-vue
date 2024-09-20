@@ -48,6 +48,8 @@ const mainRoutes = {
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
     { path: '/formdetail', component: _import('modules/site/formdetail'), name: 'formdetail', meta: { title: '问题单详情', isTab: true } },
+    { path: '/repair-index', component: _import('repair/repair-index'), name: 'repair-index' , meta: { title: '报修表单'}}, 
+    { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply' , meta: { title: '报修表单'}}, 
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

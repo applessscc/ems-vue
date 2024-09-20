@@ -34,6 +34,18 @@
             <span slot="title">CMS 能耗历史查询</span>
           </el-menu-item>
         </el-submenu>
+
+        <el-submenu index="任务管理">
+          <template slot="title">
+            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
+            <span>任务管理</span>
+          </template>
+          <el-menu-item index="stop" @click="$router.push({ name: 'repair-index' })">
+            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">保修</span>
+          </el-menu-item>
+        </el-submenu>
+
         <sub-menu v-for="menu in menuList" :key="menu.menuId" :menu="menu" :dynamicMenuRoutes="dynamicMenuRoutes">
         </sub-menu>
       </el-menu>
@@ -42,6 +54,7 @@
 </template>
 
 <script>
+import 'element-ui/lib/theme-chalk/index.css';
 import SubMenu from './main-sidebar-sub-menu'
 import { isURL } from '@/utils/validate'
 export default {
