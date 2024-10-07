@@ -14,7 +14,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="申请时间">
-        <el-date-picker v-model="searchForm.dateRange" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
+        <el-date-picker v-model="searchForm.dateRange" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -30,7 +30,7 @@
     <el-table :data="tableData" style="width: 100%">
       <el-table-column fixed label="序号" width="50">
         <template slot-scope="scope">
-          {{ scope.$index + 1 }}
+    {{ (scope.$index + 1) + (currentPage - 1) * pageSize }}
         </template>
       </el-table-column>
       <el-table-column label="任务状态" width="130">
@@ -63,7 +63,7 @@
       </el-table-column>
 
       <el-dialog :visible.sync="imageDialogVisible" width="50%">
-        <img :src="selectedImage" alt="放大图片" style="width: 100%;">
+        <img :src="`https://img-blog.csdnimg.cn/2021051521244130.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl81MzQ0Nzc3Ng==,size_16,color_FFFFFF,t_70`" alt="放大图片" style="width: 100%;">
       </el-dialog>
 
       <el-table-column label="操作" width="100">
@@ -89,7 +89,15 @@
     </el-table>
 
     <!-- 分页组件 -->
-    <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="totalItems" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :current-page.sync="currentPage" @current-change="handlePageChange">
+    <el-pagination background layout="total, sizes, prev, pager, next, jumper" 
+                   :total="totalItems" 
+                   :page-sizes="[10, 20, 50, 100]" 
+                   :page-size="pageSize" 
+                   :current-page.sync="currentPage" 
+                   @current-change="handlePageChange"
+                   @size-change="handleSizeChange"
+                   
+                   >
     </el-pagination>
 
     <!-- 申请维修组件 -->
@@ -140,36 +148,41 @@ export default {
   },
 
   methods: {
+    //分页插件每页显示的条数发生改变时
+    handleSizeChange(newSize){
+      this.pageSize = newSize;
+      this.fetchData();
+    },
 
     // 点击查看图片
     showImage(fileData) {
-      this.selectedImage = `data:image/jpeg;base64,${fileData}`;
+      this.selectedImage = fileData;
       this.imageDialogVisible = true;
-      console.log(this.selectedImage)
     },
 
-    // 获取表格数据 
+    // 获取表格数据 s
     fetchData() {
       const params = {
         pageNum: this.currentPage, // 当前页码
-        pageSize: 10,   // 每页显示的数据量
+        pageSize: this.pageSize,   // 每页显示的数据量
         replyName: this.searchForm.replyName,
         statusList: this.searchForm.jobStatusList,  // 状态列表
-        startDate: this.searchForm.dateRange
-          ? new Date(this.searchForm.dateRange[0]).toISOString().slice(0, 10) // 只保留日期
+        startDate: this.searchForm.dateRange && this.searchForm.dateRange[0]
+          ? this.searchForm.dateRange[0]
           : null,
-        endDate: this.searchForm.dateRange
-          ? new Date(this.searchForm.dateRange[1]).toISOString().slice(0, 10) // 只保留日期
+        endDate: this.searchForm.dateRange && this.searchForm.dateRange[1]
+          ? this.searchForm.dateRange[1]
           : null,
-
+          loginInId:this.$store.state.user.id,
 
       };
+      console.log(params)
+
       this.$http({
         url: this.$http.adornUrl(`/job/repair/listRepairJob`),  // 接口地址
         method: 'post',              //  POST 请求
         data: params,                // 使用 data 传递参数
       }).then((response) => {
-        console.log(params)
         console.log(response)
         const data = response.data.data;  // 解析后端返回的分页数据
         this.tableData = data.list;       // 表格数据
