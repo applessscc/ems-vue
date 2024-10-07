@@ -42,7 +42,7 @@
           </template>
           <el-menu-item index="stop" @click="$router.push({ name: 'repair-index' })">
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">保修</span>
+            <span slot="title">报修</span>
           </el-menu-item>
         </el-submenu>
 

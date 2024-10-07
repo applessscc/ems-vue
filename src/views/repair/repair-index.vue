@@ -2,32 +2,33 @@
   <el-main>
     <!-- 报修统计 -->
     <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 40px">
-      <el-col :span="6" v-if="typeCon != '0'">
+      <el-col :span="6">
         <div class="show-header" style="background: #409EFF">
-          <div class="show-num">{{ readerCount }}</div>
+          <div class="show-num">{{ boardData.waitDealNum }}</div>
           <div class="bottom-text">待处理</div>
         </div>
       </el-col>
-      <el-col :span="6" v-if="typeCon != '0'">
+      <el-col :span="6">
         <div class="show-header" style="background: #67C23A">
-          <div class="show-num">{{ applyReader }}</div>
+          <div class="show-num">{{ boardData.waitFinishNum }}</div>
           <div class="bottom-text">待完成</div>
         </div>
       </el-col>
       <el-col :span="6">
         <div class="show-header" style="background: rgb(255,165,0">
-          <div class="show-num">{{ borrowApplyCount }}</div>
+          <div class="show-num">{{ boardData.waitConfirmNum }}</div>
           <div class="bottom-text">待确认</div>
         </div>
       </el-col>
       <el-col :span="6">
         <div class="show-header" style="background: #909399">
-          <div class="show-num">{{ borrowApplyCount }}</div>
+          <div class="show-num">{{ boardData.cancelNum }}</div>
           <div class="bottom-text">已取消</div>
         </div>
       </el-col>
     </el-row>
-    <repairListVue></repairListVue>
+    <repairListVue ref="repairList" @flshboardData="flshboardData"></repairListVue>
+
   </el-main>
 
 </template>
@@ -41,29 +42,45 @@ export default {
   },
   data() {
     return {
-      readerCount: 0,
-      applyReader: 0,
-      borrowApplyCount: 0,
-      borrowReturnCount: 0,
-      borrowReturnCount2: 0,
-      borrowReturnCount3: 0,
-      noticeList: [],
-      list: [1, 2, 3, 4, 11, 56],
-      roleType: '',
-      tableData: [
-        { name: '项目1', date: '2024-01-01', status: '完成' },
-        { name: '项目2', date: '2024-01-02', status: '处理中' },
-        { name: '项目3', date: '2024-01-03', status: '已确认' },
-      ],
-      roleId: '',
-      typeCon: ''
+      boardData: {
+        waitDealNum: 0,
+        waitFinishNum: 0,
+        waitConfirmNum: 0,
+        cancelNum: 0
+      }
+
+
     }
   },
   mounted() {
     // 这里可以添加获取表格数据的逻辑
-  },
+    this.fetchData()
+    this.$refs.repairList.fetchData(); // 调用子组件的方法
+    },
+
+  
   methods: {
-    // 其他方法
+    flshboardData(){
+      console.log("报修数据看板触发刷新数据")
+      this.fetchData()
+    },
+    fetchData() {
+      console.log("获取首页看板数据")
+      const params = {
+        userId: this.$store.state.user.id
+      };
+      this.$http({
+        url: this.$http.adornUrl(`/job/repair/getBoardData`),
+        method: 'get',
+        params: params
+      }).then((response) => {
+      console.log("获取首页看板数据成功", response);
+        const data = response.data.data;  
+        this.boardData = data;      
+      }).catch((error) => {
+        console.log('获取数据失败：', error);
+      });
+    },
   }
 }
 </script>
