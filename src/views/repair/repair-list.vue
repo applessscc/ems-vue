@@ -63,7 +63,7 @@
       </el-table-column>
 
       <el-dialog :visible.sync="imageDialogVisible" width="50%">
-        <img :src="`https://img-blog.csdnimg.cn/2021051521244130.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl81MzQ0Nzc3Ng==,size_16,color_FFFFFF,t_70`" alt="放大图片" style="width: 100%;">
+        <img :src="`data:image/jpeg;base64,${selectedImage}`" alt="放大图片">
       </el-dialog>
 
       <el-table-column label="操作" width="100">
