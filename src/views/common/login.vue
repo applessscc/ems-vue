@@ -15,7 +15,7 @@
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
-            <el-form-item prop="captcha">
+            <el-form-item prop="captcha" v-if="!isGuest">
               <el-row :gutter="20">
                 <el-col :span="14">
                   <el-input v-model="dataForm.captcha" placeholder="验证码">
@@ -29,6 +29,10 @@
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit()">登录</el-button>
             </el-form-item>
+             <el-form-item>
+              <el-button class="guest-login-btn" type="default" @click="guestLogin" v-show="true">游客登录</el-button> <!-- 新增: 游客登录按钮 -->
+            </el-form-item>
+
           </el-form>
         </div>
       </div>
@@ -45,7 +49,9 @@
           userName: '',
           password: '',
           uuid: '',
-          captcha: ''
+          captcha: '',
+          isGuest: false // 新增: 用于区分是否是游客登录
+
         },
         dataRule: {
           userName: [
@@ -75,11 +81,16 @@
               data: this.$http.adornData({
                 'username': this.dataForm.userName,
                 'password': this.dataForm.password,
-                'uuid': this.dataForm.uuid,
-                'captcha': this.dataForm.captcha
+                'uuid': this.isGuest ? '' : this.dataForm.uuid, // 修改: 游客登录时不传 uuid
+                'captcha': this.isGuest ? '' : this.dataForm.captcha, // 修改: 游客登录时不传验证码
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
+                this.$message({
+                message: '登录成功',
+                type: 'success',
+                duration: 1500
+              });
                 this.$cookie.set('token', data.token)
                 this.$router.replace({ name: 'home' })
               } else {
@@ -92,10 +103,21 @@
       },
       // 获取验证码
       getCaptcha () {
-        this.dataForm.uuid = getUUID()
-        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
-      }
+        if (!this.isGuest) {  // 修改: 游客登录时不需要获取验证码
+          this.dataForm.uuid = getUUID()
+          this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+        }
+      },
+      // 游客登录
+      guestLogin () {  // 新增: 游客登录方法
+        this.isGuest = true
+        this.dataForm.userName = 'guest' // 新增: 固定游客用户名
+        this.dataForm.password = 'guest' // 新增: 固定游客密码
+        this.$nextTick(() => {
+        this.dataFormSubmit() // 等待 Vue 数据更新后再提交表单
+        })     
     }
+  }
   }
 </script>
 
@@ -174,5 +196,8 @@
       width: 100%;
       margin-top: 38px;
     }
+    .guest-login-btn {
+
+        width: 100%;    }
   }
 </style>
