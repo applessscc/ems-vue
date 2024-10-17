@@ -21,6 +21,9 @@ const globalRoutes = [
   { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } },
   { path: '/equipment/electricity', component: _import('equipment/electricity'), name: 'electricity', meta: { title: 'CMS 能耗看板' } },
   { path: '/equipment/electricity-his', component: _import('equipment/electricity-his'), name: 'electricity-his', meta: { title: 'CMS 能耗历史查询' } },
+
+  { path: '/repair/repair-kanban', component: _import('repair/repair-kanban'), name: 'repair-kanban', meta: { title: '维修任务看板' } },
+
   { path: '/equipment/transformer-his', component: _import('equipment/transformer-his'), name: 'transformer-his', meta: { title: '变压器能耗历史查询' } },
   { path: '/equipment/global', component: _import('equipment/global'), name: 'global', meta: { title: '3D 地球' } },
   { path: '/equipment/map', component: _import('equipment/map'), name: 'map', meta: { title: '地图' } },

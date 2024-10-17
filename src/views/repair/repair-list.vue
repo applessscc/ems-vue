@@ -11,6 +11,7 @@
           <el-option label="已完成" value="4"></el-option>
           <el-option label="已确认" value="5"></el-option>
           <el-option label="已取消" value="6"></el-option>
+          <el-option label="关闭" value="7"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="申请时间">
@@ -27,31 +28,38 @@
       申请报修
     </el-button>
 
+    <el-button type="primary" @click="openNew('repair/repair-kanban')">
+      维修任务看板
+    </el-button>
+
     <el-table :data="tableData" style="width: 100%">
       <el-table-column fixed label="序号" width="50">
         <template slot-scope="scope">
-    {{ (scope.$index + 1) + (currentPage - 1) * pageSize }}
+          {{ (scope.$index + 1) + (currentPage - 1) * pageSize }}
         </template>
       </el-table-column>
-      <el-table-column label="任务状态" width="130">
+      <el-table-column label="任务状态" width="120">
         <template slot-scope="scope">
           {{ getJobStatusName(scope.row.status) }}
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="申请时间" width="150">
+      
+            <el-table-column prop="equipment" label="设备号" width="100">
+      </el-table-column>
+      <el-table-column prop="createTime" label="申请时间" width="140">
       </el-table-column>
       <el-table-column label="故障位置" width="130">
         <template slot-scope="scope">
           {{scope.row.floor+'-'+scope.row.corridor+'-'+scope.row.position}}
         </template>
       </el-table-column>
-      <el-table-column prop="proposerName" label="申请人" width="130">
+      <el-table-column prop="proposerName" label="申请人" width="100">
       </el-table-column>
-      <el-table-column prop="handlerName" label="处理人" width="130">
+      <el-table-column prop="handlerName" label="处理人" width="100">
       </el-table-column>
-      <el-table-column prop="description" label="描述" width="280">
+      <el-table-column prop="description" label="描述" width="250">
       </el-table-column>
-      <el-table-column prop="remark" label="备注" width="140">
+      <el-table-column prop="remark" label="备注" width="120">
       </el-table-column>
 
       <el-table-column label="图片" width="320">
@@ -62,52 +70,98 @@
         </template>
       </el-table-column>
 
-      <el-dialog :visible.sync="imageDialogVisible" width="50%">
-        <img :src="`data:image/jpeg;base64,${selectedImage}`" alt="放大图片">
-      </el-dialog>
-
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消任务
-          </el-button>
-          <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'deal')" v-if="scope.row.status === 1" style="color: #4CAF50;">
-            开始处理
-          </el-button>
-          <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2">
-            完成
-          </el-button>
-
-          <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'confirm')" v-else-if="scope.row.status === 4">
-            确认
-          </el-button>
-          <!-- <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'delete')" v-else>
-            删除
-          </el-button> -->
+          <div>
+            <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消任务
+            </el-button>
+          </div>
+          <div>
+            <el-button type="text" @click="dealJob(scope.row)" v-if="scope.row.status === 1" style="color: #4CAF50;">开始处理
+            </el-button>
+            <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2">完成
+            </el-button>
+            <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'confirm')" v-else-if="scope.row.status === 4">确认
+            </el-button>
+              <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'close')" v-else-if="scope.row.status === 5">关闭
+            </el-button>
+          </div>
         </template>
       </el-table-column>
 
     </el-table>
+    <el-dialog :visible.sync="imageDialogVisible" width="50%">
+      <el-image :src="`data:image/jpeg;base64,${selectedImage}`" alt="放大图片" fit="cover" style="width: 100%; height: auto;"></el-image>
+    </el-dialog>
 
     <!-- 分页组件 -->
-    <el-pagination background layout="total, sizes, prev, pager, next, jumper" 
-                   :total="totalItems" 
-                   :page-sizes="[10, 20, 50, 100]" 
-                   :page-size="pageSize" 
-                   :current-page.sync="currentPage" 
-                   @current-change="handlePageChange"
-                   @size-change="handleSizeChange"
-                   
-                   >
+    <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="totalItems" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :current-page.sync="currentPage" @current-change="handlePageChange"
+      @size-change="handleSizeChange">
     </el-pagination>
 
     <!-- 申请维修组件 -->
     <repairReplyVue :visible="applyVisible" @handleClose="handleClose" @handleSubmit="handleSubmit"></repairReplyVue>
+
+    <!-- 处理对话框 -->
+    <el-dialog title="任务处理" :visible="dealJobOperation" width="50%" center>
+
+      <!-- 描述列表 -->
+      <div class="dealJob-table-container">
+        <el-descriptions title="任务信息" :column="3" border v-if="dealJobData.row">
+          <el-descriptions-item label="任务状态">{{getJobStatusName(dealJobData.row.status)}}</el-descriptions-item>
+                   <el-descriptions-item label="设备号">{{dealJobData.row.equipment}}</el-descriptions-item>
+
+          <el-descriptions-item label="申请时间">{{dealJobData.row.createTime}}</el-descriptions-item>
+                    <el-descriptions-item label="发生时间">{{dealJobData.row.eventTime}}</el-descriptions-item>
+
+          <el-descriptions-item label="故障位置">{{dealJobData.row.floor+'-'+dealJobData.row.corridor+'-'+dealJobData.row.position}}</el-descriptions-item>
+          <el-descriptions-item label="申请人">{{dealJobData.row.proposerName}}</el-descriptions-item>
+          <el-descriptions-item label="描述">{{dealJobData.row.description}}</el-descriptions-item>
+          <el-descriptions-item label="备注">{{dealJobData.row.remark}}</el-descriptions-item>
+                    <el-descriptions-item label="严重程度">{{getSeverityName(dealJobData.row.severity)}}</el-descriptions-item>
+
+          <el-descriptions-item label="发生频率">{{getfrequencyName(dealJobData.row.frequency)}}</el-descriptions-item>
+          <el-descriptions-item label="图片">
+            <div style="display: flex; gap: 5px; justify-content: center;">
+              <img v-for="(img, index) in dealJobData.row.imagesList" :key="index" :src="`data:image/jpeg;base64,${img.fileData}`" alt="图片" style="width: 120px; height: auto; cursor: pointer;" @click="showImage(img.fileData)">
+            </div>
+          </el-descriptions-item>
+
+        </el-descriptions>
+      </div>
+      <el-divider></el-divider>
+      <!-- 表单 -->
+      <div class="dealJob-form-container" v-if="dealJobData.row">
+        <el-form label-width="80px" :model="dealJobFormData" ref="dealJobFormData">
+          <el-form-item label="备注">
+            <span>
+              <el-input v-model="dealJobFormData.remark"></el-input>
+            </span>
+          </el-form-item>
+          <el-form-item>
+            <el-upload class="upload-demo" :action="uploadAction" :on-success="handleSuccess" :on-error="handleError" :file-list="fileList" :data="uploadData()" list-type="picture">
+              <el-button size="small" type="primary">上传图片</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10m</div>
+            </el-upload>
+          </el-form-item>
+
+        </el-form>
+
+      </div>
+
+      <div class="dealJob-footer-container">
+        <span>
+          <el-button @click="dealJobCancel">取 消</el-button>
+          <el-button type="primary" @click="dealJobConfirm(dealJobData.row)">确 定</el-button>
+        </span>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import repairReplyVue from './repair-reply.vue';
-
 
 export default {
   mounted() {
@@ -120,6 +174,26 @@ export default {
   },
   data() {
     return {
+      // 上传的图片列表
+      fileList: [],
+
+      // 图片伤处地址
+      uploadAction: this.$http.adornUrl(`/job/repair/uploadDealImage?token=${this.$cookie.get('token')}`),
+
+      //  处理状态表单
+      dealJobFormData: {
+        remark: '',
+      },
+
+      // 处理对话框属性
+      dealJobData: {
+        row: null,
+        // 这里的createTime当做uuid
+        operationTime: null
+      },
+
+      // 处理状态对话框
+      dealJobOperation: false,
 
       // 查看图片对话框
       imageDialogVisible: false,
@@ -130,7 +204,6 @@ export default {
 
       // 表格数据
       tableData: [],
-
       // 搜索
       searchForm: {
         replyName: null,
@@ -148,8 +221,96 @@ export default {
   },
 
   methods: {
+
+
+    initDealJobForm() {
+      this.fileList = [];
+      this.dealJobData.row = null;
+      this.dealJobData.operationTime = null;
+      this.dealJobFormData.remark = '';
+    },
+    dealJobConfirm(row) {
+      this.jobOperation(row.id, row.jobId, "deal");
+      //调接口处理操作
+      const params = {
+        repairId: row.id,
+        jobId: row.jobId,
+        handlerId: this.$store.state.user.id,
+        remark: this.dealJobFormData.remark,
+        operationTime: this.dealJobData.operationTime,
+        operationType:"deal"
+      };
+      console.log("调接口处理操作params",params)
+      this.$http({
+        url: this.$http.adornUrl(`/job/repair/dealJob`),  // 接口地址
+        method: 'post',              // 改为 POST 请求
+        data: params,                // 使用 data 传递参数
+      }).then((response) => {
+        this.fetchData()
+        this.$emit('flshboardData'); // 通知父组件刷新数据
+        this.$message({
+          message: '操作成功',
+          type: 'success',
+          duration: 1000
+        });
+        this.initDealJobForm()
+        this.dealJobOperation = false
+
+      }).catch((error) => {
+        console.log('操作任务状态失败：', error);
+      });
+
+    },
+
+    // 图片上传入参
+    uploadData() {
+      if (!this.dealJobData.operationTime) {
+        this.dealJobData.operationTime = Date.now()
+      }
+      return {
+        jobId: this.dealJobData.row.jobId,
+        operationTime: this.dealJobData.operationTime,
+      };
+    },
+
+    // 图片上传失败回调
+    handleError(error, file, fileList) {
+      this.$message.error('图片上传失败!');
+    },
+
+    // 图片上传成功回调
+    handleSuccess(response, file, fileList) {
+      console.log("图片上传成功!");
+      this.$message.success('图片上传成功!');
+      this.fileList = fileList;  // 更新文件列表
+    },
+
+    dealJob(row) {
+      this.initDealJobForm()
+      this.dealJobData.row = row;
+      this.dealJobOperation = true
+
+    },
+
+
+    // 处理状态对话框开发时执行的方法
+    handleOpen() {
+      this.initDealJob();
+    },
+
+    dealJobCancel() {
+      this.dealJobOperation = false
+
+    },
+
+
+
+    openNew(path) {
+      let newUrl = this.$router.resolve({ path: path });
+      window.open(newUrl.href, '_blank');
+    },
     //分页插件每页显示的条数发生改变时
-    handleSizeChange(newSize){
+    handleSizeChange(newSize) {
       this.pageSize = newSize;
       this.fetchData();
     },
@@ -173,7 +334,7 @@ export default {
         endDate: this.searchForm.dateRange && this.searchForm.dateRange[1]
           ? this.searchForm.dateRange[1]
           : null,
-          loginInId:this.$store.state.user.id,
+        loginInId: this.$store.state.user.id,
 
       };
       console.log(params)
@@ -199,7 +360,37 @@ export default {
       this.fetchData(); // 切换页码时重新获取数据
     },
 
-    getJobStatusName(jobStatusCode) {
+
+
+
+    getSeverityName(code) {
+      if (code == 1) {
+        return "轻微"
+      } else if (code == 2) {
+        return "中等"
+      } else if (code == 4) {
+        return "非常严重"
+      } else if (code == 5) {
+        return "极其严重"
+      } else {
+        return "未知状态"
+      }
+    },
+
+        getfrequencyName(code) {
+      if (code == 1) {
+        return "极少"
+      } else if (code == 2) {
+        return "经常"
+      } else if (code == 4) {
+        return "偶尔"
+      } else if (code == 5) {
+        return "不定期"
+      }  else {
+        return "未知状态"
+      }
+    },
+        getJobStatusName(jobStatusCode) {
       if (jobStatusCode == 1) {
         return "待处理"
       } else if (jobStatusCode == 2) {
@@ -210,7 +401,9 @@ export default {
         return "已确认"
       } else if (jobStatusCode == 6) {
         return "已取消"
-      } else {
+      } else if (jobStatusCode == 7) {
+        return "关闭"
+      }else {
         return "未知状态"
       }
     },
@@ -294,6 +487,18 @@ export default {
       }
     `;
     document.head.appendChild(style);
+
+
   }
 }
 </script>
+<style >
+.dealJob-footer-container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+}
+.dealJob-table-container {
+}
+.dealJob-form-container {
+}
+</style>

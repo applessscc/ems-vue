@@ -1,51 +1,53 @@
 <template>
+
   <el-main>
+          <!-- 描述列表 -->
     <!-- 报修统计 -->
     <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 40px">
-      <el-col :span="8">
+      <el-col :span="6">
 
         <div class="show-header" style="background: #409EFF">
           <div class="show-num">{{ boardData.waitDealNum }}</div>
           <div class="bottom-text">待处理</div>
         </div>
 
-        <div class="show-header" style="background: rgb(255,165,0)">
+      </el-col>
+
+      <el-col :span="6">  
+
+        <div class="show-header" style="background: rgb(255,165,0">
           <div class="show-num">{{ boardData.waitConfirmNum }}</div>
           <div class="bottom-text">待确认</div>
         </div>
-
       </el-col>
-      <el-col :span="8">
+
+      <el-col :span="6">
 
         <div class="show-header" style="background: #67C23A">
           <div class="show-num">{{ boardData.waitFinishNum }}</div>
           <div class="bottom-text">待完成</div>
         </div>
 
+      </el-col>
+
+      <el-col :span="6">
+
         <div class="show-header" style="background: #909399">
           <div class="show-num">{{ boardData.cancelNum }}</div>
           <div class="bottom-text">已取消</div>
         </div>
-
-      </el-col>
-
-      <!-- 饼图 -->
-      <el-col :span="8" class="chart">
-        <div ref="chart" style="width: 330px; height: 180px;"></div>
       </el-col>
 
     </el-row>
 
-    <!-- 列表 -->
     <repairListVue ref="repairList" @flshboardData="flshboardData"></repairListVue>
 
   </el-main>
 
 </template>
-
-<script>
-import repairListVue from './repair-list.vue'
-import * as echarts from 'echarts';
+  
+  <script>
+import repairListVue from './repair-kanbanList.vue'
 
 export default {
   name: 'Dashboard',
@@ -74,65 +76,18 @@ export default {
     // 这里可以添加获取表格数据的逻辑
     this.fetchData()
     this.$refs.repairList.fetchData(); // 调用子组件的方法
-
-    // 饼图
-    // 创建一个 ECharts 实例
-    this.chart = echarts.init(this.$refs.chart)
-
-
   },
 
 
   methods: {
-    getOption() {
-      return {
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          top: '5%',
-          left: 'center'
-        },
-        series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            radius: ['25%', '65%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2
-            },
-            label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 15,
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data: [
-              { value: this.boardData.waitDealNum, name: '待处理' },
-              { value: this.boardData.waitFinishNum, name: '待完成' },
-              { value: this.boardData.waitConfirmNum, name: '待确认' },
-              { value: this.boardData.cancelNum, name: '已取消' },
-            ]
-          }
-        ]
-      };
-    },
 
+    // 刷新看板
     flshboardData() {
       console.log("报修数据看板触发刷新数据")
       this.fetchData()
     },
+
+    // 获取看板数据
     fetchData() {
       console.log("获取首页看板数据")
       const params = {
@@ -146,18 +101,15 @@ export default {
         console.log("获取首页看板数据成功", response);
         const data = response.data.data;
         this.boardData = data;
-
-        // 在 ECharts 实例中配置图表
-        this.chart.setOption(this.getOption())
       }).catch((error) => {
         console.log('获取数据失败：', error);
       });
     },
   }
 }
-</script>
-
-<style lang="scss" scoped>
+  </script>
+  
+  <style lang="scss" scoped>
 .bottom-text {
   bottom: 0;
   width: 100%;
@@ -178,6 +130,9 @@ export default {
   margin-bottom: 15px;
 }
 .chart {
+  background: #00c0ef;
+
+  height: 250px;
 }
 
 .show-num {
@@ -188,3 +143,4 @@ export default {
   justify-content: center;
 }
 </style>
+  
