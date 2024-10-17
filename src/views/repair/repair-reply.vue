@@ -1,19 +1,36 @@
 <template>
-  <el-dialog :title="'申请报修'" :close-on-click-modal="false" :visible.sync="dialogVisible" @open="handleOpen" @close="handleClose" width="30%">
+  <el-dialog :title="'任务申请'" :close-on-click-modal="false" :visible.sync="dialogVisible" @open="handleOpen" @close="handleClose" width="30%">
     <div>
       <el-form :model="dataForm" ref="dataForm" :rules="dataRule" @keyup.enter.native="handSubmit()" label-width="100px">
-        <el-form-item label="维修类型" prop="repairType">
-          <el-select v-model="dataForm.repairType" style="width:100%" placeholder="维修类型">
+        <el-form-item label="任务类型" prop="repairType">
+          
+          <el-select v-model="dataForm.repairType" style="width:100%" placeholder="任务类型">
             <el-option v-for="op in type" :key="op.item" :label="op.value" :value="op.item" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="申请部门" prop="department">
-          <el-input v-model="dataForm.department" placeholder="申请部门"></el-input>
+
         </el-form-item>
 
-        <!-- <el-row> -->
-        <!-- <el-col :span="6"> -->
-        <el-form-item label="楼层" prop="floor" style="width: 180px;" filterable>
+        <el-form-item label="严重程度" prop="severity"> <!-- 新增: 严重程度 -->
+          <el-select v-model="dataForm.severity" style="width:100%" placeholder="严重程度">
+            <el-option v-for="op in severityOptions" :key="op.item" :label="op.value" :value="op.item" />
+          </el-select>
+        </el-form-item>
+
+         <el-form-item label="发生时间" prop="eventTime"> <!-- 修改: 将时间选择器设置为日期时间 -->
+          <el-date-picker v-model="dataForm.eventTime" type="datetime" placeholder="选择日期和时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        </el-form-item>
+
+        <el-form-item label="频率" prop="frequency"> <!-- 新增: 频率 -->
+          <el-select v-model="dataForm.frequency" style="width:100%" placeholder="发生频率">
+            <el-option v-for="op in frequencyOptions" :key="op.item" :label="op.value" :value="op.item" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="设备号" prop="equipment">
+          <el-input v-model="dataForm.equipment" placeholder="设备号"></el-input>
+        </el-form-item>
+
+        <el-form-item label="楼层" prop="floor">
           <el-select v-model="dataForm.floor" placeholder="">
             <el-option label="b91f" value="b91f"></el-option>
             <el-option label="b92f" value="b92f"></el-option>
@@ -21,20 +38,14 @@
             <el-option label="b94f" value="b94f"></el-option>
           </el-select>
         </el-form-item>
-        <!-- </el-col> -->
 
-        <!-- <el-col :span="8"> -->
         <el-form-item label="位" prop="corridor">
-          <el-input v-model="dataForm.corridor"></el-input>
+          <el-input v-model="dataForm.corridor" placeholder="请输入位"></el-input>
         </el-form-item>
-        <!-- </el-col> -->
 
-        <!-- <el-col :span="8"> -->
         <el-form-item label="具体位置" prop="position">
-          <el-input v-model="dataForm.position"></el-input>
+          <el-input v-model="dataForm.position" placeholder="具体位置"></el-input>
         </el-form-item>
-        <!-- </el-col>
-        </el-row> -->
 
         <el-form-item label="描述" prop="description">
           <el-input v-model="dataForm.description" placeholder="描述" type="textarea"></el-input>
@@ -45,20 +56,11 @@
         </el-form-item>
 
         <el-form-item>
-          <el-upload class="upload-demo" 
-          :action="uploadAction" 
-          :on-preview="handlePreview" 
-          :on-remove="handleRemove" 
-          :on-success="handleSuccess" 
-          :on-error="handleError" 
-          :file-list="fileList" 
-          :data="uploadData()"
-           list-type="picture">
+          <el-upload class="upload-demo" :action="uploadAction" :on-preview="handlePreview" :on-remove="handleRemove" :on-success="handleSuccess" :on-error="handleError" :file-list="fileList" :data="uploadData()" list-type="picture">
             <el-button size="small" type="primary">上传图片</el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过10m</div>
           </el-upload>
         </el-form-item>
-
       </el-form>
 
       <div class="footer-container">
@@ -81,29 +83,39 @@ export default {
   },
   data() {
     return {
-      // 上传的图片列表
       fileList: [],
-      // 上传图片的jobid
       jobId: '',
-      // 上传图片的路径
-
-              
-      uploadAction: this.url = this.$http.adornUrl(`/job/repair/uploadImage?token=${this.$cookie.get('token')}`),
+      uploadAction: this.$http.adornUrl(`/job/repair/uploadImage?token=${this.$cookie.get('token')}`),
       dialogVisible: this.visible,
-      optionsCode: { 'bu_name': '1001', 'position_name': '1002', 'counter_type': '1003', 'counter_id': '1004' },
       type: [
-        { item: '1', value: '我是维修类型1' },
-        { item: '2', value: '我是维修类型2' },
-        { item: '3', value: '我是维修类型3' }
+        { item: '1', value: '维修类型1' },
+        { item: '2', value: '维修类型2' },
+        { item: '3', value: '维修类型3' }
+      ],
+      severityOptions: [  // 新增: 严重程度选项
+      { item: '1', value: '轻微' },
+      { item: '2', value: '中等' },
+      { item: '3', value: '严重' },
+      { item: '4', value: '非常严重' },
+      { item: '5', value: '极其严重' }
+      ],
+      frequencyOptions: [  // 新增: 频率选项
+      { item: '1', value: '极少' },
+      { item: '2', value: '经常' },
+      { item: '3', value: '偶尔' },
+      { item: '4', value: '不定期' }
       ],
       dataForm: {
         repairType: null,
+        severity: null,  // 新增: 严重程度
+        frequency: null,  // 新增: 频率
         department: null,
         floor: null,
         corridor: null,
         position: null,
         description: null,
         remark: null,
+        eventTime: new Date()
       },
       dataRule: {
         department: [
@@ -120,8 +132,13 @@ export default {
         ],
         description: [
           { required: true, message: '描述不能为空', trigger: 'blur' }
+        ],
+        severity: [  // 新增: 严重程度的验证规则
+          { required: true, message: '严重程度不能为空', trigger: 'blur' }
+        ],
+        frequency: [  // 新增: 频率的验证规则
+          { required: true, message: '频率不能为空', trigger: 'blur' }
         ]
-
       }
     };
   },
@@ -133,34 +150,35 @@ export default {
   methods: {
     initDataForm() {
       this.dataForm.repairType = null;
-      this.dataForm.department = null
-      this.dataForm.floor = null
-      this.dataForm.corridor = null
-      this.dataForm.position = null
-      this.dataForm.description = null
-      this.dataForm.remark = null
+      this.dataForm.severity = null;  // 新增: 清空严重程度
+      this.dataForm.frequency = null;  // 新增: 清空频率
+      this.dataForm.department = null;
+      this.dataForm.floor = null;
+      this.dataForm.corridor = null;
+      this.dataForm.position = null;
+      this.dataForm.description = null;
+      this.dataForm.remark = null;
+      this.dataForm.eventTime = null; // 新增: 清空发生时间
       this.fileList = [];
-      this.jobId = null
+      this.jobId = null;
     },
 
     handleOpen() {
-      this.initDataForm()
+      this.initDataForm();
       this.jobId = Date.now();
     },
     handleClose() {
-      this.$emit('handleClose')
+      this.$emit('handleClose');
     },
     handleCancel() {
-      this.initDataForm()
-      this.handleClose()
+      this.initDataForm();
+      this.handleClose();
     },
 
     handleRemove(file, fileList) {
       console.log("点击了删除图片");
-
       console.log(file);
-            console.log(fileList);
-
+      console.log(fileList);
     },
     handlePreview(file) {
       console.log(file);
@@ -170,16 +188,14 @@ export default {
       this.$message.success('图片上传成功!');
       this.fileList = fileList;  // 更新文件列表
     },
-    // 上传失败后的处理
     handleError(error, file, fileList) {
       this.$message.error('图片上传失败!');
     },
-    // 上传图片的额外数据jobid
     uploadData() {
       if (!this.jobId) {
         this.jobId = Date.now();
       }
-      return { jobId: this.jobId};
+      return { jobId: this.jobId };
     },
 
     handSubmit() {
@@ -192,16 +208,20 @@ export default {
             url: this.$http.adornUrl(`/job/repair/reply`),
             method: 'post',
             data: this.$http.adornData({
-              'jobId': this.jobId,
-              'department': this.dataForm.department,
-              'type': this.dataForm.repairType,
-              'description': this.dataForm.description,
-              'remark': this.dataForm.remark,
-              'floor': this.dataForm.floor,
-              'corridor': this.dataForm.corridor,
-              'position': this.dataForm.position,
-              'proposerId':this.$store.state.user.id,
-              'handlerId':this.$store.state.user.id
+              jobId: this.jobId,
+              department: this.dataForm.department,
+              type: this.dataForm.repairType,
+              severity: this.dataForm.severity, // 新增: 提交严重程度
+              frequency: this.dataForm.frequency, // 新增: 提交频率
+              description: this.dataForm.description,
+              remark: this.dataForm.remark,
+              floor: this.dataForm.floor,
+              corridor: this.dataForm.corridor,
+              position: this.dataForm.position,
+              eventTime: this.dataForm.eventTime, // 新增: 提交发生时间
+              proposerId: this.$store.state.user.id,
+              handlerId: this.$store.state.user.id,
+              equipment: this.dataForm.equipment
             })
           }).then(({ data }) => {
             if (data && data.code === 200) {
@@ -215,7 +235,7 @@ export default {
                 }
               });
             } else {
-              console.error(data)
+              console.error(data);
               this.$message.error("提交失败");
             }
           }).catch(error => {
@@ -226,11 +246,9 @@ export default {
         }
       });
     }
-
   }
 }
 </script>
-
 
 <style>
 .footer-container {
