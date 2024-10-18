@@ -15,7 +15,7 @@
 
       <el-col :span="6">  
 
-        <div class="show-header" style="background: rgb(255,165,0">
+        <div class="show-header" style="background: #FFA500">
           <div class="show-num">{{ boardData.waitConfirmNum }}</div>
           <div class="bottom-text">待确认</div>
         </div>
@@ -32,7 +32,7 @@
 
       <el-col :span="6">
 
-        <div class="show-header" style="background: #909399">
+        <div class="show-header" style="background: #FF4D4D">
           <div class="show-num">{{ boardData.cancelNum }}</div>
           <div class="bottom-text">已取消</div>
         </div>

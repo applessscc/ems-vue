@@ -1,7 +1,8 @@
 <template>
   <div>
-    <div class="scroll-container">
-<el-table :data="tableData" style="width: 100%" :row-class-name="rowhighlight" class="listTable" >
+
+
+    <el-table :data="[]" style="width: 100%" :row-class-name="rowhighlight" class="listTable"   >
         <el-table-column fixed label="序号" width="100">
           <template slot-scope="scope">
             {{ scope.$index }}
@@ -12,6 +13,47 @@
             {{ getJobStatusName(scope.row.status) }}
           </template>
         </el-table-column>
+      
+            <el-table-column prop="equipment" label="设备号" width="100">
+
+            </el-table-column>
+
+        <el-table-column prop="createTime" label="申请时间" width="220">
+        </el-table-column>
+        <el-table-column label="故障位置" width="160">
+          <template slot-scope="scope">
+            {{scope.row.floor+'-'+scope.row.corridor+'-'+scope.row.position}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="proposerName" label="申请人" width="130">
+        </el-table-column>
+        <el-table-column prop="handlerName" label="处理人" width="130">
+        </el-table-column>
+        <el-table-column prop="description" label="描述" width="280">
+        </el-table-column>
+        <el-table-column prop="remark" label="备注" width="140">
+        </el-table-column>
+        <el-table-column label="图片" width="400">
+        </el-table-column>
+      </el-table>
+
+
+    <div class="scroll-container">
+<el-table :data="tableData" style="width: 100%" :row-class-name="rowhighlight" class="listTable" :show-header="false">
+        <el-table-column fixed label="序号" width="100">
+          <template slot-scope="scope">
+            {{ scope.$index }}
+          </template>
+        </el-table-column>
+        <el-table-column label="任务状态" width="150">
+          <template slot-scope="scope">
+            {{ getJobStatusName(scope.row.status) }}
+          </template>
+        </el-table-column>
+
+                <el-table-column prop="equipment" label="设备号" width="100">
+              
+            </el-table-column>
         <el-table-column prop="createTime" label="申请时间" width="220">
         </el-table-column>
         <el-table-column label="故障位置" width="160">
@@ -162,7 +204,9 @@ export default {
         return "已确认"
       } else if (jobStatusCode == 6) {
         return "已取消"
-      } else {
+      }  else if (jobStatusCode == 7) {
+        return "关闭"
+      }else {
         return "未知状态"
       }
     },
@@ -239,9 +283,16 @@ export default {
   max-height: 100vh; 
   /* 启用垂直滚动 */
   overflow-y: auto;  
+   /* margin: 0;  */
+  /* padding: 0;  */
 }
 
 .listTable{
+}
+
+/* 隐藏表格的提示信息 */
+.el-table__empty-block {
+  display: none;
 }
 </style>
 

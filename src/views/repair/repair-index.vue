@@ -9,7 +9,7 @@
           <div class="bottom-text">待处理</div>
         </div>
 
-        <div class="show-header" style="background: rgb(255,165,0)">
+        <div class="show-header" style="background: #FFA500">
           <div class="show-num">{{ boardData.waitConfirmNum }}</div>
           <div class="bottom-text">待确认</div>
         </div>
@@ -22,7 +22,7 @@
           <div class="bottom-text">待完成</div>
         </div>
 
-        <div class="show-header" style="background: #909399">
+        <div class="show-header" style="background:#FF4D4D">
           <div class="show-num">{{ boardData.cancelNum }}</div>
           <div class="bottom-text">已取消</div>
         </div>
@@ -31,7 +31,7 @@
 
       <!-- 饼图 -->
       <el-col :span="8" class="chart">
-        <div ref="chart" style="width: 330px; height: 180px;"></div>
+        <div ref="chart" style="width: 349px; height: 180px;"></div>
       </el-col>
 
     </el-row>
@@ -97,7 +97,7 @@ export default {
           {
             name: 'Access From',
             type: 'pie',
-            radius: ['25%', '65%'],
+            radius: ['25%', '70%'],
             avoidLabelOverlap: false,
             itemStyle: {
               borderRadius: 10,
@@ -178,7 +178,12 @@ export default {
   margin-bottom: 15px;
 }
 .chart {
+
+    display: flex;
+  justify-content: center;
+  align-items: center; /* 垂直居中对齐饼图 */
 }
+
 
 .show-num {
   font-size: 38px;
