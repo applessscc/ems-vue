@@ -104,14 +104,13 @@ export default {
           trigger: 'item'
         },
         legend: {
-                    orient: "vertical", //图例的显示方式  默认横向显示 horizontal  vertical
-                             itemWidth: 14, //图例颜色块的宽度和高度
-         itemHeight: 14,
-
+          orient: "vertical", //图例的显示方式  默认横向显示 horizontal  vertical
+          itemWidth: 14, //图例颜色块的宽度和高度
+          itemHeight: 14,
 
           top: '5%',
           right: '70%',
-                  color: ['#696969', '#5470c6', '#91cd77', '#ef6567', '#f9c956', '#75bedc','#ccc'],// 饼图各块颜色
+          color: ['#409EFF', '#FFA500', '#FFD700', '#FF4D4D', '#67C23A', '#B0B0B0'], // 图例的颜色和饼图颜色一致
 
         },
         series: [
@@ -141,14 +140,24 @@ export default {
             },
             data: [
               { value: this.boardData.waitDealNum, name: '待处理' },
-              { value: this.boardData.waitFinishNum, name: '待完成' },
               { value: this.boardData.waitConfirmNum, name: '待确认' },
-              { value: this.boardData.cancelNum, name: '已取消' },
               { value: this.boardData.timeOutNum, name: '超时' },
               { value: this.boardData.severityNum, name: '紧急待处理' },
+              { value: this.boardData.waitFinishNum, name: '待完成' },
+              { value: this.boardData.cancelNum, name: '已取消' },
 
 
-            ]
+            ],
+            itemStyle: {
+            borderRadius: 5,        
+            borderColor: '#fff',
+            borderWidth: 2,
+
+              color: (params) => {
+                const colorList = ['#409EFF', '#FFA500', '#FFD700', '#FF4D4D', '#67C23A', '#B0B0B0'];
+                return colorList[params.dataIndex]; // 根据数据索引返回相应的颜色
+              }
+            }
           }
         ]
       };

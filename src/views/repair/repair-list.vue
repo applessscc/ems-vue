@@ -32,7 +32,7 @@
       任务看板
     </el-button>
 
-    <el-table :data="tableData" style="width: 100%" @row-click="handleRowClick">
+    <el-table :data="tableData" style="width: 100%" @row-click="handleRowClick" v-loading="loading">
       <el-table-column fixed label="序号" width="50">
         <template slot-scope="scope">
           {{ (scope.$index + 1) + (currentPage - 1) * pageSize }}
@@ -73,11 +73,15 @@
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
           <div>
+            <el-button type="text" @click.stop="$router.push({ name: 'repair-jobDetail', query: { jobId: scope.row.jobId } })">查看</el-button>
+
+          </div>
+          <div>
             <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消任务
             </el-button>
           </div>
           <div>
-            <el-button type="text" @click.stop="dealJob(scope.row)" v-if="scope.row.status === 1" style="color: #4CAF50;">开始处理
+            <el-button type="text" @click.stop="dealJob(scope.row)" v-if="scope.row.status === 1">开始处理
             </el-button>
             <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2">完成
             </el-button>
@@ -87,8 +91,6 @@
             </el-button>
           </div>
           <div>
-
-            <el-button type="text" @click.stop="$router.push({ name: 'repair-jobDetail', query: { jobId: scope.row.jobId } })">查看</el-button>
 
           </div>
         </template>
@@ -176,6 +178,9 @@ export default {
   },
   data() {
     return {
+      buttonDisabled: false,
+
+      loading: true,
       // 上传的图片列表
       fileList: [],
 
@@ -225,9 +230,9 @@ export default {
   methods: {
 
 
-handleRowClick(row){
-    this.$router.push({ name: 'repair-jobDetail', query: { jobId: row.jobId } });
-},
+    handleRowClick(row) {
+      this.$router.push({ name: 'repair-jobDetail', query: { jobId: row.jobId } });
+    },
     initDealJobForm() {
       this.fileList = [];
       this.dealJobData.row = null;
@@ -235,6 +240,8 @@ handleRowClick(row){
       this.dealJobFormData.remark = '';
     },
     dealJobConfirm(row) {
+      this.buttonDisabled = true;
+
       //调接口处理操作
       const params = {
         repairId: row.id,
@@ -259,8 +266,15 @@ handleRowClick(row){
         });
         this.initDealJobForm()
         this.dealJobOperation = false
+        this.buttonDisabled = false;
 
       }).catch((error) => {
+        this.buttonDisabled = false;
+        this.$message({
+          message: '操作失败',
+          type: 'error',
+          duration: 1000
+        });
         console.log('操作任务状态失败：', error);
       });
 
@@ -327,6 +341,7 @@ handleRowClick(row){
 
     // 获取表格数据 s
     fetchData() {
+      this.loading = true;
       const params = {
         pageNum: this.currentPage, // 当前页码
         pageSize: this.pageSize,   // 每页显示的数据量
@@ -354,7 +369,10 @@ handleRowClick(row){
         this.totalItems = data.total;     // 总条目数
         this.currentPage = data.pageNum;  // 当前页码
         this.pageSize = data.pageSize;    // 每页显示条数
+        this.loading = false;
       }).catch((error) => {
+        this.loading = false;
+        this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },
@@ -436,7 +454,6 @@ handleRowClick(row){
     // 表单搜索功能
     search() {
       console.log("搜索条件:", this.searchForm);
-
       this.fetchData()
 
     },
@@ -450,6 +467,8 @@ handleRowClick(row){
       }
     },
     jobOperation(id, jobId, operationType) {
+      this.buttonDisabled = true;
+
       //调接口处理操作
       console.log(id + jobId + operationType)
       const params = {
@@ -470,8 +489,17 @@ handleRowClick(row){
           type: 'success',
           duration: 1000
         });
+        this.buttonDisabled = false;
+
       }).catch((error) => {
+        this.$message({
+          message: '操作失败',
+          type: 'error',
+          duration: 1000
+        });
         console.log('操作任务状态失败：', error);
+        this.buttonDisabled = false;
+
       });
 
     }

@@ -49,14 +49,15 @@
             <el-form-item label="具体位置" prop="position">
               <el-input v-model="dataForm.position" placeholder="具体位置"></el-input>
             </el-form-item>
-
-            <el-form-item label="问题" prop="position">
-              <el-select v-model="dataForm.frequency" style="width:100%" placeholder="发生频率">
-                <el-option v-for="op in frequencyOptions" :key="op.item" :label="op.value" :value="op.item" />
-              </el-select> </el-form-item>
           </el-col>
 
         </el-row>
+
+        <el-form-item label="三级选项" prop="issue">
+          <el-cascader clearable v-model="dataForm.issue" :options="options" :props="{ expandTrigger: 'hover' }" @change="handleChange">
+
+          </el-cascader>
+        </el-form-item>
 
         <el-form-item label="描述" prop="description">
           <el-input v-model="dataForm.description" placeholder="描述" type="textarea"></el-input>
@@ -77,7 +78,7 @@
       <div class="footer-container">
         <span slot="footer" class="dialog-footer">
           <el-button @click="handleCancel">取消</el-button>
-          <el-button type="primary" @click="handSubmit()">确定</el-button>
+          <el-button type="primary" @click="handSubmit()" :disabled="buttonDisabled">确定</el-button>
         </span>
       </div>
     </div>
@@ -95,6 +96,139 @@ export default {
   },
   data() {
     return {
+      buttonDisabled: false,
+      value: [],
+      options: [
+        {
+          label: '人',
+          value: 'a',
+          children: [
+            {
+              label: '人员',
+              value: 'a1',
+              children: [
+                { label: 'a1-1', value: 'a1-1' },
+                { label: 'a1-2', value: 'a1-2' }
+              ]
+            },
+            {
+              label: '培训',
+              value: 'a2',
+              children: [
+                { label: 'a2-1', value: 'a2-1' },
+                { label: 'a2-1', value: 'a2-2' }
+              ]
+            }
+            ,
+            {
+              label: 'WI',
+              value: 'a3',
+              children: [
+                { label: 'a3-1', value: 'a3-1' },
+                { label: 'a3-2', value: 'a3-2' }
+              ]
+            }
+          ]
+        },
+        {
+          label: '机',
+          value: 'b',
+          children: [
+            {
+              label: '机',
+              value: 'b1',
+              children: [
+                { label: 'b1-1', value: 'b1-1' },
+                { label: 'b1-2', value: 'b1-2' }
+              ]
+            },
+            {
+              label: '环',
+              value: 'b2',
+              children: [
+                { label: 'b2-1', value: 'b2-1' },
+                { label: 'b2-2', value: 'b2-2' }
+              ]
+            }
+            ,
+            {
+              label: '产',
+              value: 'b3',
+              children: [
+                { label: 'b3-1', value: 'b3-1' },
+                { label: 'b3-2', value: 'b3-2' }
+              ]
+            }
+          ]
+        },
+        {
+          label: '料',
+          value: 'c',
+          children: [
+            {
+              label: '物数',
+              value: 'c1',
+              children: [
+                { label: 'c1-1', value: 'c1-1' },
+                { label: 'c1-2', value: 'c1-2' }
+              ]
+            },
+            {
+              label: '料问题',
+              value: 'c2',
+              children: [
+                { label: 'c2-1', value: 'c2-1' },
+                { label: 'c2-2', value: 'c2-2' }
+              ]
+            }
+          ]
+        },
+        {
+          label: '法',
+          value: 'd',
+          children: [
+            {
+              label: 'WI',
+              value: 'd1',
+              children: [
+                { label: 'd1-1', value: 'd1-1' },
+                { label: 'd1-2', value: 'd1-2' }
+              ]
+            },
+            {
+              label: '生产',
+              value: 'd2',
+              children: [
+                { label: 'd2-1', value: 'd2-1' },
+                { label: 'd2-2', value: 'd2-2' }
+              ]
+            }
+          ]
+        },
+        {
+          label: '环节',
+          value: 'e',
+          children: [
+            {
+              label: 'e1',
+              value: 'e1',
+              children: [
+                { label: 'e1-1', value: 'e1-1' },
+                { label: 'e1-2', value: 'e1-2' }
+              ]
+            },
+            {
+              label: 'e2',
+              value: 'e2',
+              children: [
+                { label: 'e2-1', value: 'e2-1' },
+                { label: 'e2-2', value: 'e2-2' }
+              ]
+            }
+          ]
+        }
+      ],
+
       fileList: [],
       jobId: '',
       uploadAction: this.$http.adornUrl(`/job/repair/uploadImage?token=${this.$cookie.get('token')}`),
@@ -129,7 +263,8 @@ export default {
         description: null,
         remark: null,
         eventTime: null,
-        equipment: null
+        equipment: null,
+        issue: []
       },
       dataRule: {
         department: [
@@ -162,6 +297,10 @@ export default {
     }
   },
   methods: {
+
+    handleChange(value) {
+      console.log(value);
+    },
     initDataForm() {
       this.dataForm.repairType = null;
       this.dataForm.severity = '3';  // 新增: 清空严重程度
@@ -214,6 +353,7 @@ export default {
     },
 
     handSubmit() {
+      this.buttonDisabled = true;
       this.$refs.dataForm.validate((valid) => {
         if (valid) {
           console.log('提交数据：', this.dataForm);
@@ -243,21 +383,29 @@ export default {
               this.$message({
                 message: '操作成功',
                 type: 'success',
-                duration: 1500,
+                duration: 1000,
                 onClose: () => {
                   this.$emit('handleSubmit'); // 通知父组件刷新数据
                   this.dialogVisible = false; // 关闭对话框
                 }
               });
+              this.buttonDisabled = false;
+
             } else {
               console.error(data);
               this.$message.error("提交失败");
+              this.buttonDisabled = false;
+
             }
           }).catch(error => {
             console.error('提交失败:', error);
+            this.buttonDisabled = false;
+
           });
         } else {
           console.log('表单验证失败！');
+          this.buttonDisabled = false;
+
         }
       });
     }
@@ -274,5 +422,12 @@ export default {
 .dialog-footer {
   display: flex;
   gap: 10px; /* 按钮之间的间距，可根据需要调整 */
+}
+
+.el-cascader-menu {
+  max-height: 400px;
+  max-width: 400px;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 </style>
