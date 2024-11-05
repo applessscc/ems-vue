@@ -1,51 +1,62 @@
 <template>
-  <el-dialog :title="'任务申请'" :close-on-click-modal="false" :visible.sync="dialogVisible" @open="handleOpen" @close="handleClose" width="30%">
+  <el-dialog :title="'任务申请'" :close-on-click-modal="false" :visible.sync="dialogVisible" @open="handleOpen" @close="handleClose" width="40%">
     <div>
       <el-form :model="dataForm" ref="dataForm" :rules="dataRule" @keyup.enter.native="handSubmit()" label-width="100px">
-        <el-form-item label="任务类型" prop="repairType">
-          
-          <el-select v-model="dataForm.repairType" style="width:100%" placeholder="任务类型">
-            <el-option v-for="op in type" :key="op.item" :label="op.value" :value="op.item" />
-          </el-select>
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="任务类型" prop="repairType">
+              <el-select v-model="dataForm.repairType" style="width:100%" placeholder="任务类型">
+                <el-option v-for="op in type" :key="op.item" :label="op.value" :value="op.item" />
+              </el-select>
+            </el-form-item>
 
-        </el-form-item>
+            <el-form-item label="楼层" prop="floor">
+              <el-select v-model="dataForm.floor" placeholder="请输入楼层">
+                <el-option label="b91f" value="b91f"></el-option>
+                <el-option label="b92f" value="b92f"></el-option>
+                <el-option label="b93f" value="b93f"></el-option>
+                <el-option label="b94f" value="b94f"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="设备号" prop="equipment">
+              <el-input v-model="dataForm.equipment" placeholder="设备号"></el-input>
+            </el-form-item>
+          </el-col>
 
-        <el-form-item label="严重程度" prop="severity"> <!-- 新增: 严重程度 -->
-          <el-select v-model="dataForm.severity" style="width:100%" placeholder="严重程度">
-            <el-option v-for="op in severityOptions" :key="op.item" :label="op.value" :value="op.item" />
-          </el-select>
-        </el-form-item>
+          <el-col :span="8">
+            <el-form-item label="程度级别" prop="severity">
+              <el-select v-model="dataForm.severity" style="width:100%" placeholder="严重程度">
+                <el-option v-for="op in severityOptions" :key="op.item" :label="op.value" :value="op.item" />
+              </el-select>
+            </el-form-item>
 
-         <el-form-item label="发生时间" prop="eventTime"> <!-- 修改: 将时间选择器设置为日期时间 -->
-          <el-date-picker v-model="dataForm.eventTime" type="datetime" placeholder="选择日期和时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
-        </el-form-item>
+            <el-form-item label="位" prop="corridor">
+              <el-input v-model="dataForm.corridor" placeholder="请输入位"></el-input>
+            </el-form-item>
 
-        <el-form-item label="频率" prop="frequency"> <!-- 新增: 频率 -->
-          <el-select v-model="dataForm.frequency" style="width:100%" placeholder="发生频率">
-            <el-option v-for="op in frequencyOptions" :key="op.item" :label="op.value" :value="op.item" />
-          </el-select>
-        </el-form-item>
+            <el-form-item label="发生时间" prop="eventTime">
+              <el-date-picker v-model="dataForm.eventTime" type="datetime" placeholder="选择日期和时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+            </el-form-item>
 
-        <el-form-item label="设备号" prop="equipment">
-          <el-input v-model="dataForm.equipment" placeholder="设备号"></el-input>
-        </el-form-item>
+          </el-col>
 
-        <el-form-item label="楼层" prop="floor">
-          <el-select v-model="dataForm.floor" placeholder="">
-            <el-option label="b91f" value="b91f"></el-option>
-            <el-option label="b92f" value="b92f"></el-option>
-            <el-option label="b93f" value="b93f"></el-option>
-            <el-option label="b94f" value="b94f"></el-option>
-          </el-select>
-        </el-form-item>
+          <el-col :span="8">
+            <el-form-item label="频率" prop="frequency">
+              <el-select v-model="dataForm.frequency" style="width:100%" placeholder="发生频率">
+                <el-option v-for="op in frequencyOptions" :key="op.item" :label="op.value" :value="op.item" />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="具体位置" prop="position">
+              <el-input v-model="dataForm.position" placeholder="具体位置"></el-input>
+            </el-form-item>
 
-        <el-form-item label="位" prop="corridor">
-          <el-input v-model="dataForm.corridor" placeholder="请输入位"></el-input>
-        </el-form-item>
+            <el-form-item label="问题" prop="position">
+              <el-select v-model="dataForm.frequency" style="width:100%" placeholder="发生频率">
+                <el-option v-for="op in frequencyOptions" :key="op.item" :label="op.value" :value="op.item" />
+              </el-select> </el-form-item>
+          </el-col>
 
-        <el-form-item label="具体位置" prop="position">
-          <el-input v-model="dataForm.position" placeholder="具体位置"></el-input>
-        </el-form-item>
+        </el-row>
 
         <el-form-item label="描述" prop="description">
           <el-input v-model="dataForm.description" placeholder="描述" type="textarea"></el-input>
@@ -70,6 +81,7 @@
         </span>
       </div>
     </div>
+
   </el-dialog>
 </template>
 
@@ -93,17 +105,18 @@ export default {
         { item: '3', value: '维修类型3' }
       ],
       severityOptions: [  // 新增: 严重程度选项
-      { item: '1', value: '轻微' },
-      { item: '2', value: '中等' },
-      { item: '3', value: '严重' },
-      { item: '4', value: '非常严重' },
-      { item: '5', value: '极其严重' }
+        // { item: '1', value: '轻微' },
+        // { item: '2', value: '中等' },
+        { item: '3', value: '严重' },
+        // { item: '4', value: '非常严重' },
+        // { item: '5', value: '极其严重' }
+        { item: '6', value: '紧急' }
       ],
       frequencyOptions: [  // 新增: 频率选项
-      { item: '1', value: '极少' },
-      { item: '2', value: '经常' },
-      { item: '3', value: '偶尔' },
-      { item: '4', value: '不定期' }
+        { item: '1', value: '极少' },
+        { item: '2', value: '经常' },
+        { item: '3', value: '偶尔' },
+        { item: '4', value: '不定期' }
       ],
       dataForm: {
         repairType: null,
@@ -115,7 +128,8 @@ export default {
         position: null,
         description: null,
         remark: null,
-        eventTime: new Date()
+        eventTime: null,
+        equipment: null
       },
       dataRule: {
         department: [
@@ -150,17 +164,18 @@ export default {
   methods: {
     initDataForm() {
       this.dataForm.repairType = null;
-      this.dataForm.severity = null;  // 新增: 清空严重程度
-      this.dataForm.frequency = null;  // 新增: 清空频率
+      this.dataForm.severity = '3';  // 新增: 清空严重程度
+      this.dataForm.frequency = '2';  // 新增: 清空频率
       this.dataForm.department = null;
       this.dataForm.floor = null;
       this.dataForm.corridor = null;
       this.dataForm.position = null;
       this.dataForm.description = null;
       this.dataForm.remark = null;
-      this.dataForm.eventTime = null; // 新增: 清空发生时间
+      this.dataForm.eventTime = new Date(); // 新增: 清空发生时间
       this.fileList = [];
       this.jobId = null;
+      this.equipment = null;
     },
 
     handleOpen() {
