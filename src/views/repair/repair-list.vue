@@ -25,14 +25,14 @@
     </el-form>
 
     <el-button type="primary" @click="handleOpen" style="margin-bottom: 20px;">
-      申请报修
+      请求任务
     </el-button>
 
     <el-button type="primary" @click="openNew('repair/repair-kanban')">
-      维修任务看板
+      任务看板
     </el-button>
 
-    <el-table :data="tableData" style="width: 100%">
+    <el-table :data="tableData" style="width: 100%" @row-click="handleRowClick">
       <el-table-column fixed label="序号" width="50">
         <template slot-scope="scope">
           {{ (scope.$index + 1) + (currentPage - 1) * pageSize }}
@@ -43,8 +43,8 @@
           {{ getJobStatusName(scope.row.status) }}
         </template>
       </el-table-column>
-      
-            <el-table-column prop="equipment" label="设备号" width="100">
+
+      <el-table-column prop="equipment" label="设备号" width="100">
       </el-table-column>
       <el-table-column prop="createTime" label="申请时间" width="140">
       </el-table-column>
@@ -73,18 +73,23 @@
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
           <div>
-            <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消任务
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消任务
             </el-button>
           </div>
           <div>
-            <el-button type="text" @click="dealJob(scope.row)" v-if="scope.row.status === 1" style="color: #4CAF50;">开始处理
+            <el-button type="text" @click.stop="dealJob(scope.row)" v-if="scope.row.status === 1" style="color: #4CAF50;">开始处理
             </el-button>
-            <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2">完成
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2">完成
             </el-button>
-            <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'confirm')" v-else-if="scope.row.status === 4">确认
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'confirm')" v-else-if="scope.row.status === 4">确认
             </el-button>
-              <el-button type="text" @click="jobOperation(scope.row.id,scope.row.jobId,'close')" v-else-if="scope.row.status === 5">关闭
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'close')" v-else-if="scope.row.status === 5">关闭
             </el-button>
+          </div>
+          <div>
+
+            <el-button type="text" @click.stop="$router.push({ name: 'repair-jobDetail', query: { jobId: scope.row.jobId } })">查看</el-button>
+
           </div>
         </template>
       </el-table-column>
@@ -109,17 +114,14 @@
       <div class="dealJob-table-container">
         <el-descriptions title="任务信息" :column="3" border v-if="dealJobData.row">
           <el-descriptions-item label="任务状态">{{getJobStatusName(dealJobData.row.status)}}</el-descriptions-item>
-                   <el-descriptions-item label="设备号">{{dealJobData.row.equipment}}</el-descriptions-item>
-
+          <el-descriptions-item label="设备号">{{dealJobData.row.equipment}}</el-descriptions-item>
           <el-descriptions-item label="申请时间">{{dealJobData.row.createTime}}</el-descriptions-item>
-                    <el-descriptions-item label="发生时间">{{dealJobData.row.eventTime}}</el-descriptions-item>
-
+          <el-descriptions-item label="发生时间">{{dealJobData.row.eventTime}}</el-descriptions-item>
           <el-descriptions-item label="故障位置">{{dealJobData.row.floor+'-'+dealJobData.row.corridor+'-'+dealJobData.row.position}}</el-descriptions-item>
           <el-descriptions-item label="申请人">{{dealJobData.row.proposerName}}</el-descriptions-item>
           <el-descriptions-item label="描述">{{dealJobData.row.description}}</el-descriptions-item>
           <el-descriptions-item label="备注">{{dealJobData.row.remark}}</el-descriptions-item>
-                    <el-descriptions-item label="严重程度">{{getSeverityName(dealJobData.row.severity)}}</el-descriptions-item>
-
+          <el-descriptions-item label="严重程度">{{getSeverityName(dealJobData.row.severity)}}</el-descriptions-item>
           <el-descriptions-item label="发生频率">{{getfrequencyName(dealJobData.row.frequency)}}</el-descriptions-item>
           <el-descriptions-item label="图片">
             <div style="display: flex; gap: 5px; justify-content: center;">
@@ -223,6 +225,9 @@ export default {
   methods: {
 
 
+handleRowClick(row){
+    this.$router.push({ name: 'repair-jobDetail', query: { jobId: row.jobId } });
+},
     initDealJobForm() {
       this.fileList = [];
       this.dealJobData.row = null;
@@ -230,7 +235,6 @@ export default {
       this.dealJobFormData.remark = '';
     },
     dealJobConfirm(row) {
-      this.jobOperation(row.id, row.jobId, "deal");
       //调接口处理操作
       const params = {
         repairId: row.id,
@@ -238,9 +242,9 @@ export default {
         handlerId: this.$store.state.user.id,
         remark: this.dealJobFormData.remark,
         operationTime: this.dealJobData.operationTime,
-        operationType:"deal"
+        operationType: "deal"
       };
-      console.log("调接口处理操作params",params)
+      console.log("调接口处理操作params", params)
       this.$http({
         url: this.$http.adornUrl(`/job/repair/dealJob`),  // 接口地址
         method: 'post',              // 改为 POST 请求
@@ -377,7 +381,7 @@ export default {
       }
     },
 
-        getfrequencyName(code) {
+    getfrequencyName(code) {
       if (code == 1) {
         return "极少"
       } else if (code == 2) {
@@ -386,11 +390,11 @@ export default {
         return "偶尔"
       } else if (code == 5) {
         return "不定期"
-      }  else {
+      } else {
         return "未知状态"
       }
     },
-        getJobStatusName(jobStatusCode) {
+    getJobStatusName(jobStatusCode) {
       if (jobStatusCode == 1) {
         return "待处理"
       } else if (jobStatusCode == 2) {
@@ -403,7 +407,7 @@ export default {
         return "已取消"
       } else if (jobStatusCode == 7) {
         return "关闭"
-      }else {
+      } else {
         return "未知状态"
       }
     },

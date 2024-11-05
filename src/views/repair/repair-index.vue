@@ -2,7 +2,7 @@
   <el-main>
     <!-- 报修统计 -->
     <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 40px">
-      <el-col :span="8">
+      <el-col :span="6">
 
         <div class="show-header" style="background: #409EFF">
           <div class="show-num">{{ boardData.waitDealNum }}</div>
@@ -15,14 +15,27 @@
         </div>
 
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
+
+        <div class="show-header" style="background:#FFD700">
+          <div class="show-num">{{ boardData.timeOutNum }}</div>
+          <div class="bottom-text">超时</div>
+        </div>
+
+        <div class="show-header" style="background:#FF4D4D">
+          <div class="show-num">{{ boardData.severityNum }}</div>
+          <div class="bottom-text">紧急待处理</div>
+        </div>
+
+      </el-col>
+      <el-col :span="6">
 
         <div class="show-header" style="background: #67C23A">
           <div class="show-num">{{ boardData.waitFinishNum }}</div>
           <div class="bottom-text">待完成</div>
         </div>
 
-        <div class="show-header" style="background:#FF4D4D">
+        <div class="show-header" style="background:#B0B0B0">
           <div class="show-num">{{ boardData.cancelNum }}</div>
           <div class="bottom-text">已取消</div>
         </div>
@@ -33,7 +46,6 @@
       <el-col :span="8" class="chart">
         <div ref="chart" style="width: 349px; height: 180px;"></div>
       </el-col>
-
     </el-row>
 
     <!-- 列表 -->
@@ -64,7 +76,9 @@ export default {
         waitDealNum: 0,
         waitFinishNum: 0,
         waitConfirmNum: 0,
-        cancelNum: 0
+        cancelNum: 0,
+        severityNum: 0,
+        timeOutNum: 0
       }
 
 
@@ -90,8 +104,15 @@ export default {
           trigger: 'item'
         },
         legend: {
+                    orient: "vertical", //图例的显示方式  默认横向显示 horizontal  vertical
+                             itemWidth: 14, //图例颜色块的宽度和高度
+         itemHeight: 14,
+
+
           top: '5%',
-          left: 'center'
+          right: '70%',
+                  color: ['#696969', '#5470c6', '#91cd77', '#ef6567', '#f9c956', '#75bedc','#ccc'],// 饼图各块颜色
+
         },
         series: [
           {
@@ -123,6 +144,10 @@ export default {
               { value: this.boardData.waitFinishNum, name: '待完成' },
               { value: this.boardData.waitConfirmNum, name: '待确认' },
               { value: this.boardData.cancelNum, name: '已取消' },
+              { value: this.boardData.timeOutNum, name: '超时' },
+              { value: this.boardData.severityNum, name: '紧急待处理' },
+
+
             ]
           }
         ]
@@ -178,12 +203,10 @@ export default {
   margin-bottom: 15px;
 }
 .chart {
-
-    display: flex;
+  display: flex;
   justify-content: center;
   align-items: center; /* 垂直居中对齐饼图 */
 }
-
 
 .show-num {
   font-size: 38px;

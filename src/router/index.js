@@ -53,6 +53,7 @@ const mainRoutes = {
     { path: '/formdetail', component: _import('modules/site/formdetail'), name: 'formdetail', meta: { title: '问题单详情', isTab: true } },
     { path: '/repair-index', component: _import('repair/repair-index'), name: 'repair-index' , meta: { title: '报修表单'}}, 
     { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply' , meta: { title: '报修表单'}}, 
+    { path: '/repair-jobDetail', component: _import('repair/repair-jobDetail'), name: 'repair-jobDetail' , meta: { title: '任务详情'}}, 
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')

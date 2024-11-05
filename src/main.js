@@ -11,7 +11,10 @@ import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/a
 import { isAuth } from '@/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import dataV from '@jiaminghi/data-view'      // 大屏组件
+import ElementUI  from 'element-ui'
+import "element-ui/lib/theme-chalk/index.css"
 
+Vue.use(ElementUI)
 Vue.use(VueCookie)
 Vue.use(dataV)
 Vue.config.productionTip = false
