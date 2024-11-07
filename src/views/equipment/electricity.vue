@@ -45,7 +45,7 @@
             </div>
           </dv-border-box-10>
 
-          <dv-border-box-10 class="top-right-container">
+          <dv-border-box-10 class="top-right-container" v-if="showTransformer">
             <el-row :gutter="10" style="height:50%;">
               <el-col :span="15" style="height:100%;">
                 <!-- <dv-water-level-pond :config="{data: [66],waveHeight:0}" style="width:60%;height:60%" /> -->
@@ -108,6 +108,7 @@ export default {
   },
   data() {
     return {
+      showTransformer: true,
       dialogFormVisible: true,
       oldForm: {
         bu_name: ['02'],
@@ -127,16 +128,16 @@ export default {
       pieBottomTitle: '1000KVA',
       pieTopData: [
         { value: 500, name: '负载44%', itemStyle: { color: '#fac858' } },
-        { value: 1100, name: '空闲56%', itemStyle: { color: '#9fe6b8' }, label: {show:false, fontSize: 20}},
+        { value: 1100, name: '空闲56%', itemStyle: { color: '#9fe6b8' }, label: { show: false, fontSize: 20 } },
       ],
       pieBottomData: [
         { value: 400, name: '负载40%', itemStyle: { color: '#fac858' } },
-        { value: 600, name: '空闲60%', itemStyle: { color: '#9fe6b8' }, label: {show:false, fontSize: 20}},
+        { value: 600, name: '空闲60%', itemStyle: { color: '#9fe6b8' }, label: { show: false, fontSize: 20 } },
       ],
       loadValueTop: 0,
-      loadValueBottom:0,
+      loadValueBottom: 0,
       loadRateValueTop: 0,
-      loadRateValueBottom:0,
+      loadRateValueBottom: 0,
       wenduValueTop: 0,
       wenduValueBottom: 0,
       shiduValueTop: 0,
@@ -288,9 +289,13 @@ export default {
       this.form.counter_id = [];
       if ($event == '1') {
         //用电
+        this.showTransformer = true;
+
         this.optionsCode = { 'bu_name': '1001', 'position_name': '1002', 'counter_type': '1003', 'counter_id': '1004' }
       } else {
         //用水
+        this.showTransformer = false;
+
         this.optionsCode = { 'bu_name': '1001', 'position_name': '1002', 'counter_type': '1006', 'counter_id': '1005' }
       }
       //刷新下拉框和数据

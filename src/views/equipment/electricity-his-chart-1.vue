@@ -138,7 +138,7 @@ export default {
       });
 
       //组装x轴
-      optionData.xAxis.data = data.page.xData;
+      optionData.xAxis.data = data.page.xData.map(value => (parseInt(value) + 1).toString());
 
       //双Y轴对齐
       // this.yAxisAlignment(optionData, data.page.seriesDataBar, data.page.seriesDataLine, 5);

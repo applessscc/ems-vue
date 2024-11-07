@@ -101,7 +101,7 @@ export default {
       showEffectOn: 'render',
       zlevel: 99,
       effectType: "ripple",
-      symbolSize: 20,
+      symbolSize: 27,
       rippleEffect: {
         period: 4,
         scale: 4,
@@ -113,7 +113,7 @@ export default {
         normal: {
           show: true,
           // distance: 20,
-          position: 'top',
+          position: 'insideTop', // 保证字体位置在点的上方
           formatter: '{b}',
           formatter: function (data) {
             // return data.data.name;
@@ -124,7 +124,7 @@ export default {
             borderWidth: 0, // 字体边框宽度
             borderColor: '#fff', // 字体边框颜色
             fontFamily: 'sans-serif', // 字体格式
-            fontSize: 18, // 字体大小
+            fontSize: 20, // 字体大小
             fontWeight: 700 // 字体加粗
             // show: false,
             // fontSize: 16,                   //地址文字大小

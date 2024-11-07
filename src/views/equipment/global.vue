@@ -16,7 +16,7 @@
             <el-row class="right-top-container">
               <el-col :span="12">
                 <dv-border-box-7>
-                  <pie-chart title="每月指标" :data="pieTopData"/>
+                  <pie-chart title="每月指标" :data="pieTopData" />
                 </dv-border-box-7>
               </el-col>
               <el-col :span="12">
@@ -28,12 +28,12 @@
             <el-row class="right-bottom-container">
               <el-col :span="12">
                 <dv-border-box-7>
-                  <pie-chart title="每日指标" :data="pieBottomData"/>
+                  <pie-chart title="每日指标" :data="pieBottomData" />
                 </dv-border-box-7>
               </el-col>
               <el-col :span="12">
                 <dv-border-box-7>
-                  <global-chart-bottom title="每日" :yAxis="topYAxis" :dataset="topData" :series="topSeries" />
+                  <global-chart-bottom title="每日" :yAxis="topYAxis" :dataset="topData2" :series="topSeries" />
                 </dv-border-box-7>
               </el-col>
             </el-row>
@@ -66,45 +66,21 @@ export default {
       topData: {
         dimensions: ['product', 'VTC', 'VTM', 'VTX'],
         source: [
-          {
-            "product": 8,
-            "VTC": 36,
-            "VTM": 34,
-            "VTX": 30
-          },
-          {
-            "product": 9,
-            "VTC": 41,
-            "VTM": 35,
-            "VTX": 55
-          },
-          {
-            "product": 10,
-            "VTC": 29,
-            "VTM": 30,
-            "VTX": 21
-          },
-          {
-            "product": 11,
-            "VTC": 24,
-            "VTM": 28,
-            "VTX": 21
-          },
-          {
-            "product": 12,
-            "VTC": 55,
-            "VTM": 58,
-            "VTX": 46
-          }
+        ]
+      },
+      topData2: {
+        dimensions: ['product', 'VTC', 'VTM', 'VTX'],
+        source: [
+
         ]
       },
       topYAxis: [
         { name: ' ', type: 'value' }
       ],
       topSeries: [
-        { type: 'bar', color: '#37a2da', label: { show: true, position: 'top', color: '#fff' } },
-        { type: 'bar', color: '#9fe080', label: { show: true, position: 'top', color: '#fff' } },
-        { type: 'bar', color: '#ffdb5c', label: { show: true, position: 'top', color: '#fff' } },
+        { type: 'bar', color: '#37a2da', label: { show: false, position: 'top', color: '#fff' } },
+        { type: 'bar', color: '#9fe080', label: { show: false, position: 'top', color: '#fff' } },
+        { type: 'bar', color: '#ffdb5c', label: { show: false, position: 'top', color: '#fff' } },
       ],
       pieTopData: [
         { value: 89, name: 'VTC' },
@@ -119,12 +95,65 @@ export default {
     }
   },
   created() {
+    this.refreshMonthData();
+    this.refreshMonthData2();
 
   },
   mounted() {
-
+    setInterval(() => {
+      this.refreshMonthData();
+      this.refreshMonthData2();
+    }, 1000 * 60 * 3)
   },
   methods: {
+    refreshMonthData() {
+            const params = {
+        type: 2
+
+      };
+      this.$http({
+        url: this.$http.adornUrl('/report/electricitybu/queryBuElectricityByMonth2'),
+        method: 'post',
+                params: params,
+
+        // data: this.$http.adornData(params)
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          console.log(this.topData.source);
+          this.topData = data.chart_data;
+          console.log(this.topData.source);
+
+          // this.monthData = data.chart_data
+          // this.monthSeries = []
+          // data.chart_data.dimensions.forEach((item, index) => {
+          //   if (index > 0) {
+          //     this.monthSeries.push({ type: 'bar', stack: 'bu', barMaxWidth: '40' })
+          //   }
+          // });
+        } else {
+          console.log(data);
+        }
+      })
+    },
+
+       refreshMonthData2() {
+             const params = {
+        type: 2
+
+      };
+      this.$http({
+        url: this.$http.adornUrl('/report/electricitybu/queryBuElectricityByDay2'),
+        method: 'post',
+                params: params,
+
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          this.topData2 = data.chart_data;
+        } else {
+          console.log(data);
+        }
+      })
+    }
 
   }
 }

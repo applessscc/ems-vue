@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="'任务申请'" :close-on-click-modal="false" :visible.sync="dialogVisible" @open="handleOpen" @close="handleClose" width="40%">
+  <el-dialog :title="'任务申请'" :close-on-click-modal="false" :visible.sync="dialogVisible" @open="handleOpen" @close="handleClose" width="800px">
     <div>
       <el-form :model="dataForm" ref="dataForm" :rules="dataRule" @keyup.enter.native="handSubmit()" label-width="100px">
         <el-row :gutter="20">

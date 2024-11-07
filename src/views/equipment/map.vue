@@ -16,14 +16,14 @@
             <el-row class="right-top-container">
               <el-col :span="24">
                 <dv-border-box-7>
-                  <global-chart-top title="每月" :yAxis="topYAxis" :dataset="topData" :series="topSeries"/>
+                  <global-chart-top title="每月" :yAxis="topYAxis" :dataset="topData" :series="topSeries" />
                 </dv-border-box-7>
               </el-col>
             </el-row>
             <el-row class="right-bottom-container">
               <el-col :span="24">
                 <dv-border-box-7>
-                  <global-chart-bottom title="每日" :yAxis="topYAxis" :dataset="topData" :series="topSeries"/>
+                  <global-chart-bottom title="每日" :yAxis="topYAxis" :dataset="topData2" :series="topSeries" />
                 </dv-border-box-7>
               </el-col>
             </el-row>
@@ -54,55 +54,76 @@ export default {
       topData: {
         dimensions: ['product', 'LB', 'XX', 'RD'],
         source: [
-          {
-            "product": 4,
-            "LB": 80,
-            "XX": 90,
-            "RD": 99
-          },
-          {
-            "product": 5,
-            "LB": 80,
-            "XX": 45,
-            "RD": 99
-          },
-          {
-            "product": 6,
-            "LB": 80,
-            "XX": 90,
-            "RD": 67
-          },
-          {
-            "product": 7,
-            "LB": 55,
-            "XX": 90,
-            "RD": 87
-          },
-          {
-            "product": 8,
-            "LB": 80,
-            "XX": 90,
-            "RD": 45
-          }
+        ]
+      },
+      topData2: {
+        dimensions: ['product', 'LB', 'XX', 'RD'],
+        source: [
         ]
       },
       topYAxis: [
         { name: ' ', type: 'value' }
       ],
       topSeries: [
-        { type: 'bar', color: '#37a2da', label: { show: true, position: 'top', color: '#fff' } },
-        { type: 'bar', color: '#ffdb5c', label: { show: true, position: 'top', color: '#fff' } },
-        { type: 'bar', color: '#9fe6b8', label: { show: true, position: 'top', color: '#fff' } },
+        { type: 'bar', color: '#37a2da', label: { show: false, position: 'top', color: '#fff' } },
+        { type: 'bar', color: '#ffdb5c', label: { show: false, position: 'top', color: '#fff' } },
+        { type: 'bar', color: '#9fe6b8', label: { show: false, position: 'top', color: '#fff' } },
       ]
     }
   },
   created() {
-
+    this.refreshMonthData();
+    this.refreshMonthData2();
   },
   mounted() {
+    setInterval(() => {
+      this.refreshMonthData();
+      this.refreshMonthData2();
+    }, 1000 * 60 * 3)
 
   },
   methods: {
+
+    refreshMonthData() {
+      const params = {
+        type: 2
+
+      };
+      this.$http({
+
+
+        url: this.$http.adornUrl('/report/electricitybu/queryBuElectricityByMonth2'),
+        method: 'post',
+        params: params,
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          data.chart_data.dimensions = ['product', 'LB', 'XX', 'RD'];
+          this.topData = data.chart_data;
+        } else {
+          console.log(data);
+        }
+      })
+    },
+
+    refreshMonthData2() {
+            const params = {
+        type: 2,
+
+      };
+      this.$http({
+        url: this.$http.adornUrl('/report/electricitybu/queryBuElectricityByDay2'),
+        method: 'post',
+        params:params,
+      }).then(({ data }) => {
+        if (data && data.code === 0) {
+          data.chart_data.dimensions = ['product', 'LB', 'XX', 'RD'];
+          this.topData2 = data.chart_data;
+        } else {
+          console.log(data);
+        }
+      })
+    }
+
 
   }
 }
