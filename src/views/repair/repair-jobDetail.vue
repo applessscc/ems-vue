@@ -28,6 +28,17 @@
       </el-descriptions>
     </el-card>
 
+    <!-- 任务状态（1-待处理 2-处理中 4-已完成 5-已确认 6-已取消 7-已关闭） -->
+    <el-card class="box-card " style="width: 90%;">
+      <el-steps :active="active" finish-status="success">
+        <el-step title="待处理"></el-step>
+        <el-step title="处理中"></el-step>
+        <el-step title="已完成"></el-step>
+        <el-step title="已确认"></el-step>
+        <el-step title="已关闭"></el-step>
+      </el-steps>
+    </el-card>
+
     <el-card class="box-card" style="width: 40%;">
       <h3 class="card-title">操作日志</h3> <!-- 添加标题 -->
       <el-divider></el-divider>
@@ -66,6 +77,7 @@ export default {
   },
   data() {
     return {
+      active: 0,
       jobDetail: {
         jObDetail:{},
       repair: {}, // 确保 repair 对象存在
@@ -125,6 +137,7 @@ export default {
     },
 
     getJobStatusName(jobStatusCode) {
+    
       if (jobStatusCode == 1) {
         return "待处理"
       } else if (jobStatusCode == 2) {
@@ -153,6 +166,11 @@ export default {
         return "确认";
       } else if (operationType == "cancel") {
         return "取消任务";
+      }else if (operationType == "close") {
+        return "关闭"
+      }
+      else if (operationType == "reject") {
+        return "驳回";
       } else {
         return "未知状态";
       }

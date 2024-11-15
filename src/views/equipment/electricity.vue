@@ -168,7 +168,7 @@ export default {
     //启动能耗定时任务刷新
     this.startTimer();
     //启动变压器定时任务刷新
-    setInterval(this.queryTransformerNowByDict, 1000 * 30)
+    // setInterval(this.queryTransformerNowByDict, 1000 * 30)
   },
   methods: {
     goHistory(date_type) {
@@ -210,6 +210,7 @@ export default {
      * params：参数 刷新所有组件时取实时数据
      */
     refreshData(refresh = 'all', params) {
+      this.queryTransformerNowByDict();
       let isAll = refresh.includes('all');
       let isYear = isAll || refresh.includes('year');
       let isMonth = isAll || refresh.includes('month');
@@ -342,12 +343,53 @@ export default {
     },
     //查询最近变压器数据（功耗和温度）
     queryTransformerNowByDict() {
+
+      console.log("Mounted, pieBottomChart:", this.$refs.pieBottomChart);
+
+      const requestData = {
+        bu_name: this.form.bu_name,  // 从 form 中获取 bu_name 数组
+      };
       this.$http({
+        data: this.$http.adornData(requestData),
         url: this.$http.adornUrl('/equipment/transformer/queryTransformerNowByDict'),
         method: 'post',
         // data: this.$http.adornData(params)
       }).then(({ data }) => {
         if (data && data.code === 0) {
+          if (data.list.length === 0) {
+            // 给定默认值
+            this.pieTopTitle = '暂无数据';
+
+            this.pieTopData[0].name = "负载0%"
+            this.pieTopData[0].value = 0;
+            this.pieTopData[1].name = "空闲100%"
+            this.pieTopData[1].value =100
+
+
+ 
+            this.pieBottomData[0].name = "负载0%"
+            this.pieBottomData[0].value = 0;
+            this.pieBottomData[1].name = "空闲100%"
+            this.pieBottomData[1].value =100
+
+
+            this.loadRateValueTop = 0;
+            this.loadValueTop = 0;
+
+            this.pieBottomTitle = '暂无数据';
+  
+
+            this.loadRateValueBottom = 0;
+            this.loadValueBottom = 0;
+
+            this.wenduValueTop = 0;
+            this.wenduValueBottom = 0;
+
+            this.shiduValueTop = 0;
+            this.shiduValueBottom = 0;
+          } else {
+
+          }
           data.list.forEach((item, index) => {
             if (index == 0) {
               this.pieTopTitle = item.remark
@@ -360,7 +402,7 @@ export default {
               this.loadValueTop = item.nowValue
 
               this.$nextTick(() => {
-                this.$refs.pieTopChart.refreshChart();
+                // this.$refs.pieTopChart.refreshChart();
               })
             } else if (index == 1) {
               this.pieBottomTitle = item.remark
@@ -373,7 +415,7 @@ export default {
               this.loadValueBottom = item.nowValue
 
               this.$nextTick(() => {
-                this.$refs.pieBottomChart.refreshChart();
+                // this.$refs.pieBottomChart.refreshChart();
               })
             } else if (index == 2) {
               this.wenduValueTop = item.nowValue
@@ -391,6 +433,14 @@ export default {
               this.shiduValueBottom = item.nowValue
             }
           })
+
+                      this.$nextTick(() => {
+              this.$refs.pieTopChart.refreshChart();
+            })
+
+            this.$nextTick(() => {
+              this.$refs.pieBottomChart.refreshChart();
+            })
         } else {
           console.log(data);
         }

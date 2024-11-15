@@ -2,8 +2,8 @@
 
   <el-main>
     <!-- 报修统计 -->
-    <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 40px">
-      <el-col :span="6">
+    <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 1px">
+      <el-col :span="8">
 
         <div class="show-header" style="background: #409EFF">
           <div class="show-num">{{ boardData.waitDealNum }}</div>
@@ -16,7 +16,7 @@
         </div>
 
       </el-col>
-      <el-col :span="6">
+      <el-col :span="8">
 
         <div class="show-header" style="background:#FFD700">
           <div class="show-num">{{ boardData.timeOutNum }}</div>
@@ -29,7 +29,7 @@
         </div>
 
       </el-col>
-      <el-col :span="6">
+      <el-col :span="8">
 
         <div class="show-header" style="background: #67C23A">
           <div class="show-num">{{ boardData.waitFinishNum }}</div>
@@ -41,11 +41,6 @@
           <div class="bottom-text">已取消</div>
         </div>
 
-      </el-col>
-
-      <!-- 饼图 -->
-      <el-col :span="8" class="chart">
-        <div ref="chart" style="width: 349px; height: 180px;"></div>
       </el-col>
     </el-row>
 
@@ -66,11 +61,6 @@ export default {
   },
   data() {
     return {
-
-      // 饼图
-      chart: null,
-      chartData: {},
-
         // 看板
       boardData: {
         waitDealNum: 0,
@@ -140,11 +130,6 @@ export default {
   border-radius: 5px;
   position: relative;
   margin-bottom: 15px;
-}
-.chart {
-  background: #00c0ef;
-
-  height: 250px;
 }
 
 .show-num {

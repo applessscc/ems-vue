@@ -59,7 +59,7 @@
           </el-cascader>
         </el-form-item>
 
-        <el-form-item label="描述" prop="description">
+        <el-form-item label="描述" prop="description" v-if="false">
           <el-input v-model="dataForm.description" placeholder="描述" type="textarea"></el-input>
         </el-form-item>
 
@@ -276,17 +276,14 @@ export default {
         corridor: [
           { required: true, message: '位不能为空', trigger: 'blur' }
         ],
-        position: [
-          { required: true, message: '具体位置不能为空', trigger: 'blur' }
-        ],
-        description: [
-          { required: true, message: '描述不能为空', trigger: 'blur' }
-        ],
         severity: [  // 新增: 严重程度的验证规则
           { required: true, message: '严重程度不能为空', trigger: 'blur' }
         ],
         frequency: [  // 新增: 频率的验证规则
           { required: true, message: '频率不能为空', trigger: 'blur' }
+        ]
+        ,eventTime: [  // 新增: 频率的验证规则
+        { required: true, message: '时间不能为空', trigger: 'blur' }
         ]
       }
     };
@@ -311,7 +308,7 @@ export default {
       this.dataForm.position = null;
       this.dataForm.description = null;
       this.dataForm.remark = null;
-      this.dataForm.eventTime = new Date(); // 新增: 清空发生时间
+      this.dataForm.eventTime = null // 新增: 清空发生时间
       this.fileList = [];
       this.jobId = null;
       this.equipment = null;

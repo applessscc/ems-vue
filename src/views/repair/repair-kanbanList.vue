@@ -1,49 +1,53 @@
 <template>
   <div>
+<!-- 
+    <el-table :data="[]" style="width: 100%" :row-class-name="rowhighlight" class="listTable" v-if="false">
+      <el-table-column fixed label="序号" width="100">
+        <template slot-scope="scope">
+          {{ scope.$index }}
+        </template>
+      </el-table-column>
+      <el-table-column label="任务状态" width="150">
+        <template slot-scope="scope">
+          {{ getJobStatusName(scope.row.status) }}
+        </template>
+      </el-table-column>
 
+      <el-table-column prop="equipment" label="设备号" width="100">
 
-    <el-table :data="[]" style="width: 100%" :row-class-name="rowhighlight" class="listTable"   >
-        <el-table-column fixed label="序号" width="100">
-          <template slot-scope="scope">
-            {{ scope.$index }}
-          </template>
-        </el-table-column>
-        <el-table-column label="任务状态" width="150">
-          <template slot-scope="scope">
-            {{ getJobStatusName(scope.row.status) }}
-          </template>
-        </el-table-column>
-      
-            <el-table-column prop="equipment" label="设备号" width="100">
+      </el-table-column>
 
-            </el-table-column>
-
-        <el-table-column prop="createTime" label="申请时间" width="220">
-        </el-table-column>
-        <el-table-column label="故障位置" width="160">
-          <template slot-scope="scope">
-            {{scope.row.floor+'-'+scope.row.corridor+'-'+scope.row.position}}
-          </template>
-        </el-table-column>
-        <el-table-column prop="proposerName" label="申请人" width="130">
-        </el-table-column>
-        <el-table-column prop="handlerName" label="处理人" width="130">
-        </el-table-column>
-        <el-table-column prop="description" label="描述" width="280">
-        </el-table-column>
-        <el-table-column prop="remark" label="备注" width="140">
-        </el-table-column>
-        <el-table-column label="图片" width="400">
-        </el-table-column>
-      </el-table>
-
+      <el-table-column prop="createTime" label="申请时间" width="220">
+      </el-table-column>
+      <el-table-column label="故障位置" width="160">
+        <template slot-scope="scope">
+          {{scope.row.floor+'-'+scope.row.corridor+'-'+scope.row.position}}
+        </template>
+      </el-table-column>
+      <el-table-column prop="proposerName" label="申请人" width="130">
+      </el-table-column>
+      <el-table-column prop="handlerName" label="处理人" width="130">
+      </el-table-column>
+      <el-table-column prop="description" label="描述" width="280" v-if="false">
+      </el-table-column>
+      <el-table-column prop="remark" label="备注" width="140">
+      </el-table-column>
+      <el-table-column label="图片" width="400">
+      </el-table-column>
+    </el-table> -->
 
     <div class="scroll-container">
-<el-table :data="tableData" style="width: 100%" :row-class-name="rowhighlight" class="listTable" :show-header="false">
+      <el-table :data="tableData" style="width: 100%" :row-class-name="rowhighlight" class="listTable" :show-header="true" :cell-style="{ textAlign: 'center' }"
+ :header-cell-style="{ textAlign: 'center' }"
+>
         <el-table-column fixed label="序号" width="100">
           <template slot-scope="scope">
             {{ scope.$index }}
           </template>
+        </el-table-column>
+
+                <el-table-column prop="jobId" label="任务ID" width="130">
+
         </el-table-column>
         <el-table-column label="任务状态" width="150">
           <template slot-scope="scope">
@@ -51,9 +55,9 @@
           </template>
         </el-table-column>
 
-                <el-table-column prop="equipment" label="设备号" width="100">
-              
-            </el-table-column>
+        <el-table-column prop="equipment" label="设备号" width="100">
+
+        </el-table-column>
         <el-table-column prop="createTime" label="申请时间" width="220">
         </el-table-column>
         <el-table-column label="故障位置" width="160">
@@ -65,7 +69,7 @@
         </el-table-column>
         <el-table-column prop="handlerName" label="处理人" width="130">
         </el-table-column>
-        <el-table-column prop="description" label="描述" width="280">
+        <el-table-column prop="description" label="描述" width="280" v-if="false">
         </el-table-column>
         <el-table-column prop="remark" label="备注" width="140">
         </el-table-column>
@@ -77,6 +81,19 @@
             </div>
           </template>
         </el-table-column>
+
+
+    <el-table-column label="节点耗时">
+      <template slot-scope="scope">
+        {{ getTimeDifference(scope.row.nodeTime) }}
+      </template>
+    </el-table-column>
+
+        <el-table-column label="总共耗时">
+      <template slot-scope="scope">
+        {{ getTimeDifference(scope.row.totalTime) }}
+      </template>
+    </el-table-column>
 
       </el-table>
     </div>
@@ -94,15 +111,15 @@ import repairReplyVue from './repair-reply.vue';
 
 
 export default {
-  created(){
-  this.fetchData()
+  created() {
+    this.fetchData()
     setInterval(() => {
       this.fetchData()
     }, 1000 * 10)
   },
   mounted() {
     console.log("开始加载数据")
-    this.fetchData(); // 加载第一页数据
+    this.fetchData(); // 加载第一页数据f
   },
   components: {
     repairReplyVue
@@ -133,7 +150,26 @@ export default {
   },
 
   methods: {
+  // 计算时间差并格式化
+    getTimeDifference(previousTime) {
+      const now = new Date(); // 当前时间
+      const previousDate = new Date(previousTime); // 之前的时间
 
+
+      const diffInMilliseconds = now - previousDate; // 时间差，单位为毫秒
+      const diffInMinutes = Math.floor(diffInMilliseconds / 60000); // 转换为分钟
+
+      if (diffInMinutes < 60) {
+        // 如果小于1小时，显示分钟
+        return `${diffInMinutes}分钟`;
+      } else {
+        // 否则，显示小时和分钟
+        const hours = Math.floor(diffInMinutes / 60); // 计算小时
+        const minutes = diffInMinutes % 60; // 计算剩余分钟
+        return `${hours}小时${minutes}分钟`;
+      }
+    },
+  
 
     // 滚动表格
     startAutoScroll() {
@@ -176,7 +212,7 @@ export default {
     // 获取表格数据 s
     fetchData() {
       const params = {
-
+statusList:[1,2,8]
       };
 
       this.$http({
@@ -204,9 +240,9 @@ export default {
         return "已确认"
       } else if (jobStatusCode == 6) {
         return "已取消"
-      }  else if (jobStatusCode == 7) {
+      } else if (jobStatusCode == 7) {
         return "关闭"
-      }else {
+      } else {
         return "未知状态"
       }
     },
@@ -239,8 +275,8 @@ export default {
   },
   mounted() {
 
-    // 滚动表格
-    this.startAutoScroll();
+    // 滚动表格（暂时关闭滚动）
+    // this.startAutoScroll();
 
 
 
@@ -274,26 +310,26 @@ export default {
 }
 
 .scroll-container {
-    /* display: flex;
+  /* display: flex;
   flex-direction: column; */
 
   /* 占满父容器 */
- min-height: 100%;
- /* 最大高度为视口高度，超过则滚动  */
-  max-height: 100vh; 
+  min-height: 100%;
+  /* 最大高度为视口高度，超过则滚动  */
+  max-height: 100vh;
   /* 启用垂直滚动 */
-  overflow-y: auto;  
-   /* margin: 0;  */
+  overflow-y: auto;
+  /* margin: 0;  */
   /* padding: 0;  */
 }
 
-.listTable{
-}
 
 /* 隐藏表格的提示信息 */
 .el-table__empty-block {
   display: none;
 }
+
+
 </style>
 
 

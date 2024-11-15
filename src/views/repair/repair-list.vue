@@ -1,6 +1,11 @@
 <template>
   <div>
     <el-form :inline="true" :model="searchForm" class="search-form">
+
+      <el-form-item label="任务ID">
+        <el-input v-model="searchForm.jobId" placeholder="请输入任务id"></el-input>
+      </el-form-item>
+
       <el-form-item label="申请人">
         <el-input v-model="searchForm.replyName" placeholder="请输入申请人名称"></el-input>
       </el-form-item>
@@ -12,6 +17,7 @@
           <el-option label="已确认" value="5"></el-option>
           <el-option label="已取消" value="6"></el-option>
           <el-option label="关闭" value="7"></el-option>
+          <el-option label="驳回" value="8"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="申请时间">
@@ -32,32 +38,36 @@
       任务看板
     </el-button>
 
-    <el-table :data="tableData" style="width: 100%" @row-click="handleRowClick" v-loading="loading">
-      <el-table-column fixed label="序号" width="50">
+    <el-table :data="tableData" style="width: 100%"  v-loading="loading" :show-header="true" :cell-style="{ textAlign: 'center' }"
+ :header-cell-style="{ textAlign: 'center' }">
+      <el-table-column fixed label="序号" width="60">
         <template slot-scope="scope">
           {{ (scope.$index + 1) + (currentPage - 1) * pageSize }}
         </template>
       </el-table-column>
-      <el-table-column label="任务状态" width="120">
+            <el-table-column prop="jobId" label="jobId" width="130">
+      </el-table-column>
+      <el-table-column label="任务状态" width="130">
         <template slot-scope="scope">
           {{ getJobStatusName(scope.row.status) }}
         </template>
       </el-table-column>
-
-      <el-table-column prop="equipment" label="设备号" width="100">
+            <el-table-column prop="handlerName" label="处理人" width="110">
       </el-table-column>
-      <el-table-column prop="createTime" label="申请时间" width="140">
+
+      <el-table-column prop="equipment" label="设备号" width="130">
+      </el-table-column>
+      <el-table-column prop="createTime" label="申请时间" width="170">
       </el-table-column>
       <el-table-column label="故障位置" width="130">
         <template slot-scope="scope">
           {{scope.row.floor+'-'+scope.row.corridor+'-'+scope.row.position}}
         </template>
       </el-table-column>
-      <el-table-column prop="proposerName" label="申请人" width="100">
+      <el-table-column prop="proposerName" label="申请人" width="110">
       </el-table-column>
-      <el-table-column prop="handlerName" label="处理人" width="100">
-      </el-table-column>
-      <el-table-column prop="description" label="描述" width="250">
+
+      <el-table-column prop="description" label="描述" width="250" v-if="false">
       </el-table-column>
       <el-table-column prop="remark" label="备注" width="120">
       </el-table-column>
@@ -65,34 +75,35 @@
       <el-table-column label="图片" width="320">
         <template slot-scope="scope">
           <div style="display: flex; gap: 5px; justify-content: center;">
-            <img v-for="(img, index) in scope.row.imagesList" :key="index" :src="`data:image/jpeg;base64,${img.fileData}`" alt="图片" style="width: 120px; height: auto; cursor: pointer;" @click="showImage(img.fileData)">
+            <img v-for="(img, index) in scope.row.imagesList" :key="index" :src="`data:image/jpeg;base64,${img.fileData}`" alt="图片" style="width: 120px; height: auto; cursor: pointer;" @click.stop="showImage(img.fileData)">
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作">
         <template slot-scope="scope">
-          <div>
+          <div style="display: flex; align-items: center; gap: 10px;">
             <el-button type="text" @click.stop="$router.push({ name: 'repair-jobDetail', query: { jobId: scope.row.jobId } })">查看</el-button>
 
-          </div>
-          <div>
-            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消任务
+            <el-button type="text" @click.stop="dealJob(scope.row)" v-if="scope.row.status === 1">处理
             </el-button>
-          </div>
-          <div>
-            <el-button type="text" @click.stop="dealJob(scope.row)" v-if="scope.row.status === 1">开始处理
-            </el-button>
-            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2">完成
+
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'finish')" v-else-if="scope.row.status === 2 || scope.row.status === 8">完成
             </el-button>
             <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'confirm')" v-else-if="scope.row.status === 4">确认
             </el-button>
             <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'close')" v-else-if="scope.row.status === 5">关闭
             </el-button>
           </div>
-          <div>
 
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'reject')" v-if="scope.row.status === 4" style="color:  #ff6666;">驳回
+            </el-button>
+
+            <el-button type="text" @click.stop="jobOperation(scope.row.id,scope.row.jobId,'cancel')" v-if="[1, 2, 3].includes(scope.row.status) " style="color:  #ff6666;">取消
+            </el-button>
           </div>
+
         </template>
       </el-table-column>
 
@@ -215,7 +226,8 @@ export default {
       searchForm: {
         replyName: null,
         statusList: [],
-        dateRange: []
+        dateRange: [],
+        jobId:null
       },
 
       // 分页
@@ -354,6 +366,7 @@ export default {
           ? this.searchForm.dateRange[1]
           : null,
         loginInId: this.$store.state.user.id,
+        jobId:this.searchForm.jobId
 
       };
       console.log(params)
@@ -425,6 +438,8 @@ export default {
         return "已取消"
       } else if (jobStatusCode == 7) {
         return "关闭"
+      } else if (jobStatusCode == 8) {
+        return "驳回"
       } else {
         return "未知状态"
       }

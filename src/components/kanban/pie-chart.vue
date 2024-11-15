@@ -101,10 +101,10 @@ export default {
   computed: {},
   //监控 data 中的数据变化
   watch: {
-    // data(newData) {
-    //   this.option.series.data = newData;
-    //   this.option && this.myChart.setOption(this.option);
-    // }
+    data(newData) {
+      this.option.series.data = newData;
+      this.option && this.myChart.setOption(this.option);
+    }
   },
   //方法集合
   methods: {
