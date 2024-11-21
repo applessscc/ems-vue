@@ -33,6 +33,12 @@
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">CMS 能耗历史查询</span>
           </el-menu-item>
+
+          <el-menu-item index="demo-ueditor" @click="openNew('equipment/ai-temp-borad')">
+            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">CMS 实时温度</span>
+          </el-menu-item>
+
         </el-submenu>
 
         <el-submenu index="任务管理">

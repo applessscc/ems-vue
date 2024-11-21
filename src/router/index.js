@@ -21,6 +21,9 @@ const globalRoutes = [
   { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } },
   { path: '/equipment/electricity', component: _import('equipment/electricity'), name: 'electricity', meta: { title: 'CMS 能耗看板' } },
   { path: '/equipment/electricity-his', component: _import('equipment/electricity-his'), name: 'electricity-his', meta: { title: 'CMS 能耗历史查询' } },
+  { path: '/equipment/ai-temp-borad', component: _import('equipment/ai-temp-borad'), name: 'ai-temp-borad', meta: { title: 'CMS 实时温度' } },
+  { path: '/equipment/ai-temp-board-detail', component: _import('equipment/ai-temp-board-detail'), name: 'ai-temp-board-detail', meta: { title: 'CMS 实时温度详情' } },
+
 
   { path: '/repair/repair-kanban', component: _import('repair/repair-kanban'), name: 'repair-kanban', meta: { title: '维修任务看板' } },
 
