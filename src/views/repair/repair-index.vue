@@ -1,6 +1,6 @@
 <template>
   <el-main>
-    <!-- 报修统计 -->
+       <!-- 报修统计 -->
     <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
       <el-col :span="6">
 
