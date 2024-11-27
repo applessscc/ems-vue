@@ -39,7 +39,7 @@
 
       <dv-border-box-1 class="main-container" :dur="66">
         <div class="top-main-container">
-          <dv-border-box-10 class="top-left-container">
+          <dv-border-box-10 class="top-left-container" :style="{ width: showTransformer ? '73%' : '100%' }">
             <div class="go-history-div" @dblclick="goHistory('date')">
               <chart-Line-Bar ref="chartLineBar1" @refreshData="refreshData" />
             </div>
@@ -363,21 +363,21 @@ export default {
             this.pieTopData[0].name = "负载0%"
             this.pieTopData[0].value = 0;
             this.pieTopData[1].name = "空闲100%"
-            this.pieTopData[1].value =100
+            this.pieTopData[1].value = 100
 
 
- 
+
             this.pieBottomData[0].name = "负载0%"
             this.pieBottomData[0].value = 0;
             this.pieBottomData[1].name = "空闲100%"
-            this.pieBottomData[1].value =100
+            this.pieBottomData[1].value = 100
 
 
             this.loadRateValueTop = 0;
             this.loadValueTop = 0;
 
             this.pieBottomTitle = '暂无数据';
-  
+
 
             this.loadRateValueBottom = 0;
             this.loadValueBottom = 0;
@@ -434,13 +434,13 @@ export default {
             }
           })
 
-                      this.$nextTick(() => {
-              this.$refs.pieTopChart.refreshChart();
-            })
+          this.$nextTick(() => {
+            this.$refs.pieTopChart.refreshChart();
+          })
 
-            this.$nextTick(() => {
-              this.$refs.pieBottomChart.refreshChart();
-            })
+          this.$nextTick(() => {
+            this.$refs.pieBottomChart.refreshChart();
+          })
         } else {
           console.log(data);
         }
