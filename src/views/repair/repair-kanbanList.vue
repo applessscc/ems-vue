@@ -295,7 +295,7 @@ statusList:[1,2,8]
 }
 </script>
 
-<style>
+<style >
 /* 表格行背景颜色 */
 .el-table.warning-row {
   background: oldlace;
