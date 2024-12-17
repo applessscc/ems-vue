@@ -1,0 +1,243 @@
+<template>
+  <div>
+
+    <div class="main-contain-top">
+      <el-card>
+        <div style="text-align: center;">
+          <span style="font-weight: bold; font-size: 30px;">当前SN：0204212411220006</span>
+        </div>
+
+      </el-card>
+    </div>
+
+    <div class="curent-job-contain">
+      <el-card>
+        <div slot="header" class="clearfix">
+          <span style="font-weight: bold;">当前检测设备</span>
+        </div>
+        <div>
+          <el-descriptions :column="3" border>
+            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">kooriookami</el-descriptions-item>
+            <el-descriptions-item label="SO">1312321321312</el-descriptions-item>
+            <el-descriptions-item label="Nadel">1312321321312</el-descriptions-item>
+            <el-descriptions-item label="状态">
+              <el-tag size="small">待检测</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="检测结果">
+              <el-tag size="small">通过</el-tag>
+            </el-descriptions-item>
+
+          </el-descriptions>
+        </div>
+      </el-card>
+
+    </div>
+    <div class="main-contain">
+      <el-card>
+        <div slot="header" class="clearfix">
+          <span style="font-weight: bold;" v-if="switchValue">设备检测</span>
+          <span style="font-weight: bold;" v-else>设备过站</span>
+          <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db">
+          </el-switch>
+        </div>
+        <div class="main-form-container" v-if="switchValue">
+          <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="SN">
+              <el-input v-model="form.name" placeholder="请输入SN号"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-radio v-model="radio" label="1">PASS</el-radio>
+              <el-radio v-model="radio" label="2">FAIL</el-radio>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSubmit">确定</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <div class="main-form-container" v-else>
+
+          <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="SN">
+              <el-input v-model="form.name" placeholder="请输入SN号"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-radio v-model="radio" label="1">进站</el-radio>
+              <el-radio v-model="radio" label="2">出站</el-radio>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSubmit">确定</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+
+      </el-card>
+    </div>
+
+    <div>
+      <div class="left-top-contain">
+        <el-card>
+          <div slot="header">
+            <span style="font-weight: bold;">设备图片 </span>
+          </div>
+          <div class="left-top-contain-img">
+          </div>
+        </el-card>
+      </div>
+    </div>
+
+    <div class="left-bottom-contain">
+      <el-card>
+        <div slot="header">
+          <span style="font-weight: bold;">SN列表
+          </span>
+        </div>
+        <div class="left-bottom-contain-table">
+          <el-table :data="tableData" style="width: 100%" stripe border height="320px">
+            <el-table-column prop="name" label="SN号" width="180">
+            </el-table-column>
+            <el-table-column prop="address" label="状态" width="80">
+            </el-table-column>
+            <el-table-column prop="date" label="操作时间" width="180">
+            </el-table-column>
+
+          </el-table>
+        </div>
+
+      </el-card>
+
+    </div>
+
+  </div>
+
+</template>
+
+<script>
+export default {
+
+  data() {
+    return {
+      radio: '1',
+      switchValue: false,
+      form: {
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      },
+
+      tableData: [{
+        date: '2016-05-02',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-04',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-01',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-01',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-01',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-01',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-01',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-01',
+        name: '0204212411220006',
+        address: '进站'
+      }, {
+        date: '2016-05-03',
+        name: '0204212411220006',
+        address: '进站'
+      }]
+
+
+    }
+  },
+  components: {
+
+  },
+  computed: {
+
+  },
+  created() {
+  },
+  mounted() {
+
+
+  },
+  methods: {
+    onSubmit() {
+      console.log('submit!');
+    }
+  }
+}
+</script>
+<style >
+.main-contain {
+  /* background-color: rgb(184, 31, 31); */
+  position: fixed;
+  top: 470px;
+  left: 800px;
+  width: 1000px;
+  height: 560px;
+}
+.left-top-contain {
+  position: fixed;
+  top: 10%;
+  width: 500px;
+  height: 400px;
+
+  /* background-color: rgb(89, 61, 165); */
+}
+.left-top-contain-img {
+  background-image: url("../../assets/img/left-top-bg.jpg");
+  background-size: cover; /* 让背景图片覆盖整个 div */
+  background-position: center; /* 图片居中 */
+  width: 100%;
+  height: 250px;
+}
+.left-bottom-contain {
+  position: fixed;
+  top: 500px;
+  width: 500px;
+  height: 200px;
+}
+.left-bottom-contain-table {
+  overflow-y: auto;
+  width: 100%;
+  height: 320px;
+}
+.curent-job-contain {
+  position: fixed;
+  left: 800px;
+  top: 230px;
+  width: 1000px;
+  height: 300px;
+  /* background-color: aquamarine; */
+}
+.main-contain-top {
+  top: 10%;
+  left: 800px;
+  width: 1000px;
+
+  position: fixed;
+}
+</style>

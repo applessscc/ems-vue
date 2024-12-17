@@ -50,6 +50,12 @@
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">任务</span>
           </el-menu-item>
+
+          <el-menu-item index="stop" @click="$router.push({ name: 'cookerJob' })">
+            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">炒饭机任务</span>
+          </el-menu-item>
+
         </el-submenu>
 
         <sub-menu v-for="menu in menuList" :key="menu.menuId" :menu="menu" :dynamicMenuRoutes="dynamicMenuRoutes">

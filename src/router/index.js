@@ -26,6 +26,7 @@ const globalRoutes = [
 
 
   { path: '/repair/repair-kanban', component: _import('repair/repair-kanban'), name: 'repair-kanban', meta: { title: '维修任务看板' } },
+  { path: '/cookerJob/cookerJobKanban', component: _import('cookerJob/cookerJobKanban'), name: 'cookerJobKanban', meta: { title: '炒饭机任务看板' } },
 
   { path: '/equipment/transformer-his', component: _import('equipment/transformer-his'), name: 'transformer-his', meta: { title: '变压器能耗历史查询' } },
   { path: '/equipment/global', component: _import('equipment/global'), name: 'global', meta: { title: '3D 地球' } },
@@ -55,6 +56,8 @@ const mainRoutes = {
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
     { path: '/formdetail', component: _import('modules/site/formdetail'), name: 'formdetail', meta: { title: '问题单详情', isTab: true } },
     { path: '/repair-index', component: _import('repair/repair-index'), name: 'repair-index' , meta: { title: '报修表单'}}, 
+    { path: '/cookerJob', component: _import('cookerJob/cookerJob'), name: 'cookerJob' , meta: { title: '炒房机任务'}}, 
+
     { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply' , meta: { title: '报修表单'}}, 
     { path: '/repair-jobDetail', component: _import('repair/repair-jobDetail'), name: 'repair-jobDetail' , meta: { title: '任务详情'}}, 
   ],

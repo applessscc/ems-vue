@@ -25,15 +25,18 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="primary" @click="search(false)">搜索</el-button>
           <el-button @click="resetForm">重置</el-button>
+          <!-- <el-button type="primary" @click="search(true)">导出</el-button> -->
         </el-form-item>
       </el-form>
     </div>
 
     <!-- 顶部容器 -->
     <div class="echart-div">
-      <div ref="echart" class="echartContaion"></div>
+        <div ref="echart" class="echartContaion"></div>
+      <!-- <div class="warmContaion">
+      </div> -->
     </div>
 
     <div class="table-head">
@@ -121,17 +124,17 @@ export default {
 
       buNameOptions: ["b9", "b8"],
       AINameList: [
-        "B8后化学危险品仓1#房温度", 
-        "B8后化学危险品仓2#房温度", 
-        "B8后化学危险品仓3#房温度", 
-        "B8后化学危险品仓4#房温度", 
-        "B8后化学危险品仓5#房温度", 
+        "B8后化学危险品仓1#房温度",
+        "B8后化学危险品仓2#房温度",
+        "B8后化学危险品仓3#房温度",
+        "B8后化学危险品仓4#房温度",
+        "B8后化学危险品仓5#房温度",
         "B8后化学危险品仓6#房温度",
         "B6后化学危险品仓1#房温度",
-        "B6后化学危险品仓2#房温度", 
-        "B6后化学危险品仓3#房温度", 
-        "B6后化学危险品仓4#房温度", 
-        "B6后化学危险品仓5#房温度", 
+        "B6后化学危险品仓2#房温度",
+        "B6后化学危险品仓3#房温度",
+        "B6后化学危险品仓4#房温度",
+        "B6后化学危险品仓5#房温度",
         "B6后化学危险品仓6#房温度",
         "B9/1#变压房温湿度计 温度",
         "B9/2#变压房温湿度计 温度"
@@ -203,9 +206,9 @@ export default {
       }, 50); // 滚动间隔，单位为毫秒，可以调整以控制滚动速度
     },
     // 表单搜索功能
-    search() {
-      console.log("搜索条件:", this.searchForm);
-      this.fetchData()
+    search(isExport) {
+      console.log("搜索条件:", this.searchForm, isExport);
+      this.fetchData(isExport)
 
     },
     // 重置搜索框表单
@@ -267,9 +270,10 @@ export default {
     },
 
 
-    fetchData() {
+    fetchData(isExport) {
       this.loading = true;
       const params = {
+        isExport: isExport,
         aiName: this.searchForm.aiName,
         loginInId: this.$store.state.user.id,
         startDate: this.searchForm.dateRange && this.searchForm.dateRange[0]
@@ -284,22 +288,54 @@ export default {
         url: this.$http.adornUrl(`/equipment/transformer/getAIList`),  // 接口地址
         method: 'post',              //  POST 请求
         data: params,                // 使用 data 传递参数
+        responseType: isExport ? 'blob' : 'json' // 如果是导出，设置为 blob
+
       }).then((response) => {
-        console.log(response.data.data)
-        const data = response.data.data.aiList;  // 解析后端返回的分页数据
-        this.series = response.data.data.seriesList;
-        const xaxisData = response.data.data.xaxisData;
-        this.xAxisData = xaxisData
-        this.tableData = data;       // 表格数据
-        this.loading = false;
+        if (isExport) {
+          // 处理导出的文件
+          // const { data } = response
+          // const link = document.createElement('a');
+          // let blob = new Blob([data], {
+          //   type: 'application/vnd.ms-excel;charset=UTF-8'
+          // })
+          // link.style.display = 'none'
 
-        this.yMax = response.data.data.maxValue
-        this.ymin = response.data.data.minValue
+          // link.href = URL.createObjectURL(blob);
+          // link.download = `实时温度-${moment(new Date()).format('YYYYMMDD HHmmss')}.xlsx`
+          // // document.body.appendChild(link)
+          // link.click();
+// https://www.microsoft.com/zh-cn/download/details.aspx?id=16614
+// https://learn.microsoft.com/zh-cn/dotnet/core/install/windows#net-installer
 
-        console.log("max + min",this.yMax,this.ymin)
+          console.log(response.data)
 
-      
-        this.initChart(); // 在数据加载完之后初始化图表
+          // 处理导出的文件
+          const blob = response.data;
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(new Blob([blob]))
+          link.download = 'exported_file.xlsx';  // 设置下载文件名
+          document.body.appendChild(link)
+          link.click()
+          window.setTimeout(function () {
+            URL.revokeObjectURL(link.href)
+            document.body.removeChild(link)
+          }, 0)
+
+
+        } else {
+          console.log(response.data.data)
+          const data = response.data.data.aiList;  // 解析后端返回的分页数据
+          this.series = response.data.data.seriesList;
+          const xaxisData = response.data.data.xaxisData;
+          this.xAxisData = xaxisData
+          this.tableData = data;       // 表格数据
+          this.loading = false;
+          this.yMax = response.data.data.maxValue
+          this.ymin = response.data.data.minValue
+          console.log("max + min", this.yMax, this.ymin)
+          this.initChart(); // 在数据加载完之后初始化图表
+        }
+
 
         if (!this.isStart) {
           this.startAutoScroll();
@@ -323,7 +359,13 @@ export default {
 
 .echartContaion {
   height: 395px;
-  width: 100%;
+  width: 80%;
+}
+  
+.warmContaion{
+  background-color: aqua;
+    height: 395px;
+  width: 20%;
 }
 
 .listContaion {
