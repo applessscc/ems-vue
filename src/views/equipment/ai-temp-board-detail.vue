@@ -39,24 +39,53 @@
       </div> -->
     </div>
 
+    <!-- 顶部容器 -->
+    <div class="echart-list-div">
+
+      <el-card style="height: 300px">
+
+
+
+
+
+        <template slot="header">
+          <el-row type="flex" justify="space-between" align="middle">
+            <div class="title" style="font-weight: bold;">温度异常列表</div>
+          </el-row>
+          <!-- <div class="title">温度异常列表</div> -->
+        </template>
+
+        <el-table :data="tableData2" border style="width: 100% " :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }" height="180" 
+         :row-class-name="rowClassName" size="mini"  empty-text="暂无数据">
+          <el-table-column prop="aiName" label="AI名称" width="200px">
+          </el-table-column>
+          <el-table-column prop="currentRealTimeValue" label="实时温度" width="115" :formatter="(row, column, cellValue) => `${cellValue}℃`">
+          </el-table-column>
+          <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数" width="115"></el-table-column>
+        </el-table>
+      </el-card>
+    </div>
+
     <div class="table-head">
       <!-- 表头不滚动 -->
       <el-table :data="[]" style="width: 100%;" :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' } ">
-        <el-table-column fixed label="序号" width="50">
+        <!-- <el-table-column fixed label="序号" width="50">
           <template slot-scope="scope">
             {{ (scope.$index + 1) }}
           </template>
+        </el-table-column> -->
+        <!-- <el-table-column prop="aiSeqNo" label="AI序号" width="180"></el-table-column> -->
+                <el-table-column prop="aiName" label="AI名称" width="250"></el-table-column>
+
+        <el-table-column prop="day" label="日" width="150"></el-table-column>
+        <el-table-column prop="currentRealTimeValue" label="实时温度" width="200"></el-table-column>
+
+        <el-table-column prop="dayMaxTime" label="日最大时间" width="220"></el-table-column>
+        <el-table-column prop="dayMaxValue" label="日最大值" width="220">
         </el-table-column>
-        <el-table-column prop="aiSeqNo" label="AI序号" width="180"></el-table-column>
-        <el-table-column prop="day" label="日" width="180"></el-table-column>
-        <el-table-column prop="aiName" label="AI名称" width="250"></el-table-column>
-        <el-table-column prop="dayMaxTime" label="日最大时间" width="180"></el-table-column>
-        <el-table-column prop="dayMaxValue" label="日最大值" width="180">
-        </el-table-column>
-        <el-table-column prop="dayMinTime" label="日最小时间" width="180"></el-table-column>
-        <el-table-column prop="dayMinValue" label="日最小值" width="180"></el-table-column>
-        <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数" width="180"></el-table-column>
-        <el-table-column prop="avg" label="日平均值" width="180"></el-table-column>
+        <el-table-column prop="dayMinTime" label="日最小时间" width="220"></el-table-column>
+        <el-table-column prop="dayMinValue" label="日最小值" width="220"></el-table-column>
+        <el-table-column prop="avg" label="日平均值" width="220"></el-table-column>
       </el-table>
     </div>
     <!-- 底部容器 -->
@@ -66,21 +95,23 @@
         <!-- 滚动列表 -->
         <div class="scroll-container">
           <el-table :data="tableData" style="width: 100%" v-loading="loading" :show-header="false" :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }">
-            <el-table-column fixed label="序号" width="50">
+            <!-- <el-table-column fixed label="序号" width="50" v-if="true">
               <template slot-scope="scope">
                 {{ (scope.$index + 1) }}
               </template>
+            </el-table-column> -->
+            <!-- <el-table-column prop="aiSeqNo" label="AI序号" width="180" v-if="true"></el-table-column> -->
+                        <el-table-column prop="aiName" label="AI名称" width="250"></el-table-column>
+
+            <el-table-column prop="day" label="日" width="150"></el-table-column>
+            <el-table-column prop="currentRealTimeValue" label="实时温度" width="200" :formatter="(row, column, cellValue) => `${cellValue}℃`"></el-table-column>
+
+            <el-table-column prop="dayMaxTime" label="日最大时间" width="220"></el-table-column>
+            <el-table-column prop="dayMaxValue" label="日最大值" width="220" :formatter="(row, column, cellValue) => `${cellValue}℃`">
             </el-table-column>
-            <el-table-column prop="aiSeqNo" label="AI序号" width="180"></el-table-column>
-            <el-table-column prop="day" label="日" width="180"></el-table-column>
-            <el-table-column prop="aiName" label="AI名称" width="250"></el-table-column>
-            <el-table-column prop="dayMaxTime" label="日最大时间" width="180"></el-table-column>
-            <el-table-column prop="dayMaxValue" label="日最大值" width="180" :formatter="(row, column, cellValue) => `${cellValue}℃`">
-            </el-table-column>
-            <el-table-column prop="dayMinTime" label="日最小时间" width="180"></el-table-column>
-            <el-table-column prop="dayMinValue" label="日最小值" width="180" :formatter="(row, column, cellValue) => `${cellValue}℃`"></el-table-column>
-            <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数" width="180"></el-table-column>
-            <el-table-column prop="avg" label="日平均值" width="180" :formatter="(row, column, cellValue) => `${(cellValue).toFixed(2)}℃`"></el-table-column>
+            <el-table-column prop="dayMinTime" label="日最小时间" width="220"></el-table-column>
+            <el-table-column prop="dayMinValue" label="日最小值" width="220" :formatter="(row, column, cellValue) => `${cellValue}℃`"></el-table-column>
+            <el-table-column prop="avg" label="日平均值" width="220" :formatter="(row, column, cellValue) => `${(cellValue).toFixed(2)}℃`"></el-table-column>
           </el-table>
         </div>
 
@@ -99,6 +130,12 @@ import { now } from 'moment';
 export default {
   data() {
     return {
+
+      tableData2:[],
+
+
+
+
 
       // 实时数据开关
       pageTimerSwitch: false,
@@ -170,7 +207,7 @@ export default {
           this.reflashData()
         }
 
-      }, 15000);
+      }, 60000);
     });
 
     window.addEventListener('resize', this.resizeChart); // 监听窗口大小变化
@@ -184,7 +221,9 @@ export default {
   },
 
   methods: {
-
+ rowClassName() {
+    return 'error-row' ;
+  },
 
     reflashData() {
       this.fetchData()
@@ -240,7 +279,13 @@ export default {
 
         tooltip: {
           order: 'valueDesc',
-          trigger: 'axis'
+          trigger: 'axis',
+          // 设置 tooltip 的 position 为一个函数
+          position: function (point, params, dom, rect, size) {
+            // point 是鼠标当前的位置 [x, y]
+            // 可以通过调整 y 值来让 tooltip 出现在鼠标下方
+            return [point[0], point[1] + 10]; // 向下偏移 10px
+          }
         },
 
         xAxis: {
@@ -304,8 +349,8 @@ export default {
           // link.download = `实时温度-${moment(new Date()).format('YYYYMMDD HHmmss')}.xlsx`
           // // document.body.appendChild(link)
           // link.click();
-// https://www.microsoft.com/zh-cn/download/details.aspx?id=16614
-// https://learn.microsoft.com/zh-cn/dotnet/core/install/windows#net-installer
+          // https://www.microsoft.com/zh-cn/download/details.aspx?id=16614
+          // https://learn.microsoft.com/zh-cn/dotnet/core/install/windows#net-installer
 
           console.log(response.data)
 
@@ -334,6 +379,25 @@ export default {
           this.ymin = response.data.data.minValue
           console.log("max + min", this.yMax, this.ymin)
           this.initChart(); // 在数据加载完之后初始化图表
+
+
+          // 封装日不合格分钟数
+          // this.tableData.forEach(item => {
+          //   if(item.unqualifiedMinutes !=null && item.unqualifiedMinutes !=0 ){
+          //     this.tableData2.push(item);
+          //   }
+          // })
+
+
+        this.tableData2 = data.forEach(element => {
+          console.log(element.dayUnqualifiedMinutes)
+          console.log(element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0)
+          if (element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0) {
+            this.tableData2.push(element);
+          }
+        });
+
+          
         }
 
 
@@ -361,10 +425,10 @@ export default {
   height: 395px;
   width: 80%;
 }
-  
-.warmContaion{
+
+.warmContaion {
   background-color: aqua;
-    height: 395px;
+  height: 395px;
   width: 20%;
 }
 
@@ -429,7 +493,7 @@ export default {
   left: 0;
   width: 100%;
   height: 395px;
-  z-index: 100; /* 保证图表在搜索栏下方，但在内容表格之上 */
+  z-index: 400; /* 保证图表在搜索栏下方，但在内容表格之上 */
   background-color: white; /* 可根据需要修改背景色 */
 }
 
@@ -448,10 +512,27 @@ export default {
   position: fixed; /* 固定定位 */
   top: 480px;
   left: 20px;
-  z-index: 300; /* 确保位于其他元素之上 */
+  z-index: 10; /* 确保位于其他元素之上 */
 }
 //
 .el-select .el-input__inner {
   width: 300px;
 }
+.echart-list-div {
+  position: fixed;
+  left: 1400px;
+  top: 110px;
+  width: 500px;
+  z-index: 9999;
+  color: yellow;
+  height: 300px;
+}
+
+.el-table .error-row {
+  background: #ebabab;
+}/* 隐藏表格的提示信息 */
+.el-table__empty-block {
+  display: flex;
+}
+
 </style>

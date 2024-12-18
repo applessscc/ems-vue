@@ -4,7 +4,7 @@
     <div class="top-contain">
       <el-card style="height: 300px;">
         <el-row justify="center">
-          <el-col :span="4" class="show-item">
+          <el-col :span="3" class="show-item">
             <el-card :body-style="{ padding: '10px' }">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div style="padding: 14px;">
@@ -15,7 +15,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :span="4" class="show-item">
+          <el-col :span="3" class="show-item">
             <el-card :body-style="{ padding: '10px' }">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div style="padding: 14px;">
@@ -26,7 +26,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :span="4" class="show-item">
+          <el-col :span="3" class="show-item">
             <el-card :body-style="{ padding: '10px' }">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div style="padding: 14px;">
@@ -37,7 +37,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :span="4" class="show-item">
+          <el-col :span="3" class="show-item">
             <el-card :body-style="{ padding: '10px' }">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div style="padding: 14px;">
@@ -48,7 +48,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :span="4" class="show-item">
+          <el-col :span="3" class="show-item">
             <el-card :body-style="{ padding: '10px' }">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div style="padding: 14px;">
@@ -59,7 +59,7 @@
               </div>
             </el-card>
           </el-col>
-          <el-col :span="4" class="show-item">
+          <el-col :span="3" class="show-item">
             <el-card :body-style="{ padding: '10px' }">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div style="padding: 14px;">
@@ -70,6 +70,29 @@
               </div>
             </el-card>
           </el-col>
+                  <el-col :span="3" class="show-item">
+            <el-card :body-style="{ padding: '10px' }">
+              <img src="../../assets/img/left-top-bg.jpg" class="image">
+              <div style="padding: 14px;">
+                <span>1号拉</span>
+                <div class="bottom clearfix">
+                  <time class="time">{{ currentDate }}</time>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+             <el-col :span="3" class="show-item">
+            <el-card :body-style="{ padding: '10px' }">
+              <img src="../../assets/img/left-top-bg.jpg" class="image">
+              <div style="padding: 14px;">
+                <span>1号拉</span>
+                <div class="bottom clearfix">
+                  <time class="time">{{ currentDate }}</time>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+          
 
         </el-row>
       </el-card>
@@ -83,7 +106,7 @@
     </div>
 
     <div class="right-contain">
-      <el-card>
+      <el-card style="height: 550px;">
         <el-row>
           <el-col :span="24" class="show-item">
             <el-card :body-style="{ padding: '10px' }">

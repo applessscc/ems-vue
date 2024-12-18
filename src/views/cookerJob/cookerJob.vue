@@ -15,7 +15,7 @@
         <div slot="header" class="clearfix">
           <span style="font-weight: bold;">当前检测设备</span>
         </div>
-        <div>
+        <div class="curent-job-contain-top">
           <el-descriptions :column="3" border>
             <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{form.sn == null|| form.sn == ''?"暂无":form.sn}}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
@@ -26,7 +26,6 @@
             <el-descriptions-item label="检测结果" v-if="false">
               <el-tag size="small">通过</el-tag>
             </el-descriptions-item>
-
           </el-descriptions>
         </div>
       </el-card>
@@ -202,6 +201,10 @@ export default {
   components: {
 
   },
+
+  watch: {
+
+  },
   computed: {
 
   },
@@ -270,16 +273,16 @@ export default {
     onSubmit() {
 
       this.$refs.form.validate((valid) => {
-             if(this.form.operationType == null || this.form.sn == null ) {
-        this.$message({
-                message: '参数不全',
-                type: 'warn',
-                duration: 1000
-              });
-              return
-          }
-        if (valid ) {
-    
+        if (this.form.operationType == null || this.form.sn == null) {
+          this.$message({
+            message: '参数不全',
+            type: 'warn',
+            duration: 1000
+          });
+          return
+        }
+        if (valid) {
+
           const params = {
             operationType: this.form.operationType,
             sn: this.form.sn,
@@ -295,7 +298,7 @@ export default {
             method: 'post',              // 改为 POST 请求
             data: params,                // 使用 data 传递参数
           }).then((response) => {
-                          this.fetchData();
+            this.fetchData();
 
             if (response.data.data == 11) {
               this.$message({
@@ -327,8 +330,8 @@ export default {
                 type: 'error',
                 duration: 1000
               });
-              }
-               else {
+            }
+            else {
               console.log('炒饭机任务操作', response);
               this.$message({
                 message: '操作成功',
@@ -423,4 +426,10 @@ export default {
 .el-switch__core {
   left: 10px;
 }
+.curent-job-contain-bottom{
+  margin-top: 25px;
+    margin-left: 5px;
+}
+
+
 </style>
