@@ -103,7 +103,7 @@
     <div class="left-bottom-contain">
       <el-card>
         <div slot="header">
-          <span style="font-weight: bold;">SN列表
+          <span style="font-weight: bold;">SN列表 
           </span>
 
         </div>
