@@ -11,9 +11,19 @@
     </div>
 
     <div class="curent-job-contain">
-      <el-card style="height: 210px;">
+      <el-card>
         <div slot="header" class="clearfix">
-          <span style="font-weight: bold;">当前检测设备</span>
+
+          <el-row type="flex" justify="space-between" align="middle">
+            <span style="font-weight: bold;" v-if="switchValue">设备检测
+              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+            </span>
+            <span style="font-weight: bold;" v-else>设备过站
+              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+            </span>
+            <el-button type="primary" @click="openNew('cookerJob/cookerJobKanban')">任务看板</el-button>
+          </el-row>
+
         </div>
         <div class="curent-job-contain-top">
           <el-descriptions :column="3" border>
@@ -28,62 +38,41 @@
             </el-descriptions-item>
           </el-descriptions>
         </div>
-      </el-card>
 
-    </div>
-    <div class="main-contain">
-      <el-card style="height: 437px;">
-        <div slot="header" class="clearfix">
-
-          <el-row type="flex" justify="space-between" align="middle">
-            <span style="font-weight: bold;" v-if="switchValue">设备检测
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
-            <span style="font-weight: bold;" v-else>设备过站
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
-            <el-button type="primary" @click="openNew('cookerJob/cookerJobKanban')">任务看板</el-button>
-          </el-row>
-
-        </div>
-        <div class="main-form-container" v-if="switchValue">
+                <div class="main-form-container" v-if="switchValue">
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
               <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"></el-input>
             </el-form-item>
 
-            <el-form-item label="位置">
-              <el-select v-model="form.location" placeholder="请选择">
-                <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
+            <el-form-item>
+                            <el-button type="primary" @click="onSubmit(5)">开始检测</el-button>
 
-            <el-form-item>
-              <el-radio v-model="form.operationType" label="3">PASS</el-radio>
-              <el-radio v-model="form.operationType" label="4">FAIL</el-radio>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit">确定</el-button>
+              <el-button type="primary" @click="onSubmit(3)">PASS</el-button>
+              <el-button type="danger" @click="onSubmit(4)">FAIL</el-button>
             </el-form-item>
           </el-form>
         </div>
 
         <div class="main-form-container" v-else>
-
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
               <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"></el-input>
             </el-form-item>
+
             <el-form-item>
-              <el-radio v-model="form.operationType" label="1">进站</el-radio>
-              <el-radio v-model="form.operationType" label="2">出站</el-radio>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit">确定</el-button>
+              <el-button type="primary" @click="onSubmit(1)">进站</el-button>
+              <el-button type="primary" @click="onSubmit(2)">入站</el-button>
             </el-form-item>
           </el-form>
         </div>
+      </el-card>
+
+    </div>
+    <div class="main-contain">
+      <el-card style="height: 380px;">
+
+
 
       </el-card>
     </div>
@@ -92,7 +81,13 @@
       <div class="left-top-contain">
         <el-card>
           <div slot="header">
-            <span style="font-weight: bold;">设备图片 </span>
+            <el-row type="flex" justify="space-between" align="middle">
+              <span style="font-weight: bold;">设备图片
+              </span>
+              <el-select v-model="form.location" placeholder="请选择位置">
+                <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.value">
+                </el-option>
+              </el-select> </el-row>
           </div>
           <div class="left-top-contain-img">
           </div>
@@ -103,7 +98,7 @@
     <div class="left-bottom-contain">
       <el-card>
         <div slot="header">
-          <span style="font-weight: bold;">SN列表 
+          <span style="font-weight: bold;">SN列表
           </span>
 
         </div>
@@ -174,15 +169,12 @@ export default {
 
       // 提交表单
       form: {
-        operationType: null,
+        // operationType: null,
         sn: null,
         location: null,
       },
 
       dataRule: {
-        operationType: [
-          { required: true, message: '请选择操作类型', trigger: 'blur' }
-        ],
         sn: [
           { required: true, message: 'sn不能为空', trigger: 'blur' }
         ],
@@ -270,10 +262,10 @@ export default {
       let newUrl = this.$router.resolve({ path: path });
       window.open(newUrl.href, '_blank');
     },
-    onSubmit() {
+    onSubmit(type) {
 
       this.$refs.form.validate((valid) => {
-        if (this.form.operationType == null || this.form.sn == null) {
+        if (this.form.type == null || this.form.sn == null) {
           this.$message({
             message: '参数不全',
             type: 'warn',
@@ -284,7 +276,7 @@ export default {
         if (valid) {
 
           const params = {
-            operationType: this.form.operationType,
+            type: this.form.type,
             sn: this.form.sn,
             // proposerId:this.$store.state.user.id,
             handlerId: this.$store.state.user.id,
@@ -376,7 +368,7 @@ export default {
 .main-contain {
   /* background-color: rgb(184, 31, 31); */
   position: fixed;
-  top: 470px;
+  top: 540px;
   left: 800px;
   width: 1000px;
   height: 560px;
@@ -398,7 +390,7 @@ export default {
 }
 .left-bottom-contain {
   position: fixed;
-  top: 470px;
+  top: 480px;
   width: 500px;
   height: 200px;
 }
@@ -411,7 +403,7 @@ export default {
 .curent-job-contain {
   position: fixed;
   left: 800px;
-  top: 230px;
+  top: 210px;
   width: 1000px;
   height: 300px;
   /* background-color: aquamarine; */
@@ -426,10 +418,11 @@ export default {
 .el-switch__core {
   left: 10px;
 }
-.curent-job-contain-bottom{
+.curent-job-contain-bottom {
   margin-top: 25px;
-    margin-left: 5px;
+  margin-left: 5px;
 }
-
-
+.main-form-container{
+      margin-top: 25px;
+}
 </style>
