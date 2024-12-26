@@ -39,15 +39,14 @@
           </el-descriptions>
         </div>
 
-                <div class="main-form-container" v-if="switchValue">
+        <div class="main-form-container" v-if="switchValue">
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
               <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"></el-input>
             </el-form-item>
 
             <el-form-item>
-                            <el-button type="primary" @click="onSubmit(5)">开始检测</el-button>
-
+              <el-button type="primary" @click="onSubmit(5)">开始检测</el-button>
               <el-button type="primary" @click="onSubmit(3)">PASS</el-button>
               <el-button type="danger" @click="onSubmit(4)">FAIL</el-button>
             </el-form-item>
@@ -62,7 +61,7 @@
 
             <el-form-item>
               <el-button type="primary" @click="onSubmit(1)">进站</el-button>
-              <el-button type="primary" @click="onSubmit(2)">入站</el-button>
+              <el-button type="primary" @click="onSubmit(2)">出站</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -72,7 +71,9 @@
     <div class="main-contain">
       <el-card style="height: 380px;">
 
-
+        <div id="app">
+          <div ref="echart" style="width: 100%; height: 350px;"></div>
+        </div>
 
       </el-card>
     </div>
@@ -85,9 +86,10 @@
               <span style="font-weight: bold;">设备图片
               </span>
               <el-select v-model="form.location" placeholder="请选择位置">
-                <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.value">
+                <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.item">
                 </el-option>
-              </el-select> </el-row>
+              </el-select> 
+              </el-row>
           </div>
           <div class="left-top-contain-img">
           </div>
@@ -131,12 +133,19 @@
 </template>
 
 <script>
+import * as echarts from 'echarts'; // 引入echarts
+
 export default {
+
 
   data() {
     return {
-      locationOptions: [
 
+      // 总进站数和不良品数
+      inCount:[],
+      failCount:[],
+      // 可选位置
+      locationOptions: [
       ],
 
 
@@ -165,13 +174,14 @@ export default {
         }
       },
 
+      // 设备检测||设备进站
       switchValue: false,
 
-      // 提交表单
+      // 提交设备表单
       form: {
         // operationType: null,
         sn: null,
-        location: null,
+        location: this.$route.params.location == null ? 1:this.$route.params.location == null,
       },
 
       dataRule: {
@@ -195,24 +205,108 @@ export default {
   },
 
   watch: {
+  '$route.query.location'(location) {
+    if (location) {
+          this.geSysList(1019,location);
 
+      this.fetchData();
+      this.getDailyDate();
+    }
+  }
   },
   computed: {
+
+  },
+
+  beforeDestroy() {
 
   },
   created() {
   },
   mounted() {
-    this.geSysList(1019);
+    this.geSysList(1019,this.location);
     this.fetchData();
+    this.getDailyDate();
 
 
   },
   methods: {
 
+initChart() {
+
+      const myChart2 = echarts.getInstanceByDom(this.$refs.echart);
+      if (myChart2) {
+        myChart2.dispose();  // 销毁已有的图表实例
+      }
+
+      const myChart = echarts.init(this.$refs.echart);
 
 
+  // 更新图表配置项
+  const option = {
+    legend: {
+      data: ['总进站数', '不良品数'],
+      top: 'top',
+      left: 'center',
+    },
+    xAxis: {
+      type: 'category',
+      data: [
+        '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00',
+        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00',
+        '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+      ],
+      axisLabel: {
+        interval: 0,
+        rotate: 45,
+      },
+    },
+    yAxis: {
+      type: 'value',
+    },
+    series: [
+      {
+        name: '总进站数',
+        data: this.inCount,  // 使用动态数据
+        type: 'bar',
+      },
+      {
+        name: '不良品数',
+        data: this.failCount, // 使用动态数据
+        type: 'bar',
+        itemStyle: {
+          color: 'lightcoral',
+        },
+      },
+    ],
+  };
 
+  // 设置图表的配置项
+  myChart.setOption(option);
+},
+
+
+    getDailyDate(location) {
+      const params = {
+        location:location
+      };
+      this.$http({
+        url: this.$http.adornUrl(`/cooker/cookerJob/getDailyDate`),  // 接口地址
+        method: 'post',              //  POST 请求
+        data: params,                // 使用 data 传递参数
+      }).then((response) => {
+        console.log(response)
+        const data = response.data.data;  // 解析后端返回的分页数据
+        console.log('data.inCount', );
+          this.inCount = data.in;
+          this.failCount = data.fail;
+          this.initChart(); // 在数据加载完之后初始化图表
+
+      }).catch((error) => {
+        this.$message.error('加载数据失败');
+        console.log('获取数据失败：', error);
+      });
+    },
     // 获取sn列表
     fetchData() {
       const params = {
@@ -240,7 +334,7 @@ export default {
     },
 
     // 获取位置字典
-    geSysList(code) {
+    geSysList(code,defaultIndex) {
       this.code = code;
       this.$http({
         url: this.$http.adornUrl('/sys/dictitem/list'),
@@ -253,6 +347,9 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.locationOptions = data.page.list
+          if (defaultIndex) {
+          this.form.location = this.locationOptions[defaultIndex].item
+          }
         } else {
           this.locationOptions = []
         }
@@ -265,7 +362,7 @@ export default {
     onSubmit(type) {
 
       this.$refs.form.validate((valid) => {
-        if (this.form.type == null || this.form.sn == null) {
+        if (type == null || this.form.sn == null) {
           this.$message({
             message: '参数不全',
             type: 'warn',
@@ -276,7 +373,7 @@ export default {
         if (valid) {
 
           const params = {
-            type: this.form.type,
+            operationType:type,
             sn: this.form.sn,
             // proposerId:this.$store.state.user.id,
             handlerId: this.$store.state.user.id,
@@ -291,6 +388,7 @@ export default {
             data: params,                // 使用 data 传递参数
           }).then((response) => {
             this.fetchData();
+            this.getDailyDate();
 
             if (response.data.data == 11) {
               this.$message({
@@ -313,6 +411,12 @@ export default {
             } else if (response.data.data == 44) {  // 修改这里为一个不同的代码值
               this.$message({
                 message: '已经FAIL或者不满足FAIL条件',
+                type: 'error',
+                duration: 1000
+              });
+            }else if (response.data.data == 55) {  // 修改这里为一个不同的代码值
+              this.$message({
+                message: '还未进站或者已经开始检测',
                 type: 'error',
                 duration: 1000
               });
@@ -422,7 +526,7 @@ export default {
   margin-top: 25px;
   margin-left: 5px;
 }
-.main-form-container{
-      margin-top: 25px;
+.main-form-container {
+  margin-top: 25px;
 }
 </style>
