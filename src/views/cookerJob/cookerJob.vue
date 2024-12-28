@@ -4,7 +4,7 @@
     <div class="main-contain-top">
       <el-card>
         <div style="text-align: center;">
-          <span style="font-weight: bold; font-size: 50px;">当前SN：{{form.sn}}</span>
+          <span style="font-weight: bold; font-size: 50px;">当前SN：{{currentSn.sn}}</span>
         </div>
 
       </el-card>
@@ -27,7 +27,7 @@
         </div>
         <div class="curent-job-contain-top">
           <el-descriptions :column="3" border>
-            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{form.sn == null|| form.sn == ''?"暂无":form.sn}}</el-descriptions-item>
+            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{currentSn.sn == null|| currentSn.sn == ''?"暂无":currentSn.sn}}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
             <el-descriptions-item label="Nadel">暂无</el-descriptions-item>
             <el-descriptions-item label="状态" v-if="false">
@@ -56,15 +56,15 @@
         <div class="main-form-container" v-else>
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit(1)"></el-input>
             </el-form-item>
-
             <el-form-item>
               <el-button type="primary" @click="onSubmit(1)">进站</el-button>
               <el-button type="primary" @click="onSubmit(2)">出站</el-button>
             </el-form-item>
           </el-form>
         </div>
+
       </el-card>
 
     </div>
@@ -88,8 +88,8 @@
               <el-select v-model="form.location" placeholder="请选择位置">
                 <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.item">
                 </el-option>
-              </el-select> 
-              </el-row>
+              </el-select>
+            </el-row>
           </div>
           <div class="left-top-contain-img">
           </div>
@@ -142,8 +142,8 @@ export default {
     return {
 
       // 总进站数和不良品数
-      inCount:[],
-      failCount:[],
+      inCount: [],
+      failCount: [],
       // 可选位置
       locationOptions: [
       ],
@@ -181,7 +181,7 @@ export default {
       form: {
         // operationType: null,
         sn: null,
-        location: this.$route.params.location == null ? 1:this.$route.params.location == null,
+        location: null
       },
 
       dataRule: {
@@ -195,7 +195,22 @@ export default {
       },
 
       // sn列表
-      tableData: []
+      tableData: [],
+      currentSn: {
+        id: null,                   // 主键id
+        sn: null,                   // sn号
+        so: null,                   // so
+        nadel: null,                // nadel
+        proposerId: null,           // 申请人id
+        handlerId: null,            // 操作人id
+        position: null,             // 位置
+        status: null,               // 任务状态
+        testStatus: null,           // 测试状态
+        operationTime: null,        // 操作时间
+        createTime: null,           // 创建时间
+        updateTime: null,           // 修改时间
+        currentSn: null,            // 当前sn号
+      },
 
 
     }
@@ -204,15 +219,29 @@ export default {
 
   },
 
-  watch: {
-  '$route.query.location'(location) {
-    if (location) {
-          this.geSysList(1019,location);
 
-      this.fetchData();
-      this.getDailyDate();
+
+  watch: {
+    // 监听 location 的变化
+    "form.location"(newLocation, oldLocation) {
+      console.log('form.location发生改变', oldLocation, newLocation);
+      if (newLocation != oldLocation) {
+        this.geSysList(1019, newLocation); // 更新数据
+        this.fetchData();  // 获取数据
+        this.getDailyDate(newLocation);  // 获取日数据
+      }
+    },
+    "$route.query.location"(newLocation, oldLocation) {
+      console.log('$route.query.location发生改变', oldLocation, newLocation);
+      // 如果需要根据路由参数直接更新
+      if (newLocation) {
+        this.form.location = newLocation;
+
+      }
     }
-  }
+
+
+
   },
   computed: {
 
@@ -224,15 +253,16 @@ export default {
   created() {
   },
   mounted() {
-    this.geSysList(1019,this.location);
+    const location = this.$route.query.location || (this.form.location?this.form.location:1) // 默认使用路由中的 location
+    this.geSysList(1019, location);
     this.fetchData();
-    this.getDailyDate();
+    this.getDailyDate(this.location);
 
 
   },
   methods: {
 
-initChart() {
+    initChart() {
 
       const myChart2 = echarts.getInstanceByDom(this.$refs.echart);
       if (myChart2) {
@@ -242,65 +272,67 @@ initChart() {
       const myChart = echarts.init(this.$refs.echart);
 
 
-  // 更新图表配置项
-  const option = {
-    legend: {
-      data: ['总进站数', '不良品数'],
-      top: 'top',
-      left: 'center',
-    },
-    xAxis: {
-      type: 'category',
-      data: [
-        '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00',
-        '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00',
-        '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
-      ],
-      axisLabel: {
-        interval: 0,
-        rotate: 45,
-      },
-    },
-    yAxis: {
-      type: 'value',
-    },
-    series: [
-      {
-        name: '总进站数',
-        data: this.inCount,  // 使用动态数据
-        type: 'bar',
-      },
-      {
-        name: '不良品数',
-        data: this.failCount, // 使用动态数据
-        type: 'bar',
-        itemStyle: {
-          color: 'lightcoral',
+      // 更新图表配置项
+      const option = {
+        legend: {
+          data: ['总进站数', '不良品数'],
+          top: 'top',
+          left: 'center',
         },
-      },
-    ],
-  };
+        xAxis: {
+          type: 'category',
+          data: [
+            '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00',
+            '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00',
+            '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'
+          ],
+          axisLabel: {
+            interval: 0,
+            rotate: 45,
+          },
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            name: '总进站数',
+            data: this.inCount,  // 使用动态数据
+            type: 'bar',
+          },
+          {
+            name: '不良品数',
+            data: this.failCount, // 使用动态数据
+            type: 'bar',
+            itemStyle: {
+              color: 'lightcoral',
+            },
+          },
+        ],
+      };
 
-  // 设置图表的配置项
-  myChart.setOption(option);
-},
+      // 设置图表的配置项
+      myChart.setOption(option);
+    },
 
 
+    // 入站数和不良品柱形图
     getDailyDate(location) {
       const params = {
-        location:location
+        location: location ? location : 1
       };
+      console.log('getDailyDatelocation', location);
+
       this.$http({
         url: this.$http.adornUrl(`/cooker/cookerJob/getDailyDate`),  // 接口地址
-        method: 'post',              //  POST 请求
-        data: params,                // 使用 data 传递参数
+        method: 'get',              //  POST 请求
+        params: params,                // 使用 data 传递参数
       }).then((response) => {
         console.log(response)
         const data = response.data.data;  // 解析后端返回的分页数据
-        console.log('data.inCount', );
-          this.inCount = data.in;
-          this.failCount = data.fail;
-          this.initChart(); // 在数据加载完之后初始化图表
+        this.inCount = data.in;
+        this.failCount = data.fail;
+        this.initChart(); // 在数据加载完之后初始化图表
 
       }).catch((error) => {
         this.$message.error('加载数据失败');
@@ -310,9 +342,7 @@ initChart() {
     // 获取sn列表
     fetchData() {
       const params = {
-        // pageNum: this.currentPage, // 当前页码
-        // pageSize: this.pageSize,   // 每页显示的数据量
-
+location:this.form.location
       };
       this.$http({
         url: this.$http.adornUrl(`/cooker/cookerJob/listJob`),  // 接口地址
@@ -324,9 +354,6 @@ initChart() {
         console.log('data', data);
 
         this.tableData = data;       // 表格数据
-        // this.totalItems = data.total;     // 总条目数
-        // this.currentPage = data.pageNum;  // 当前页码
-        // this.pageSize = data.pageSize;    // 每页显示条数
       }).catch((error) => {
         this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
@@ -334,7 +361,7 @@ initChart() {
     },
 
     // 获取位置字典
-    geSysList(code,defaultIndex) {
+    geSysList(code, defaultIndex) {
       this.code = code;
       this.$http({
         url: this.$http.adornUrl('/sys/dictitem/list'),
@@ -347,9 +374,7 @@ initChart() {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.locationOptions = data.page.list
-          if (defaultIndex) {
-          this.form.location = this.locationOptions[defaultIndex].item
-          }
+          this.form.location = this.locationOptions[defaultIndex - 1].item
         } else {
           this.locationOptions = []
         }
@@ -359,8 +384,28 @@ initChart() {
       let newUrl = this.$router.resolve({ path: path });
       window.open(newUrl.href, '_blank');
     },
+
+
+    getBySn(sn) {
+      const params = {
+        sn: sn
+      };
+      this.$http({
+        url: this.$http.adornUrl(`/cooker/cookerJob/getBySn`),
+        method: 'get',
+        params: params,
+      }).then((response) => {
+        const data = response.data.data;
+        this.currentSn = data;
+      }).catch((error) => {
+        this.$message.error('加载数据失败');
+        console.log('获取数据失败：', error);
+      });
+    },
+
     onSubmit(type) {
 
+console.info("onSubmit触发")
       this.$refs.form.validate((valid) => {
         if (type == null || this.form.sn == null) {
           this.$message({
@@ -371,9 +416,8 @@ initChart() {
           return
         }
         if (valid) {
-
           const params = {
-            operationType:type,
+            operationType: type,
             sn: this.form.sn,
             // proposerId:this.$store.state.user.id,
             handlerId: this.$store.state.user.id,
@@ -388,8 +432,9 @@ initChart() {
             data: params,                // 使用 data 传递参数
           }).then((response) => {
             this.fetchData();
-            this.getDailyDate();
-
+            this.getDailyDate(this.form.location);
+            this.getBySn(this.form.sn);
+            this.form.sn = null;
             if (response.data.data == 11) {
               this.$message({
                 message: '已经入站！',
@@ -414,7 +459,7 @@ initChart() {
                 type: 'error',
                 duration: 1000
               });
-            }else if (response.data.data == 55) {  // 修改这里为一个不同的代码值
+            } else if (response.data.data == 55) {  // 修改这里为一个不同的代码值
               this.$message({
                 message: '还未进站或者已经开始检测',
                 type: 'error',
@@ -479,7 +524,7 @@ initChart() {
 }
 .left-top-contain {
   position: fixed;
-  top: 10%;
+  top: 95px;
   width: 500px;
   height: 400px;
 
@@ -513,7 +558,7 @@ initChart() {
   /* background-color: aquamarine; */
 }
 .main-contain-top {
-  top: 10%;
+  top: 95px;
   left: 800px;
   width: 1000px;
 
