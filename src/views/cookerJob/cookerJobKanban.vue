@@ -57,15 +57,15 @@
               <div>
 
                 <el-descriptions border :title="'检修统计'" :column="2">
-                  <el-descriptions-item label="今日出站数">11</el-descriptions-item>
-                  <el-descriptions-item label="今日进站数">32</el-descriptions-item>
+                  <el-descriptions-item label="今日进站数">{{statisticalDesc.inCount}}</el-descriptions-item>
+                  <el-descriptions-item label="今日触出站数">{{statisticalDesc.outCount}}</el-descriptions-item>
                 </el-descriptions>
 
                 <el-descriptions border :title="'WIP'" :column="2" style="margin-top: 25px;">
-                  <el-descriptions-item label="今日待检">122</el-descriptions-item>
-                  <el-descriptions-item label="3天未检" :style="{ backgroundColor: '#e9c6c6' }">22</el-descriptions-item>
-                  <el-descriptions-item label="5天未检"  :style="{ backgroundColor: '#e48383' }">13</el-descriptions-item>
-                  <el-descriptions-item label="不良品（未出站）" :style="{ backgroundColor: '#e48383' }">1</el-descriptions-item>
+                  <el-descriptions-item label="今日待检">{{statisticalDesc.todayWaitTest}}</el-descriptions-item>
+                  <el-descriptions-item label="3天未检" :style="{ backgroundColor: '#e9c6c6' }">{{statisticalDesc.threeWaitTest}}</el-descriptions-item>
+                  <el-descriptions-item label="5天未检" :style="{ backgroundColor: '#e48383' }">{{statisticalDesc.fiveWaitTest}}</el-descriptions-item>
+                  <el-descriptions-item label="不良品（未出站）" :style="{ backgroundColor: '#e48383' }">{{statisticalDesc.defective}}</el-descriptions-item>
                 </el-descriptions>
 
               </div>
@@ -207,6 +207,8 @@ export default {
 
 
     return {
+
+      borderColor: '',
       // echart总进站数和不良品数
       inCount: [],
       failCount: [],
@@ -216,6 +218,16 @@ export default {
 
       // 位置选项
       locationOptions: [],
+
+      // 统计数据
+      statisticalDesc: {
+        inCount: null,
+        outCount: null,
+        ptodayWaitTest: null,
+        threeWaitTest: null,
+        fiveWaitTest: null,
+        defective: null,
+      }
     }
 
   },
@@ -223,6 +235,7 @@ export default {
 
   },
   computed: {
+
 
 
     statusType() {
@@ -261,16 +274,87 @@ export default {
   },
   created() {
   },
+  unmounted() {
+    // 清除定时器
+    clearInterval(this.intervalId);
+  },
   mounted() {
+
     this.geSysList(1019);
     this.getCurrentPositionJob();
     this.getDailyDate();
+    this.getStatisticalDesc();
+
     this.intervalId = setInterval(() => {
       this.getCurrentPositionJob();
+      this.getStatisticalDesc();
+      this.getDailyDate();
     }, 10000); // 5000 毫秒，即 5 秒
 
   },
   methods: {
+
+    // 获取统计列表
+    getStatisticalDesc() {
+      const params = {
+      };
+      this.$http({
+        url: this.$http.adornUrl(`/cooker/cookerJob/getStatisticalDesc`),
+        method: 'get',
+        params: params,
+      }).then((response) => {
+        console.log(response)
+        const data = response.data.data;
+        console.log('data', data);
+        this.statisticalDesc = data;
+      }).catch((error) => {
+        this.$message.error('加载数据失败');
+        console.log('获取数据失败：', error);
+      });
+    },
+
+    // getBorderClour(position) {
+    //   console.log('getBorderClourposition', position);
+
+    //   // 默认边框颜色
+    //   this.borderColor = '#c0c4cc';  // 默认灰色
+
+    //   const positionData = this.currentPositionJob.find(item => item.position === position);
+
+    //   if (positionData) {
+    //     const now = new Date();
+    //     const operationTime = new Date(positionData.operationTime);
+    //     const timeDifference = now - operationTime;
+    //     const minutesDifference = timeDifference / (1000 * 60);  // 将毫秒转为分钟
+
+    //     console.log('minutesDifference', minutesDifference);
+
+    //     if (minutesDifference > 60) {
+    //       // 超过1小时没操作，灰色
+    //       this.borderColor = '#c0c4cc';
+    //       console.log('超过1小时，边框灰色');
+    //     } else if (minutesDifference > 30) {
+    //       // 超过30分钟但不超过1小时，黄色
+    //       this.borderColor = '#FFFFE0';
+    //       console.log('超过30分钟，边框黄色');
+    //     } else {
+    //       // 少于30分钟，有操作，白色
+    //       this.borderColor = 'white';
+    //       console.log('少于30分钟，有操作，边框白色');
+    //     }
+    //   } else {
+    //     console.log('没有找到位置数据，边框灰色');
+    //     // 没有对应数据时，默认灰色
+    //     this.borderColor = '#c0c4cc';
+    //   }
+
+    //   return this.borderColor;
+    // },
+
+
+
+
+
 
     // 位置边框颜色 
     getBorderClour(position) {
@@ -295,7 +379,7 @@ export default {
           // 有操作不设置边框
         } else {
           console.log('else');
-          return 'while';
+          return 'white';
         }
       } else {
         console.log('elseelse');
@@ -317,7 +401,9 @@ export default {
         const data = response.data.data;  // 解析后端返回的分页数据
         this.inCount = data.in;
         this.failCount = data.fail;
-        this.initChart(); // 在数据加载完之后初始化图表
+        this.$nextTick(() => {
+          this.initChart();
+        });
 
       }).catch((error) => {
         this.$message.error('加载数据失败');
@@ -460,6 +546,7 @@ export default {
         const timeDifference = now - operationTime;
         const minutesDifference = timeDifference / (1000 * 60);
 
+        // pass fail 之后超过20分就idle
         if (positionData.operationType && (positionData.operationType == 3 || positionData.operationType == 4) && minutesDifference > 20) {
           return "idle";
         } else {
