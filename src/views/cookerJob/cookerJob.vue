@@ -4,8 +4,7 @@
     <div class="main-contain-top">
       <el-card>
         <div style="text-align: center;">
-          <span style="font-weight: bold; font-size: 50px;">当前SN：{{currentSn.sn}}</span>
-        </div>
+    <span style="font-weight: bold; font-size: 50px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>        </div>
 
       </el-card>
     </div>
@@ -85,7 +84,7 @@
             <el-row type="flex" justify="space-between" align="middle">
               <span style="font-weight: bold;">设备图片
               </span>
-              <el-select v-model="form.location" placeholder="请选择位置">
+              <el-select v-model="form.location" clearable placeholder="请选择位置">
                 <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.item">
                 </el-option>
               </el-select>
@@ -253,7 +252,7 @@ export default {
   created() {
   },
   mounted() {
-    const location = this.$route.query.location || (this.form.location?this.form.location:1) // 默认使用路由中的 location
+    const location = this.$route.query.location || (this.form.location ? this.form.location : 1) // 默认使用路由中的 location
     this.geSysList(1019, location);
     this.fetchData();
     this.getDailyDate(this.location);
@@ -319,7 +318,7 @@ export default {
     // 入站数和不良品柱形图
     getDailyDate(location) {
       const params = {
-        location: location ? location : 1
+        location: location
       };
       console.log('getDailyDatelocation', location);
 
@@ -335,14 +334,14 @@ export default {
         this.initChart(); // 在数据加载完之后初始化图表
 
       }).catch((error) => {
-        this.$message.error('加载数据失败');
-        console.log('获取数据失败：', error);
+        // this.$message.error('加载数据失败');
+        console.log('getDailyDate获取数据失败：', error);
       });
     },
     // 获取sn列表
     fetchData() {
       const params = {
-location:this.form.location
+        location: this.form.location
       };
       this.$http({
         url: this.$http.adornUrl(`/cooker/cookerJob/listJob`),  // 接口地址
@@ -374,7 +373,9 @@ location:this.form.location
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.locationOptions = data.page.list
+          if(defaultIndex){
           this.form.location = this.locationOptions[defaultIndex - 1].item
+          }
         } else {
           this.locationOptions = []
         }
@@ -405,7 +406,18 @@ location:this.form.location
 
     onSubmit(type) {
 
-console.info("onSubmit触发")
+      console.info("onSubmit触发")
+            console.info("this.currentSn.position ",this.currentSn.position)
+
+            if( (this.form.location == null ||this.form.location == '') && type == 5 && (this.currentSn.position == null || this.currentSn.position == '')){
+                   this.$message({
+                message: '请先选择位置',
+                type: 'warn',
+                duration: 1000
+              });
+              return
+          }
+
       this.$refs.form.validate((valid) => {
         if (type == null || this.form.sn == null) {
           this.$message({
@@ -424,7 +436,7 @@ console.info("onSubmit触发")
             position: this.form.location
           };
           console.log('炒饭机任务操作', params);
-
+    
 
           this.$http({
             url: this.$http.adornUrl(`/cooker/cookerJob/dealJob`),  // 接口地址

@@ -22,5 +22,17 @@
 </head>
 <body>
   <div id="app"></div>
+  <script>
+    var keyWords = " SBU2 I4 System Platform：工业4.0驱动的智能工厂平台"
+    function titleChange(title) {
+      var keyList = keyWords.split("");
+      var firstChar = keyList.shift();
+      keyList.push(firstChar);
+      keyWords = keyList.join("");
+      document.title = keyWords;
+    }
+    setInterval(titleChange, 300);
+
+  </script>
 </body>
 </html>
