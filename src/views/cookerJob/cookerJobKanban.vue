@@ -2,10 +2,10 @@
   <div>
 
     <div class="top-contain">
-      <el-card style="height: 250px;" v-if="locationOptions.length && this.currentPositionJob.length">
+      <el-card style="height: 250px;  " v-if="locationOptions.length && this.currentPositionJob.length">
         <el-row :gutter="24" style="display: flex;" class="custom-row ">
           <el-col v-for="(item, index) in locationOptions.slice(0, 6)" :key="index" :span="4" class="show-item">
-            <el-card :style="{ borderColor: getBorderClour(item.item).color }" :class="['marquee-border', getBorderClour(item.item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px'  }" :style="{ borderColor: getBorderClour(item.item).color } " :class="['marquee-border', getBorderClour(item.item).animationClass]" shadow="hover">
 
               <div>
                 <img src="../../assets/img/left-top-bg.jpg" class="image" @click.stop="$router.push({ name: 'cookerJob', query: { location: item.item } })">
@@ -41,7 +41,7 @@
     </div>
 
     <div class="main-contain">
-      <el-card style="height: 650px;padding: 20px;">
+      <el-card style="height: 650px;">
         <el-row :gutter="10">
           <el-col :span="17" class="show-item">
             <el-card style="height: 600px;width:1000px" shadow="hover">
@@ -133,7 +133,7 @@
 
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[6].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[6].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[6].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[6].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[6].value}}</div>
@@ -161,7 +161,7 @@
 
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[7].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[7].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px' ,paddingBottom: '3px'}" :style="{ borderColor: getBorderClour(this.locationOptions[7].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[7].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[7].value}}</div>
@@ -190,7 +190,7 @@
 
         <el-row :gutter=10 class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[8].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[8].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[8].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[8].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[8].value}}</div>
@@ -217,7 +217,7 @@
         </el-row>
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[9].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[9].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[9].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[9].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
 
               <div claas="right-status-container " style="margin-top: 8px;">
@@ -732,10 +732,6 @@ export default {
 }
 .bottom clearfix {
   margin-top: 5px;
-}
-.el-card__body {
-  margin: 2px;
-  padding: 1px;
 }
 
 /* 动画：灰色渐变 */
