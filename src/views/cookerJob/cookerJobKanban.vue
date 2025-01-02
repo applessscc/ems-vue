@@ -41,7 +41,7 @@
     </div>
 
     <div class="main-contain">
-      <el-card style="height: 650px;">
+      <el-card style="height: 650px;padding: 20px;">
         <el-row :gutter="10">
           <el-col :span="17" class="show-item">
             <el-card style="height: 600px;width:1000px" shadow="hover">
@@ -54,23 +54,75 @@
           </el-col>
           <el-col :span="7" class="show-item">
             <el-card style="height: 600px;width:400px" shadow="hover">
-              <div>
 
-                <el-descriptions border :title="'检修统计'" :column="2">
-                  <el-descriptions-item label="今日进站数">{{statisticalDesc.inCount}}</el-descriptions-item>
-                  <el-descriptions-item label="今日触出站数">{{statisticalDesc.outCount}}</el-descriptions-item>
-                </el-descriptions>
+              <!-- 今日进站 -->
+              <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
+                <el-col :span="24">
+                  <div class="show-header" style="background: #409EFF"> <!-- 蓝色 -->
+                    <div class="show-num">22</div>
+                    <div class="bottom-text">今日进站</div>
+                  </div>
+                </el-col>
+              </el-row>
 
-                <el-descriptions border :title="'WIP'" :column="2" style="margin-top: 25px;">
-                  <el-descriptions-item label="今日待检">{{statisticalDesc.todayWaitTest}}</el-descriptions-item>
-                  <el-descriptions-item label="3天未检" :style="{ backgroundColor: '#e9c6c6' }">{{statisticalDesc.threeWaitTest}}</el-descriptions-item>
-                  <el-descriptions-item label="5天未检" :style="{ backgroundColor: '#e48383' }">{{statisticalDesc.fiveWaitTest}}</el-descriptions-item>
-                  <el-descriptions-item label="不良品（未出站）" :style="{ backgroundColor: '#e48383' }">{{statisticalDesc.defective}}</el-descriptions-item>
-                </el-descriptions>
+              <!-- 今日出站 -->
+              <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
+                <el-col :span="24">
+                  <div class="show-header" style="background: #409EFF"> <!-- 蓝色 -->
+                    <div class="show-num">11</div>
+                    <div class="bottom-text">今日出站</div>
+                  </div>
+                </el-col>
+              </el-row>
 
-              </div>
+              <!-- 今日待、未检和不良品 -->
+              <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
+
+                <!-- 今日待 -->
+                <el-col :span="12">
+                  <div class="show-header" style="background: #FFD700"> <!-- 金黄色 -->
+                    <div class="show-num">5</div>
+                    <div class="bottom-text">今日待检</div>
+                  </div>
+
+                  <!-- 3天未检 -->
+                  <div class="show-header" style="background: #FFD700"> <!-- 红色 -->
+                    <div class="show-num">3</div>
+                    <div class="bottom-text">3天未检</div>
+                  </div>
+
+                  <!-- 5天未检 -->
+                  <div class="show-header" style="background: #FFD700"> <!-- 红色 -->
+                    <div class="show-num">2</div>
+                    <div class="bottom-text">5天未检</div>
+                  </div>
+                </el-col>
+
+                <!-- PASS 不良品、FAIL 不良品和返工 -->
+                <el-col :span="12">
+                  <!-- PASS 不良品 -->
+                  <div class="show-header" style="background: #67C23A"> <!-- 绿色 -->
+                    <div class="show-num">2</div>
+                    <div class="bottom-text">PASS出站</div>
+                  </div>
+
+                  <!-- FAIL 不良品 -->
+                  <div class="show-header" style="background: #FF4D4D"> <!-- 红色 -->
+                    <div class="show-num">2</div>
+                    <div class="bottom-text">FAIL出站</div>
+                  </div>
+
+                  <!-- 返工 -->
+                  <div class="show-header" style="background: #FF6A00"> <!-- 橙色 -->
+                    <div class="show-num">2</div>
+                    <div class="bottom-text">返工（未检测出站）</div>
+                  </div>
+                </el-col>
+              </el-row>
+
             </el-card>
           </el-col>
+
         </el-row>
       </el-card>
 
@@ -294,43 +346,43 @@ export default {
   },
   methods: {
 
-   getBorderClour(position) {
-  console.log('getBorderClour position', position);
-  const positionData = this.currentPositionJob.find(item => item.position === position);
-  if (positionData) {
-    const now = new Date();
-    const operationTime = new Date(positionData.operationTime);
-    const timeDifference = now - operationTime;
-    const minutesDifference = timeDifference / (1000 * 60);
+    getBorderClour(position) {
+      console.log('getBorderClour position', position);
+      const positionData = this.currentPositionJob.find(item => item.position === position);
+      if (positionData) {
+        const now = new Date();
+        const operationTime = new Date(positionData.operationTime);
+        const timeDifference = now - operationTime;
+        const minutesDifference = timeDifference / (1000 * 60);
 
-    // 1小时没操作灰色
-    if (minutesDifference > 60) {
-      return {
-        color: '#c0c4cc',
-        animationClass: 'marquee-border-idle'  // 应用空的动画类
-      };
-    }
-    // 30分钟没操作黄色
-    else if (minutesDifference > 30) {
-      return {
-        color: '#FFFFE0',
-        animationClass: 'marquee-border-wait-idle'  // 应用黄色动画类
-      };
-    }
-    // 有操作不设置边框动画
-    else {
-      return {
-        color: '#0a9e0a',
-        animationClass: 'marquee-border-testing'  // 绿色动画类
-      };
-    }
-  } else {
-    return {
-      color: '#c0c4cc',
-      animationClass: 'marquee-border-idle'  // 默认应用空的动画类
-    };
-  }
-},
+        // 1小时没操作灰色
+        if (minutesDifference > 60) {
+          return {
+            color: '#c0c4cc',
+            animationClass: 'marquee-border-idle'  // 应用空的动画类
+          };
+        }
+        // 30分钟没操作黄色
+        else if (minutesDifference > 30) {
+          return {
+            color: '#FFFFE0',
+            animationClass: 'marquee-border-wait-idle'  // 应用黄色动画类
+          };
+        }
+        // 有操作不设置边框动画
+        else {
+          return {
+            color: '#0a9e0a',
+            animationClass: 'marquee-border-testing'  // 绿色动画类
+          };
+        }
+      } else {
+        return {
+          color: '#c0c4cc',
+          animationClass: 'marquee-border-idle'  // 默认应用空的动画类
+        };
+      }
+    },
 
 
     // 获取统计列表
@@ -622,7 +674,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .top-contain {
   margin: 20px;
   height: 250px;
@@ -682,9 +734,9 @@ export default {
   margin-top: 5px;
 }
 .el-card__body {
-  padding: 7px;
+  margin: 2px;
+  padding: 1px;
 }
-
 
 /* 动画：灰色渐变 */
 @keyframes idle-marquee-border {
@@ -694,18 +746,18 @@ export default {
   33% {
     border-color: #f5f5f5; /* 浅灰色 */
   }
-  66% {  
-    border-color: #e2e2e2; /* 中灰色 */ 
+  66% {
+    border-color: #e2e2e2; /* 中灰色 */
   }
   100% {
-    border-color: #b5b6b8; /* 深灰色 */
+    border-color: #c6c7c9; /* 深灰色 */
   }
 }
 
 /* 动画：绿色渐变 */
 @keyframes testing-marquee-border {
   0% {
-    border-color:  #ffffff;  /* 白色 */
+    border-color: #ffffff; /* 白色 */
   }
   33% {
     border-color: #c0e4be; /* 浅绿色 */
@@ -714,7 +766,7 @@ export default {
     border-color: #a9eba9; /* 中绿色 */
   }
   100% {
-    border-color: #80ee80; /* 深绿色 */
+    border-color: #92f392; /* 深绿色 */
   }
 }
 
@@ -724,19 +776,19 @@ export default {
     border-color: #ffffff; /* 白色 */
   }
   33% {
-    border-color: #e0e0a3; /* 浅黄色 */
+    border-color: #fcf8c5; /* 浅黄色 */
   }
   66% {
-    border-color: #ece364; /* 中黄色 */
+    border-color: #e0e0a3; /* 中黄色 */
   }
   100% {
-    border-color: #fcd603; /* 黄色 */
+    border-color: #ece364; /* 黄色 */
   }
 }
 
 /* 应用动画的类 */
 .marquee-border {
-  border: 12px solid;  /* 设置边框宽度 */
+  border: 12px solid; /* 设置边框宽度 */
   animation: 3s linear infinite; /* 每次动画3秒，持续循环 */
 }
 
@@ -753,4 +805,30 @@ export default {
   animation-name: wait-idle-marquee-border;
 }
 
+.show-header {
+  background: #00c0ef;
+  color: #fff;
+  height: 80px;
+  border-radius: 5px;
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.show-num {
+  font-size: 38px;
+  font-weight: 600;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+}
+.bottom-text {
+  bottom: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  height: 25px;
+  line-height: 25px;
+  text-align: center;
+  position: absolute;
+  font-weight: 600;
+}
 </style>
