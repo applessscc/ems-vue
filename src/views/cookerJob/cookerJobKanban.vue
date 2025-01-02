@@ -5,7 +5,7 @@
       <el-card style="height: 250px;" v-if="locationOptions.length && this.currentPositionJob.length">
         <el-row :gutter="24" style="display: flex;" class="custom-row ">
           <el-col v-for="(item, index) in locationOptions.slice(0, 6)" :key="index" :span="4" class="show-item">
-            <el-card :body-style="{ padding: '10px', border: '12px solid ' + getBorderClour(item.item) }" shadow="hover">
+            <el-card :style="{ borderColor: getBorderClour(item.item).color }" :class="['marquee-border', getBorderClour(item.item).animationClass]" shadow="hover">
 
               <div>
                 <img src="../../assets/img/left-top-bg.jpg" class="image" @click.stop="$router.push({ name: 'cookerJob', query: { location: item.item } })">
@@ -81,7 +81,7 @@
 
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '1px', border: '12px solid ' + getBorderClour(this.locationOptions[6].item) }" shadow="hover">
+            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[6].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[6].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[6].value}}</div>
@@ -109,7 +109,7 @@
 
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '1px', border: '12px solid ' + getBorderClour(this.locationOptions[7].item) }" shadow="hover">
+            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[7].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[7].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[7].value}}</div>
@@ -138,7 +138,7 @@
 
         <el-row :gutter=10 class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '1px', border: '12px solid ' + getBorderClour(this.locationOptions[8].item) }" shadow="hover">
+            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[8].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[8].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[8].value}}</div>
@@ -165,7 +165,7 @@
         </el-row>
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '1px', border: '12px solid ' + getBorderClour(this.locationOptions[9].item) }" shadow="hover">
+            <el-card :style="{ borderColor: getBorderClour(this.locationOptions[9].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[9].item).animationClass]" shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
 
               <div claas="right-status-container " style="margin-top: 8px;">
@@ -294,6 +294,45 @@ export default {
   },
   methods: {
 
+   getBorderClour(position) {
+  console.log('getBorderClour position', position);
+  const positionData = this.currentPositionJob.find(item => item.position === position);
+  if (positionData) {
+    const now = new Date();
+    const operationTime = new Date(positionData.operationTime);
+    const timeDifference = now - operationTime;
+    const minutesDifference = timeDifference / (1000 * 60);
+
+    // 1小时没操作灰色
+    if (minutesDifference > 60) {
+      return {
+        color: '#c0c4cc',
+        animationClass: 'marquee-border-idle'  // 应用空的动画类
+      };
+    }
+    // 30分钟没操作黄色
+    else if (minutesDifference > 30) {
+      return {
+        color: '#FFFFE0',
+        animationClass: 'marquee-border-wait-idle'  // 应用黄色动画类
+      };
+    }
+    // 有操作不设置边框动画
+    else {
+      return {
+        color: '#0a9e0a',
+        animationClass: 'marquee-border-testing'  // 绿色动画类
+      };
+    }
+  } else {
+    return {
+      color: '#c0c4cc',
+      animationClass: 'marquee-border-idle'  // 默认应用空的动画类
+    };
+  }
+},
+
+
     // 获取统计列表
     getStatisticalDesc() {
       const params = {
@@ -312,81 +351,37 @@ export default {
         console.log('获取数据失败：', error);
       });
     },
-
+    // 位置边框颜色 
     // getBorderClour(position) {
     //   console.log('getBorderClourposition', position);
-
-    //   // 默认边框颜色
-    //   this.borderColor = '#c0c4cc';  // 默认灰色
-
     //   const positionData = this.currentPositionJob.find(item => item.position === position);
-
     //   if (positionData) {
     //     const now = new Date();
     //     const operationTime = new Date(positionData.operationTime);
     //     const timeDifference = now - operationTime;
-    //     const minutesDifference = timeDifference / (1000 * 60);  // 将毫秒转为分钟
-
+    //     const minutesDifference = timeDifference / (1000 * 60);
     //     console.log('minutesDifference', minutesDifference);
 
+
+    //     // 1小时没操作灰色
     //     if (minutesDifference > 60) {
-    //       // 超过1小时没操作，灰色
-    //       this.borderColor = '#c0c4cc';
-    //       console.log('超过1小时，边框灰色');
+    //       console.log('minutesDifference < 30');
+    //       return 'marquee-border';
+    //       // 30分没操作黄色
     //     } else if (minutesDifference > 30) {
-    //       // 超过30分钟但不超过1小时，黄色
-    //       this.borderColor = '#FFFFE0';
-    //       console.log('超过30分钟，边框黄色');
+    //       console.log('minutesDifference < 60');
+    //       return ' #FFFFE0';
+    //       // 有操作不设置边框
     //     } else {
-    //       // 少于30分钟，有操作，白色
-    //       this.borderColor = 'white';
-    //       console.log('少于30分钟，有操作，边框白色');
+    //       console.log('else');
+    //       return 'white';
     //     }
     //   } else {
-    //     console.log('没有找到位置数据，边框灰色');
-    //     // 没有对应数据时，默认灰色
-    //     this.borderColor = '#c0c4cc';
+    //     console.log('elseelse');
+    //     return ' #c0c4cc';
     //   }
 
-    //   return this.borderColor;
     // },
-
-
-
-
-
-
-    // 位置边框颜色 
-    getBorderClour(position) {
-      console.log('getBorderClourposition', position);
-      const positionData = this.currentPositionJob.find(item => item.position === position);
-      if (positionData) {
-        const now = new Date();
-        const operationTime = new Date(positionData.operationTime);
-        const timeDifference = now - operationTime;
-        const minutesDifference = timeDifference / (1000 * 60);
-        console.log('minutesDifference', minutesDifference);
-
-
-        // 1小时没操作灰色
-        if (minutesDifference > 60) {
-          console.log('minutesDifference < 30');
-          return ' #c0c4cc';
-          // 30分没操作黄色
-        } else if (minutesDifference > 30) {
-          console.log('minutesDifference < 60');
-          return ' #FFFFE0';
-          // 有操作不设置边框
-        } else {
-          console.log('else');
-          return 'white';
-        }
-      } else {
-        console.log('elseelse');
-        return ' #c0c4cc';
-      }
-
-    },
 
     getDailyDate(location) {
       const params = {
@@ -689,4 +684,73 @@ export default {
 .el-card__body {
   padding: 7px;
 }
+
+
+/* 动画：灰色渐变 */
+@keyframes idle-marquee-border {
+  0% {
+    border-color: #ffffff; /* 白色 */
+  }
+  33% {
+    border-color: #f5f5f5; /* 浅灰色 */
+  }
+  66% {  
+    border-color: #e2e2e2; /* 中灰色 */ 
+  }
+  100% {
+    border-color: #b5b6b8; /* 深灰色 */
+  }
+}
+
+/* 动画：绿色渐变 */
+@keyframes testing-marquee-border {
+  0% {
+    border-color:  #ffffff;  /* 白色 */
+  }
+  33% {
+    border-color: #c0e4be; /* 浅绿色 */
+  }
+  66% {
+    border-color: #a9eba9; /* 中绿色 */
+  }
+  100% {
+    border-color: #80ee80; /* 深绿色 */
+  }
+}
+
+/* 动画：黄色渐变 */
+@keyframes wait-idle-marquee-border {
+  0% {
+    border-color: #ffffff; /* 白色 */
+  }
+  33% {
+    border-color: #e0e0a3; /* 浅黄色 */
+  }
+  66% {
+    border-color: #ece364; /* 中黄色 */
+  }
+  100% {
+    border-color: #fcd603; /* 黄色 */
+  }
+}
+
+/* 应用动画的类 */
+.marquee-border {
+  border: 12px solid;  /* 设置边框宽度 */
+  animation: 3s linear infinite; /* 每次动画3秒，持续循环 */
+}
+
+/* 为不同状态的元素指定不同的动画 */
+.marquee-border-idle {
+  animation-name: idle-marquee-border;
+}
+
+.marquee-border-testing {
+  animation-name: testing-marquee-border;
+}
+
+.marquee-border-wait-idle {
+  animation-name: wait-idle-marquee-border;
+}
+
 </style>
