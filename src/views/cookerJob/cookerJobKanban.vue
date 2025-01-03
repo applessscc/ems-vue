@@ -58,8 +58,8 @@
               <!-- 今日进站 -->
               <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
                 <el-col :span="24">
-                  <div class="show-header" style="background: #409EFF"> <!-- 蓝色 -->
-                    <div class="show-num">22</div>
+                  <div class="show-header" style="background: #409EFF" @click="getSnList('inCount')"> <!-- 蓝色 -->
+                    <div class="show-num">{{statisticalDesc.inCount}}</div>
                     <div class="bottom-text">今日进站</div>
                   </div>
                 </el-col>
@@ -68,8 +68,8 @@
               <!-- 今日出站 -->
               <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
                 <el-col :span="24">
-                  <div class="show-header" style="background: #409EFF"> <!-- 蓝色 -->
-                    <div class="show-num">11</div>
+                  <div class="show-header" style="background: #409EFF" @click="getSnList('outCount')"> <!-- 蓝色 -->
+                    <div class="show-num">{{statisticalDesc.outCount}}</div>
                     <div class="bottom-text">今日出站</div>
                   </div>
                 </el-col>
@@ -80,20 +80,20 @@
 
                 <!-- 今日待 -->
                 <el-col :span="12">
-                  <div class="show-header" style="background: #FFD700"> <!-- 金黄色 -->
-                    <div class="show-num">5</div>
+                  <div class="show-header" style="background: #FFD700" @click="getSnList('todayWaitTest')"> <!-- 金黄色 -->
+                    <div class="show-num">{{statisticalDesc.todayWaitTest}}</div>
                     <div class="bottom-text">今日待检</div>
                   </div>
 
                   <!-- 3天未检 -->
-                  <div class="show-header" style="background: #FFD700"> <!-- 红色 -->
-                    <div class="show-num">3</div>
+                  <div class="show-header" style="background: #FFD700" @click="getSnList('threeWaitTest')"> <!-- 红色 -->
+                    <div class="show-num">{{statisticalDesc.threeWaitTest}}</div>
                     <div class="bottom-text">3天未检</div>
                   </div>
 
                   <!-- 5天未检 -->
-                  <div class="show-header" style="background: #FFD700"> <!-- 红色 -->
-                    <div class="show-num">2</div>
+                  <div class="show-header" style="background: #FFD700" @click="getSnList('fiveWaitTest')"> <!-- 红色 -->
+                    <div class="show-num">{{statisticalDesc.fiveWaitTest}}</div>
                     <div class="bottom-text">5天未检</div>
                   </div>
                 </el-col>
@@ -101,20 +101,20 @@
                 <!-- PASS 不良品、FAIL 不良品和返工 -->
                 <el-col :span="12">
                   <!-- PASS 不良品 -->
-                  <div class="show-header" style="background: #67C23A"> <!-- 绿色 -->
-                    <div class="show-num">2</div>
+                  <div class="show-header" style="background: #67C23A" @click="getSnList('passCount')"> <!-- 绿色 -->
+                    <div class="show-num">{{statisticalDesc.passCount}}</div>
                     <div class="bottom-text">PASS出站</div>
                   </div>
 
                   <!-- FAIL 不良品 -->
-                  <div class="show-header" style="background: #FF4D4D"> <!-- 红色 -->
-                    <div class="show-num">2</div>
+                  <div class="show-header" style="background: #FF4D4D" @click="getSnList('failCount')"> <!-- 红色 -->
+                    <div class="show-num">{{statisticalDesc.failCount}}</div>
                     <div class="bottom-text">FAIL出站</div>
                   </div>
 
                   <!-- 返工 -->
-                  <div class="show-header" style="background: #FF6A00"> <!-- 橙色 -->
-                    <div class="show-num">2</div>
+                  <div class="show-header" style="background: #FF6A00" @click="getSnList('reWorkCount')"> <!-- 橙色 -->
+                    <div class="show-num">{{statisticalDesc.reWorkCount}}</div>
                     <div class="bottom-text">返工（未检测出站）</div>
                   </div>
                 </el-col>
@@ -133,7 +133,8 @@
 
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[6].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[6].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[6].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[6].item).animationClass]"
+              shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[6].value}}</div>
@@ -161,7 +162,8 @@
 
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '0px' ,paddingBottom: '3px'}" :style="{ borderColor: getBorderClour(this.locationOptions[7].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[7].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px' ,paddingBottom: '3px'}" :style="{ borderColor: getBorderClour(this.locationOptions[7].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[7].item).animationClass]"
+              shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[7].value}}</div>
@@ -190,7 +192,8 @@
 
         <el-row :gutter=10 class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[8].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[8].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[8].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[8].item).animationClass]"
+              shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[8].value}}</div>
@@ -217,7 +220,8 @@
         </el-row>
         <el-row :gutter="10" class="custom-row">
           <el-col :span="24" class="show-item">
-            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[9].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[9].item).animationClass]" shadow="hover">
+            <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[9].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[9].item).animationClass]"
+              shadow="hover">
               <img src="../../assets/img/left-top-bg.jpg" class="image">
 
               <div claas="right-status-container " style="margin-top: 8px;">
@@ -246,6 +250,33 @@
       </el-card>
     </div>
 
+    <!-- sn列表对话框 -->
+      <el-dialog :title=tableDialogTitle :visible.sync="tableDataDialogVisible"  :max-width="640">
+        <div class="table-contain">
+          <el-table :data="cookerJobList" stripe border style="width: 100%" max-height="500px">
+            <el-table-column prop="sn" label="SN号" width="150"></el-table-column>
+            <el-table-column label="状态" width="100">
+              <template slot-scope="scope">
+                {{ getJobStatusName(scope.row.status) }}
+              </template>
+            </el-table-column>
+
+            <el-table-column label="检测结果" width="100">
+              <template slot-scope="scope">
+                {{ getTestJobStatusName(scope.row.testStatus) }}
+              </template>
+            </el-table-column>
+              <el-table-column label="位置" width="100"  prop="position">
+        
+            </el-table-column>
+
+            <el-table-column prop="createTime" label="进站时间" >
+
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-dialog>
+
   </div>
 </template>  
 
@@ -260,7 +291,10 @@ export default {
 
     return {
 
+      // 边框颜色
       borderColor: '',
+
+
       // echart总进站数和不良品数
       inCount: [],
       failCount: [],
@@ -272,6 +306,10 @@ export default {
       locationOptions: [],
 
       // 统计数据
+      // 对话框列表
+      tableDataDialogVisible: false,
+      tableDialogTitle:"",
+      cookerJobList: [],
       statisticalDesc: {
         inCount: null,
         outCount: null,
@@ -279,6 +317,9 @@ export default {
         threeWaitTest: null,
         fiveWaitTest: null,
         defective: null,
+        reWorkCount: null,
+        passCount: null,
+        failCount: null,
       }
     }
 
@@ -289,6 +330,84 @@ export default {
   computed: {
 
 
+
+
+  },
+  created() {
+  },
+  unmounted() {
+    // 清除定时器
+    clearInterval(this.intervalId);
+  },
+  mounted() {
+
+
+
+    this.geSysList(1019);
+    this.getCurrentPositionJob();
+    this.getDailyDate();
+    this.getStatisticalDesc();
+
+    this.intervalId = setInterval(() => {
+      this.getCurrentPositionJob();
+      this.getStatisticalDesc();
+      this.getDailyDate();
+    }, 10000); // 5000 毫秒，即 5 秒
+
+  },
+  methods: {
+
+
+  getFieldDescription(fieldName) {
+  switch (fieldName) {
+    case 'inCount':
+      return '今日进站';
+    case 'outCount':
+      return '今日出站';
+    case 'todayWaitTest':
+      return '今日待检测数';
+    case 'threeWaitTest':
+      return '三天内待检测数';
+    case 'fiveWaitTest':
+      return '五天内待检测数';
+    case 'defective':
+      return '不良品数';
+    case 'reWorkCount':
+      return '返工数';
+    case 'passCount':
+      return '合格数';
+    case 'failCount':
+      return '不合格数';
+    default:
+      return '未知字段';
+  }
+},
+
+
+    getJobStatusName(code) {
+      if (code == 1) {
+        return "进站"
+      } else if (code == 2) {
+        return "出站"
+      } else if (code == 0) {
+        return "未进站"
+      }
+      else {
+        return "未知状态"
+      }
+    },
+    getTestJobStatusName(code) {
+      if (code == 3) {
+        return "PASS"
+      } else if (code == 4) {
+        return "FAIL"
+      } else if (code == 0) {
+        return "未检测"
+      }
+      else {
+        return "未知状态"
+      }
+    },
 
     statusType() {
       switch (this.status) {
@@ -321,30 +440,28 @@ export default {
     },
 
 
+    getSnList(type) {
+      this.getStatisticalDesc(type);
 
-
-  },
-  created() {
-  },
-  unmounted() {
-    // 清除定时器
-    clearInterval(this.intervalId);
-  },
-  mounted() {
-
-    this.geSysList(1019);
-    this.getCurrentPositionJob();
-    this.getDailyDate();
-    this.getStatisticalDesc();
-
-    this.intervalId = setInterval(() => {
-      this.getCurrentPositionJob();
-      this.getStatisticalDesc();
-      this.getDailyDate();
-    }, 10000); // 5000 毫秒，即 5 秒
-
-  },
-  methods: {
+      this.tableDialogTitle = this.getFieldDescription(type)
+      this.tableDataDialogVisible = true;
+    },
+    // 获取sn列表
+    fetchData() {
+      const params = {
+      };
+      this.$http({
+        url: this.$http.adornUrl(`/cooker/cookerJob/listJob`),
+        method: 'post',
+        data: params,
+      }).then((response) => {
+        const data = response.data.data;
+        this.tableData = data;
+      }).catch((error) => {
+        this.$message.error('加载数据失败');
+        console.log('获取数据失败：', error);
+      });
+    },
 
     getBorderClour(position) {
       console.log('getBorderClour position', position);
@@ -386,8 +503,9 @@ export default {
 
 
     // 获取统计列表
-    getStatisticalDesc() {
+    getStatisticalDesc(searchParam) {
       const params = {
+        searchParam: searchParam
       };
       this.$http({
         url: this.$http.adornUrl(`/cooker/cookerJob/getStatisticalDesc`),
@@ -398,6 +516,10 @@ export default {
         const data = response.data.data;
         console.log('data', data);
         this.statisticalDesc = data;
+        if (searchParam) {
+          this.cookerJobList = data.cookerJobList;
+          console.log('cookerJobList', this.cookerJobList);
+        }
       }).catch((error) => {
         this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
