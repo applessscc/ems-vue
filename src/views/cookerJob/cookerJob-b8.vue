@@ -4,14 +4,14 @@
     <div class="main-contain-top">
       <el-card>
         <div style="text-align: center;">
-          <span style="font-weight: bold; font-size: 50px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
+          <span style="font-weight: bold; font-size: 90px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
         </div>
 
       </el-card>
     </div>
 
     <div class="curent-job-contain">
-      <el-card>
+      <el-card style = "height:370px">
         <div slot="header" class="clearfix">
 
           <el-row type="flex" justify="space-between" align="middle">
@@ -26,7 +26,7 @@
 
         </div>
         <div class="curent-job-contain-top">
-          <el-descriptions :column="3" border  >
+          <el-descriptions :column="3" border>
             <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{currentSn.sn == null|| currentSn.sn == ''?"暂无":currentSn.sn}}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
             <el-descriptions-item label="Nadel">暂无</el-descriptions-item>
@@ -45,10 +45,10 @@
               <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-radio-group v-model="form.operationType"> 
-                <el-radio :label="5"  >开始检测</el-radio>
-                <el-radio :label="3"  >PASS</el-radio>
-                <el-radio :label="4" >FAIL</el-radio>
+              <el-radio-group v-model="form.operationType">
+                <el-radio :label="5">开始检测</el-radio>
+                <el-radio :label="3">PASS</el-radio>
+                <el-radio :label="4">FAIL</el-radio>
               </el-radio-group>
             </el-form-item>
             <!-- <el-form-item>
@@ -71,8 +71,8 @@
             </el-form-item> -->
             <el-form-item>
               <el-radio-group v-model="form.operationType" border>
-                <el-radio :label="1" >进站</el-radio>
-                <el-radio :label="2"  >出站</el-radio>
+                <el-radio :label="1">进站</el-radio>
+                <el-radio :label="2">出站</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-form>
@@ -82,15 +82,14 @@
 
     </div>
     <div class="main-contain">
-      <el-card style="height: 380px;">
+      <el-card style="height: 420px;">
 
         <div id="app">
-          <div ref="echart" style="width: 100%; height: 350px;"></div>
+          <div ref="echart" style="width: 100%; height: 400px;"></div>
         </div>
 
       </el-card>
     </div>
-
     <div>
       <div class="left-top-contain">
         <el-card>
@@ -121,18 +120,18 @@
           <el-table :data="tableData" style="width: 100%" stripe border height="320px">
             <el-table-column prop="sn" label="SN号" width="150">
             </el-table-column>
-            <el-table-column label="状态" width="60">
+            <el-table-column label="状态" width="80">
               <template slot-scope="scope">
                 {{ getJobStatusName(scope.row.status) }}
               </template>
             </el-table-column>
-            <el-table-column label="检测结果" width="80">
+            <el-table-column label="检测结果">
               <template slot-scope="scope">
                 {{ getTestJobStatusName(scope.row.testStatus) }}
               </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="进站时间" width="160">
-            </el-table-column>
+            <!-- <el-table-column prop="createTime" label="进站时间" >
+            </el-table-column> -->
 
           </el-table>
         </div>
@@ -578,19 +577,28 @@ export default {
 <style >
 .main-contain {
   /* background-color: rgb(184, 31, 31); */
-  position: fixed;
+  /* position: fixed;
   top: 540px;
   left: 800px;
   width: 1000px;
-  height: 560px;
+  height: 560px; */
+
+  position: fixed;
+    left: 38%;
+    top: 55%;
+    width: 60.5%;
 }
 .left-top-contain {
-  position: fixed;
+  /* position: fixed;
   top: 95px;
   width: 500px;
-  height: 400px;
+  height: 400px; */
 
-  /* background-color: rgb(89, 61, 165); */
+  position: fixed;
+  top: 17%;
+  left: 1.5%;
+  width: 35%;
+  height: 36%;
 }
 .left-top-contain-img {
   background-image: url("../../assets/img/left-top-bg.jpg");
@@ -600,30 +608,42 @@ export default {
   height: 250px;
 }
 .left-bottom-contain {
-  position: fixed;
+  /* position: fixed;
   top: 480px;
   width: 500px;
-  height: 200px;
+  height: 200px; */
+
+  position: fixed;
+  top: 55%;
+  width: 35%;
+  height: 30%;
+  left: 1.5%;
 }
 .left-bottom-contain-table {
   overflow-y: auto;
   width: 100%;
-
-  height: 350px;
+  height: 100%;
 }
 .curent-job-contain {
-  position: fixed;
+  /* position: fixed;
   left: 800px;
   top: 210px;
   width: 1000px;
-  height: 300px;
-  /* background-color: aquamarine; */
+  height: 300px; */
+
+  position: fixed;
+  left: 38%;
+  top: 17%;
+  width: 60.5%;
 }
 .main-contain-top {
-  top: 95px;
+  /* top: 95px;
   left: 800px;
   width: 1000px;
-
+  position: fixed; */
+  top: 1.5%;
+  left: 1.5%;
+  width: 97%;
   position: fixed;
 }
 .el-switch__core {
