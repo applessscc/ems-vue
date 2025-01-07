@@ -4,7 +4,8 @@
     <div class="main-contain-top">
       <el-card>
         <div style="text-align: center;">
-    <span style="font-weight: bold; font-size: 50px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>        </div>
+          <span style="font-weight: bold; font-size: 50px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
+        </div>
 
       </el-card>
     </div>
@@ -25,7 +26,7 @@
 
         </div>
         <div class="curent-job-contain-top">
-          <el-descriptions :column="3" border>
+          <el-descriptions :column="3" border  >
             <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{currentSn.sn == null|| currentSn.sn == ''?"暂无":currentSn.sn}}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
             <el-descriptions-item label="Nadel">暂无</el-descriptions-item>
@@ -41,25 +42,38 @@
         <div class="main-form-container" v-if="switchValue">
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput"></el-input>
             </el-form-item>
-
             <el-form-item>
+              <el-radio-group v-model="form.operationType"> 
+                <el-radio :label="5"  >开始检测</el-radio>
+                <el-radio :label="3"  >PASS</el-radio>
+                <el-radio :label="4" >FAIL</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <!-- <el-form-item>
               <el-button type="primary" @click="onSubmit(5)">开始检测</el-button>
               <el-button type="primary" @click="onSubmit(3)">PASS</el-button>
               <el-button type="danger" @click="onSubmit(4)">FAIL</el-button>
-            </el-form-item>
+            </el-form-item> -->
+
           </el-form>
         </div>
 
         <div class="main-form-container" v-else>
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit(1)"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput"></el-input>
             </el-form-item>
-            <el-form-item>
+            <!-- <el-form-item>
               <el-button type="primary" @click="onSubmit(1)">进站</el-button>
               <el-button type="primary" @click="onSubmit(2)">出站</el-button>
+            </el-form-item> -->
+            <el-form-item>
+              <el-radio-group v-model="form.operationType" border>
+                <el-radio :label="1" >进站</el-radio>
+                <el-radio :label="2"  >出站</el-radio>
+              </el-radio-group>
             </el-form-item>
           </el-form>
         </div>
@@ -178,7 +192,7 @@ export default {
 
       // 提交设备表单
       form: {
-        // operationType: null,
+        operationType: 1,
         sn: null,
         location: null
       },
@@ -229,13 +243,39 @@ export default {
         this.fetchData();  // 获取数据
         this.getDailyDate(newLocation);  // 获取日数据
       }
+      this.$nextTick(() => {
+        this.$refs.snInput.focus();
+      });
+    },
+    "switchValue"(newValue, oldValue) {
+      // 确保页面加载时聚焦到输入框
+      this.$nextTick(() => {
+        this.$refs.snInput.focus();
+      });
+      if (newValue) {
+        this.form.operationType = 5
+      } else {
+        this.form.operationType = 1
+      }
+
+
+    },
+    "form.operationType"() {
+      // 确保页面加载时聚焦到输入框
+      this.$nextTick(() => {
+        this.$refs.snInput.focus();
+      });
+
     },
     "$route.query.location"(newLocation, oldLocation) {
       console.log('$route.query.location发生改变', oldLocation, newLocation);
       // 如果需要根据路由参数直接更新
       if (newLocation) {
         this.form.location = newLocation;
-
+        // 确保页面加载时聚焦到输入框
+        this.$nextTick(() => {
+          this.$refs.snInput.focus();
+        });
       }
     }
 
@@ -252,6 +292,10 @@ export default {
   created() {
   },
   mounted() {
+    // 确保页面加载时聚焦到输入框
+    this.$nextTick(() => {
+      this.$refs.snInput.focus();
+    });
     const location = this.$route.query.location || (this.form.location ? this.form.location : 1) // 默认使用路由中的 location
     this.geSysList(1019, location);
     this.fetchData();
@@ -373,8 +417,8 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.locationOptions = data.page.list
-          if(defaultIndex){
-          this.form.location = this.locationOptions[defaultIndex - 1].item
+          if (defaultIndex) {
+            this.form.location = this.locationOptions[defaultIndex - 1].item
           }
         } else {
           this.locationOptions = []
@@ -406,20 +450,26 @@ export default {
 
     onSubmit(type) {
 
-      console.info("onSubmit触发")
-            console.info("this.currentSn.position ",this.currentSn.position)
+      if (type && this.form.operationType) {
+        this.$message({
+          message: '请选择操作类型',
+          type: 'warn',
+          duration: 1000
+        });
+        return
+      }
 
-            if( (this.form.location == null ||this.form.location == '') && type == 5 && (this.currentSn.position == null || this.currentSn.position == '')){
-                   this.$message({
-                message: '请先选择位置',
-                type: 'warn',
-                duration: 1000
-              });
-              return
-          }
+      if ((this.form.location == null || this.form.location == '') && type == 5 && (this.currentSn.position == null || this.currentSn.position == '')) {
+        this.$message({
+          message: '请先选择位置',
+          type: 'warn',
+          duration: 1000
+        });
+        return
+      }
 
       this.$refs.form.validate((valid) => {
-        if (type == null || this.form.sn == null) {
+        if ((type == null && this.form.operationType == null) || this.form.sn == null) {
           this.$message({
             message: '参数不全',
             type: 'warn',
@@ -429,14 +479,14 @@ export default {
         }
         if (valid) {
           const params = {
-            operationType: type,
+            operationType: type == null ? this.form.operationType : type,
             sn: this.form.sn,
             // proposerId:this.$store.state.user.id,
             handlerId: this.$store.state.user.id,
             position: this.form.location
           };
           console.log('炒饭机任务操作', params);
-    
+
 
           this.$http({
             url: this.$http.adornUrl(`/cooker/cookerJob/dealJob`),  // 接口地址

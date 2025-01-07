@@ -416,7 +416,7 @@ export default {
 }
 </script>
 
-<style lang="scss" >
+<style lang="scss"  >
 .el-table__empty-block {
   display: none;
 }
@@ -531,8 +531,5 @@ export default {
 .el-table .error-row {
   background: #ebabab;
 }/* 隐藏表格的提示信息 */
-.el-table__empty-block {
-  display: flex;
-}
 
 </style>

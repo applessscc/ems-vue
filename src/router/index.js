@@ -23,6 +23,8 @@ const globalRoutes = [
   { path: '/equipment/electricity-his', component: _import('equipment/electricity-his'), name: 'electricity-his', meta: { title: 'CMS 能耗历史查询' } },
   { path: '/equipment/ai-temp-borad', component: _import('equipment/ai-temp-borad'), name: 'ai-temp-borad', meta: { title: 'CMS 实时温度' } },
   { path: '/equipment/ai-temp-board-detail', component: _import('equipment/ai-temp-board-detail'), name: 'ai-temp-board-detail', meta: { title: 'CMS 实时温度详情' } },
+  { path: '/cookerJob-b8', component: _import('cookerJob/cookerJob-b8'), name: 'cookerJob-b8' , meta: { title: '炒房机任务-b8'}}, 
+
 
 
   { path: '/repair/repair-kanban', component: _import('repair/repair-kanban'), name: 'repair-kanban', meta: { title: '维修任务看板' } },

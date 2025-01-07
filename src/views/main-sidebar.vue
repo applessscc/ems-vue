@@ -56,6 +56,11 @@
             <span slot="title">炒饭机任务</span>
           </el-menu-item>
 
+            <el-menu-item index="demo-echarts" @click="openNew('cookerJob-b8')">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">炒饭机任务-b8</span>
+          </el-menu-item>
+
         </el-submenu>
 
         <sub-menu v-for="menu in menuList" :key="menu.menuId" :menu="menu" :dynamicMenuRoutes="dynamicMenuRoutes">

@@ -64,7 +64,6 @@
                   </div>
                 </el-col>
               </el-row>
-
               <!-- 今日出站 -->
               <el-row :gutter="20" type="flex" class="row-bg" justify="center" style="margin-bottom: 8px">
                 <el-col :span="24">
@@ -251,31 +250,31 @@
     </div>
 
     <!-- sn列表对话框 -->
-      <el-dialog :title=tableDialogTitle :visible.sync="tableDataDialogVisible"  :max-width="640">
-        <div class="table-contain">
-          <el-table :data="cookerJobList" stripe border style="width: 100%" max-height="500px">
-            <el-table-column prop="sn" label="SN号" width="150"></el-table-column>
-            <el-table-column label="状态" width="100">
-              <template slot-scope="scope">
-                {{ getJobStatusName(scope.row.status) }}
-              </template>
-            </el-table-column>
+    <el-dialog :title=tableDialogTitle :visible.sync="tableDataDialogVisible" :max-width="640">
+      <div class="table-contain">
+        <el-table :data="cookerJobList" stripe border style="width: 100%" max-height="500px">
+          <el-table-column prop="sn" label="SN号" width="150"></el-table-column>
+          <el-table-column label="状态" width="100">
+            <template slot-scope="scope">
+              {{ getJobStatusName(scope.row.status) }}
+            </template>
+          </el-table-column>
 
-            <el-table-column label="检测结果" width="100">
-              <template slot-scope="scope">
-                {{ getTestJobStatusName(scope.row.testStatus) }}
-              </template>
-            </el-table-column>
-              <el-table-column label="位置" width="100"  prop="position">
-        
-            </el-table-column>
+          <el-table-column label="检测结果" width="100">
+            <template slot-scope="scope">
+              {{ getTestJobStatusName(scope.row.testStatus) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="位置" width="100" prop="position">
 
-            <el-table-column prop="createTime" label="进站时间" >
+          </el-table-column>
 
-            </el-table-column>
-          </el-table>
-        </div>
-      </el-dialog>
+          <el-table-column prop="createTime" label="进站时间">
+
+          </el-table-column>
+        </el-table>
+      </div>
+    </el-dialog>
 
   </div>
 </template>  
@@ -308,7 +307,7 @@ export default {
       // 统计数据
       // 对话框列表
       tableDataDialogVisible: false,
-      tableDialogTitle:"",
+      tableDialogTitle: "",
       cookerJobList: [],
       statisticalDesc: {
         inCount: null,
@@ -358,30 +357,30 @@ export default {
   methods: {
 
 
-  getFieldDescription(fieldName) {
-  switch (fieldName) {
-    case 'inCount':
-      return '今日进站';
-    case 'outCount':
-      return '今日出站';
-    case 'todayWaitTest':
-      return '今日待检测数';
-    case 'threeWaitTest':
-      return '三天内待检测数';
-    case 'fiveWaitTest':
-      return '五天内待检测数';
-    case 'defective':
-      return '不良品数';
-    case 'reWorkCount':
-      return '返工数';
-    case 'passCount':
-      return '合格数';
-    case 'failCount':
-      return '不合格数';
-    default:
-      return '未知字段';
-  }
-},
+    getFieldDescription(fieldName) {
+      switch (fieldName) {
+        case 'inCount':
+          return '今日进站';
+        case 'outCount':
+          return '今日出站';
+        case 'todayWaitTest':
+          return '今日待检测数';
+        case 'threeWaitTest':
+          return '三天内待检测数';
+        case 'fiveWaitTest':
+          return '五天内待检测数';
+        case 'defective':
+          return '不良品数';
+        case 'reWorkCount':
+          return '返工数';
+        case 'passCount':
+          return '合格数';
+        case 'failCount':
+          return '不合格数';
+        default:
+          return '未知字段';
+      }
+    },
 
 
     getJobStatusName(code) {
@@ -464,7 +463,6 @@ export default {
     },
 
     getBorderClour(position) {
-      console.log('getBorderClour position', position);
       const positionData = this.currentPositionJob.find(item => item.position === position);
       if (positionData) {
         const now = new Date();
@@ -684,8 +682,6 @@ export default {
     },
 
     getStatusType(location) {
-      console.log("getStatusType执行", this.currentPositionJob.length);
-
       const positionData = this.currentPositionJob.find(item => item.position === location);
       // 二次更改operationType
       if (positionData) {
@@ -705,8 +701,6 @@ export default {
     },
 
     getStatusText(location) {
-      console.log("getStatusText执行", this.currentPositionJob.length);
-
       const positionData = this.currentPositionJob.find(item => item.position === location);
       if (positionData) {
         // 时间差
