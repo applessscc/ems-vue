@@ -3,10 +3,9 @@
 
     <div class="main-contain-top">
       <el-card>
-        <div style="text-align: center;">
+        <div style="text-align: center;" :style="{ animation: getBackgroundCloud()}">
           <span style="font-weight: bold; font-size: 50px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
         </div>
-
       </el-card>
     </div>
 
@@ -15,18 +14,12 @@
         <div slot="header" class="clearfix">
 
           <el-row type="flex" justify="space-between" align="middle">
-            <span style="font-weight: bold;" v-if="switchValue">设备检测
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
-            <span style="font-weight: bold;" v-else>设备过站
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
             <el-button type="primary" @click="openNew('cookerJob/cookerJobKanban')">任务看板</el-button>
           </el-row>
-
+          
         </div>
         <div class="curent-job-contain-top">
-          <el-descriptions :column="3" border  >
+          <el-descriptions :column="3" border>
             <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{currentSn.sn == null|| currentSn.sn == ''?"暂无":currentSn.sn}}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
             <el-descriptions-item label="Nadel">暂无</el-descriptions-item>
@@ -45,10 +38,10 @@
               <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-radio-group v-model="form.operationType"> 
-                <el-radio :label="5"  >开始检测</el-radio>
-                <el-radio :label="3"  >PASS</el-radio>
-                <el-radio :label="4" >FAIL</el-radio>
+              <el-radio-group v-model="form.operationType">
+                <el-radio :label="5">开始检测</el-radio>
+                <el-radio :label="3">PASS</el-radio>
+                <el-radio :label="4">FAIL</el-radio>
               </el-radio-group>
             </el-form-item>
             <!-- <el-form-item>
@@ -71,8 +64,8 @@
             </el-form-item> -->
             <el-form-item>
               <el-radio-group v-model="form.operationType" border>
-                <el-radio :label="1" >进站</el-radio>
-                <el-radio :label="2"  >出站</el-radio>
+                <el-radio :label="1">进站</el-radio>
+                <el-radio :label="2">出站</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-form>
@@ -90,13 +83,18 @@
 
       </el-card>
     </div>
-
     <div>
       <div class="left-top-contain">
         <el-card>
           <div slot="header">
             <el-row type="flex" justify="space-between" align="middle">
-              <span style="font-weight: bold;">设备图片
+              <!-- <span style="font-weight: bold;">设备图片
+              </span> -->
+              <span style="font-weight: bold;" v-if="switchValue">设备检测
+                <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+              </span>
+              <span style="font-weight: bold;" v-else>设备过站
+                <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
               </span>
               <el-select v-model="form.location" clearable placeholder="请选择位置">
                 <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.item">
@@ -121,18 +119,18 @@
           <el-table :data="tableData" style="width: 100%" stripe border height="320px">
             <el-table-column prop="sn" label="SN号" width="150">
             </el-table-column>
-            <el-table-column label="状态" width="60">
+            <el-table-column label="状态" width="80">
               <template slot-scope="scope">
                 {{ getJobStatusName(scope.row.status) }}
               </template>
             </el-table-column>
-            <el-table-column label="检测结果" width="80">
+            <el-table-column label="检测结果">
               <template slot-scope="scope">
                 {{ getTestJobStatusName(scope.row.testStatus) }}
               </template>
             </el-table-column>
-            <el-table-column prop="createTime" label="进站时间" width="160">
-            </el-table-column>
+            <!-- <el-table-column prop="createTime" label="进站时间" >
+            </el-table-column> -->
 
           </el-table>
         </div>
@@ -187,12 +185,14 @@ export default {
         }
       },
 
+      backgroundCloud: "flashing-background 2s infinite",
+
       // 设备检测||设备进站
-      switchValue: false,
+      switchValue: true,
 
       // 提交设备表单
       form: {
-        operationType: 1,
+        operationType: 5,
         sn: null,
         location: null
       },
@@ -304,7 +304,21 @@ export default {
 
   },
   methods: {
+    getBackgroundCloud() {
+      // 根据当前操作类型返回不同的动画
+      if (this.currentSn) {
+        if (this.currentSn.testStatus === 5) {  // 开始检测
+          return 'flashing-background-testing 2s infinite';
+        } else if (this.currentSn.testStatus === 3) {  // PASS
+          return 'flashing-background-pass 2s infinite';
+        } else if (this.currentSn.testStatus === 4) {  // FAIL
+          return 'flashing-background-fail 2s infinite';
+        } else {
+          return ''; // 无动画
+        }
+      }
 
+    },
     initChart() {
 
       const myChart2 = echarts.getInstanceByDom(this.$refs.echart);
@@ -497,6 +511,16 @@ export default {
             this.getDailyDate(this.form.location);
             this.getBySn(this.form.sn);
             this.form.sn = null;
+
+            // 重新聚焦焦点
+            if (response.data.data == 666) {
+              if (this.form.operationType == 5) {
+                this.form.operationType = 3
+              } else if (this.form.operationType == 3 || this.form.operationType == 4) {
+                this.form.operationType = 5
+              }
+            }
+
             if (response.data.data == 11) {
               this.$message({
                 message: '已经入站！',

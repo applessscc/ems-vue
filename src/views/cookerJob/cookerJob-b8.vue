@@ -3,25 +3,18 @@
 
     <div class="main-contain-top">
       <el-card>
-        <div style="text-align: center;">
+        <div style="text-align: center;" :style="{ animation: getBackgroundCloud()}">
           <span style="font-weight: bold; font-size: 90px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
         </div>
-
       </el-card>
     </div>
 
     <div class="curent-job-contain">
-      <el-card style = "height:370px">
+      <el-card style="height:370px">
         <div slot="header" class="clearfix">
 
           <el-row type="flex" justify="space-between" align="middle">
-            <span style="font-weight: bold;" v-if="switchValue">设备检测
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
-            <span style="font-weight: bold;" v-else>设备过站
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
-            <el-button type="primary" @click="openNew('cookerJob/cookerJobKanban')">任务看板</el-button>
+            <el-button type="primary" @click="openNew('cookerJobKanban')">任务看板</el-button>
           </el-row>
 
         </div>
@@ -95,8 +88,14 @@
         <el-card>
           <div slot="header">
             <el-row type="flex" justify="space-between" align="middle">
-              <span style="font-weight: bold;">设备图片
-              </span>
+              <!-- <span style="font-weight: bold;">设备图片
+              </span> -->
+                      <span style="font-weight: bold;" v-if="switchValue">设备检测
+              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+            </span>
+            <span style="font-weight: bold;" v-else>设备过站
+              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+            </span>
               <el-select v-model="form.location" clearable placeholder="请选择位置">
                 <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.item">
                 </el-option>
@@ -185,6 +184,8 @@ export default {
           return "未知状态"
         }
       },
+
+      backgroundCloud: "flashing-background 2s infinite",
 
       // 设备检测||设备进站
       switchValue: true,
@@ -303,7 +304,18 @@ export default {
 
   },
   methods: {
-
+    getBackgroundCloud() {
+      // 根据当前操作类型返回不同的动画
+      if (this.currentSn.testStatus === 5) {  // 开始检测
+        return 'flashing-background-testing 2s infinite';
+      } else if (this.currentSn.testStatus === 3) {  // PASS
+        return 'flashing-background-pass 2s infinite';
+      } else if (this.currentSn.testStatus === 4) {  // FAIL
+        return 'flashing-background-fail 2s infinite';
+      } else {
+        return ''; // 无动画
+      }
+    },
     initChart() {
 
       const myChart2 = echarts.getInstanceByDom(this.$refs.echart);
@@ -496,6 +508,16 @@ export default {
             this.getDailyDate(this.form.location);
             this.getBySn(this.form.sn);
             this.form.sn = null;
+
+            // 重新聚焦焦点
+            if (response.data.data == 666) {
+              if (this.form.operationType == 5) {
+                this.form.operationType = 3
+              } else if (this.form.operationType == 3 || this.form.operationType == 4) {
+                this.form.operationType = 5
+              }
+            }
+
             if (response.data.data == 11) {
               this.$message({
                 message: '已经入站！',
@@ -584,9 +606,9 @@ export default {
   height: 560px; */
 
   position: fixed;
-    left: 38%;
-    top: 55%;
-    width: 60.5%;
+  left: 38%;
+  top: 55%;
+  width: 60.5%;
 }
 .left-top-contain {
   /* position: fixed;
@@ -655,5 +677,41 @@ export default {
 }
 .main-form-container {
   margin-top: 25px;
+}
+
+@keyframes flashing-background-pass {
+  0% {
+    background-color: rgb(101, 224, 101); /* 初始绿色 */
+  }
+  50% {
+    background-color: transparent; /* 中间透明 */
+  }
+  100% {
+    background-color: rgb(101, 224, 101); /* 结束绿色 */
+  }
+}
+
+@keyframes flashing-background-fail {
+  0% {
+    background-color: rgb(228, 120, 120); /* 初始绿色 */
+  }
+  50% {
+    background-color: transparent; /* 中间透明 */
+  }
+  100% {
+    background-color: rgb(228, 120, 120); /* 结束绿色 */
+  }
+}
+
+@keyframes flashing-background-testing {
+  0% {
+    background-color: rgb(99, 165, 226); /* 初始绿色 */
+  }
+  50% {
+    background-color: transparent; /* 中间透明 */
+  }
+  100% {
+    background-color: rgb(99, 165, 226); /* 结束绿色 */
+  }
 }
 </style>
