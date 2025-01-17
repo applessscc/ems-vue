@@ -79,19 +79,19 @@
 
                 <!-- 今日待 -->
                 <el-col :span="12">
-                  <div class="show-header" style="background: #FFD700" @click="getSnList('todayWaitTest')"> <!-- 金黄色 -->
+                  <div class="show-header" style="background:rgb(56 181 210);" @click="getSnList('todayWaitTest')"> <!-- 金黄色 -->
                     <div class="show-num">{{statisticalDesc.todayWaitTest}}</div>
                     <div class="bottom-text">今日待检</div>
                   </div>
 
                   <!-- 3天未检 -->
-                  <div class="show-header" style="background: #FFD700" @click="getSnList('threeWaitTest')"> <!-- 红色 -->
+                  <div class="show-header" style="background: rgb(251 233 129)" @click="getSnList('threeWaitTest')"> <!-- 红色 -->
                     <div class="show-num">{{statisticalDesc.threeWaitTest}}</div>
                     <div class="bottom-text">3天未检</div>
                   </div>
 
                   <!-- 5天未检 -->
-                  <div class="show-header" style="background: #FFD700" @click="getSnList('fiveWaitTest')"> <!-- 红色 -->
+                  <div class="show-header" style="background: rgb(241 204 7)" @click="getSnList('fiveWaitTest')"> <!-- 红色 -->
                     <div class="show-num">{{statisticalDesc.fiveWaitTest}}</div>
                     <div class="bottom-text">5天未检</div>
                   </div>
@@ -290,6 +290,7 @@ export default {
 
     return {
 
+      synFlag: true,
       // 边框颜色
       borderColor: '',
 
@@ -351,7 +352,11 @@ export default {
       this.getCurrentPositionJob();
       this.getStatisticalDesc();
       this.getDailyDate();
+      this.synMarqueeBorder();
     }, 10000); // 5000 毫秒，即 5 秒
+
+  },
+  watch: {
 
   },
   methods: {
@@ -457,10 +462,37 @@ export default {
         const data = response.data.data;
         this.tableData = data;
       }).catch((error) => {
-        this.$message.error('加载数据失败');
+        // this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },
+
+    synMarqueeBorder() {
+
+      // 获取所有带有 marquee-border 类的元素
+      const elements = document.querySelectorAll('.marquee-border');
+
+      elements.forEach(element => {
+        // 获取当前元素的动画类（假设动画类是动态的，基于样式计算）
+        const animationClass = element.classList.contains('marquee-border-idle') ? 'marquee-border-idle' :
+          element.classList.contains('marquee-border-testing') ? 'marquee-border-testing' :
+            element.classList.contains('marquee-border-wait-idle') ? 'marquee-border-wait-idle' : '';
+
+        if (animationClass) {
+          // // 移除当前的动画类
+          element.classList.remove(animationClass);
+
+          // // 强制浏览器重新计算布局（触发重排）
+          void element.offsetWidth;
+
+          // // 重新添加动画类
+          element.classList.add(animationClass);
+        }
+      });
+
+    },
+
+
 
     getBorderClour(position) {
       const positionData = this.currentPositionJob.find(item => item.position === position);
@@ -499,7 +531,6 @@ export default {
       }
     },
 
-
     // 获取统计列表
     getStatisticalDesc(searchParam) {
       const params = {
@@ -510,13 +541,10 @@ export default {
         method: 'get',
         params: params,
       }).then((response) => {
-        console.log(response)
         const data = response.data.data;
-        console.log('data', data);
         this.statisticalDesc = data;
         if (searchParam) {
           this.cookerJobList = data.cookerJobList;
-          console.log('cookerJobList', this.cookerJobList);
         }
       }).catch((error) => {
         this.$message.error('加载数据失败');
@@ -564,7 +592,6 @@ export default {
         method: 'get',              //  POST 请求
         params: params,                // 使用 data 传递参数
       }).then((response) => {
-        console.log(response)
         const data = response.data.data;  // 解析后端返回的分页数据
         this.inCount = data.in;
         this.failCount = data.fail;
@@ -573,7 +600,7 @@ export default {
         });
 
       }).catch((error) => {
-        this.$message.error('加载数据失败');
+        // this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },
@@ -633,7 +660,6 @@ export default {
 
     totalInbound() {
       return (position) => {
-        console.log("totalInbound执行", this.currentPositionJob.length);
         // 查找指定位置的相关数据
         const positionData = this.currentPositionJob.find(item => item.position === position);
         if (positionData) {
@@ -641,21 +667,16 @@ export default {
           const operationTime = new Date(positionData.operationTime);
           const timeDifference = now - operationTime;
           const minutesDifference = timeDifference / (1000 * 60);
-          console.log("minutesDifference", minutesDifference, positionData.position);
-          console.log("positionData.operationType1", positionData.operationType);
           // 修改 positionData.operationType
           if (positionData.operationType && (positionData.operationType == 3 || positionData.operationType == 4) && minutesDifference > 20) {
-            console.log("positionData.operationType2", positionData.operationType);
             return { inCount: positionData.inCount, failCount: positionData.failCount, operationType: "idle" };
           } else {
-            console.log("positionData.operationType3", positionData.operationType);
 
             return { inCount: positionData.inCount, failCount: positionData.failCount, operationType: this.getOperationTypeString(positionData.operationType) };
 
           }
 
         }
-        console.log("positionData.operationType4", positionData.operationType);
 
         return positionData || { inCount: 0, failCount: 0, operationType: "idle" }; // 如果没有找到，返回一个空对象
 
@@ -753,12 +774,10 @@ export default {
         method: 'get',                // GET 请求
         params: params,               // 使用 params 传递查询参数
       }).then((response) => {
-        console.log(response);
         const data = response.data.data;  // 解析后端返回的分页数据
-        console.log('currentPositionJob', data);
         this.currentPositionJob = data;
       }).catch((error) => {
-        this.$message.error('加载数据失败');
+        // this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },
@@ -853,55 +872,56 @@ export default {
 /* 动画：灰色渐变 */
 @keyframes idle-marquee-border {
   0% {
-    border-color: #ffffff; /* 白色 */
+    border-color: #c2c2c2;
+    background-color: #eeeaea;
   }
-  33% {
-    border-color: #f5f5f5; /* 浅灰色 */
-  }
-  66% {
-    border-color: #e2e2e2; /* 中灰色 */
+  50% {
+    border-color: transparent;
+    background-color: transparent;
   }
   100% {
-    border-color: #c6c7c9; /* 深灰色 */
+    border-color: #c2c2c2;
+    background-color: #eeeaea;
   }
 }
 
 /* 动画：绿色渐变 */
 @keyframes testing-marquee-border {
   0% {
-    border-color: #ffffff; /* 白色 */
+    border-color: #91e991;
+    background-color: #d7e2d7;
   }
-  33% {
-    border-color: #c0e4be; /* 浅绿色 */
-  }
-  66% {
-    border-color: #a9eba9; /* 中绿色 */
+  50% {
+    border-color: transparent;
+    background-color: transparent;
   }
   100% {
-    border-color: #92f392; /* 深绿色 */
+    border-color: #91e991;
+    background-color: #d7e2d7;
   }
 }
 
 /* 动画：黄色渐变 */
 @keyframes wait-idle-marquee-border {
   0% {
-    border-color: #ffffff; /* 白色 */
-  }
-  33% {
-    border-color: #fcf8c5; /* 浅黄色 */
-  }
-  66% {
-    border-color: #e0e0a3; /* 中黄色 */
+    border-color: #ece364;
+    background-color: #f0edd2;
+  } /* 初始绿色 */
+
+  50% {
+    border-color: transparent;
+    background-color: transparent;
   }
   100% {
-    border-color: #ece364; /* 黄色 */
+    border-color: #ece364;
+    background-color: #f0edd2;
   }
 }
 
 /* 应用动画的类 */
 .marquee-border {
   border: 12px solid; /* 设置边框宽度 */
-  animation: 3s linear infinite; /* 每次动画3秒，持续循环 */
+  animation: 2s linear infinite; /* 每次动画3秒，持续循环 */
 }
 
 /* 为不同状态的元素指定不同的动画 */
