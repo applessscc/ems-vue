@@ -4,13 +4,13 @@
     <div class="main-contain-top">
       <el-card>
         <div style="text-align: center;" :style="{ animation: getBackgroundCloud()}">
-          <span style="font-weight: bold; font-size: 90px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
+          <span style="font-weight: bold; font-size: 87px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
         </div>
       </el-card>
     </div>
 
     <div class="curent-job-contain">
-      <el-card style="height:370px">
+      <el-card style="height:308px">
         <div slot="header" class="clearfix">
 
           <el-row type="flex" justify="space-between" align="middle">
@@ -20,7 +20,7 @@
         </div>
         <div class="curent-job-contain-top">
           <el-descriptions :column="3" border>
-            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{currentSn.sn == null|| currentSn.sn == ''?"暂无":currentSn.sn}}</el-descriptions-item>
+            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
             <el-descriptions-item label="Nadel">暂无</el-descriptions-item>
             <el-descriptions-item label="状态" v-if="false">
@@ -35,7 +35,7 @@
         <div class="main-form-container" v-if="switchValue">
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <el-form-item>
               <el-radio-group v-model="form.operationType">
@@ -56,7 +56,7 @@
         <div class="main-form-container" v-else>
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <!-- <el-form-item>
               <el-button type="primary" @click="onSubmit(1)">进站</el-button>
@@ -75,10 +75,10 @@
 
     </div>
     <div class="main-contain">
-      <el-card style="height: 420px;">
+      <el-card style="height: 285px;">
 
         <div id="app">
-          <div ref="echart" style="width: 100%; height: 400px;"></div>
+          <div ref="echart" style="width: 100%; height:270px ;"></div>
         </div>
 
       </el-card>
@@ -90,12 +90,12 @@
             <el-row type="flex" justify="space-between" align="middle">
               <!-- <span style="font-weight: bold;">设备图片
               </span> -->
-                      <span style="font-weight: bold;" v-if="switchValue">设备检测
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
-            <span style="font-weight: bold;" v-else>设备过站
-              <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
-            </span>
+              <span style="font-weight: bold;" v-if="switchValue">设备检测
+                <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+              </span>
+              <span style="font-weight: bold;" v-else>设备过站
+                <el-switch v-model="switchValue" active-color="#13ce66" inactive-color="#3498db"></el-switch>
+              </span>
               <el-select v-model="form.location" clearable placeholder="请选择位置">
                 <el-option v-for="item in locationOptions" :key="item.item" :label="item.value" :value="item.item">
                 </el-option>
@@ -110,13 +110,13 @@
 
     <div class="left-bottom-contain">
       <el-card>
-        <div slot="header">
+        <!-- <div slot="header">
           <span style="font-weight: bold;">SN列表
           </span>
 
-        </div>
+        </div> -->
         <div class="left-bottom-contain-table">
-          <el-table :data="tableData" style="width: 100%" stripe border height="320px">
+          <el-table :data="tableData" style="width: 100%" stripe border height="245px">
             <el-table-column prop="sn" label="SN号" width="150">
             </el-table-column>
             <el-table-column label="状态" width="80">
@@ -152,6 +152,8 @@ export default {
   data() {
     return {
 
+      inputDisabled: false,
+
       // 总进站数和不良品数
       inCount: [],
       failCount: [],
@@ -180,12 +182,14 @@ export default {
         } else if (code == 0) {
           return "未检测"
         }
+        else if (code == 5) {
+          return "检测中"
+        }
         else {
           return "未知状态"
         }
       },
 
-      backgroundCloud: "flashing-background 2s infinite",
 
       // 设备检测||设备进站
       switchValue: true,
@@ -242,6 +246,7 @@ export default {
         this.geSysList(1019, newLocation); // 更新数据
         this.fetchData();  // 获取数据
         this.getDailyDate(newLocation);  // 获取日数据
+        this.getBySn(null, newLocation)
       }
       this.$nextTick(() => {
         this.$refs.snInput.focus();
@@ -272,6 +277,7 @@ export default {
       // 如果需要根据路由参数直接更新
       if (newLocation) {
         this.form.location = newLocation;
+        this.getBySn(null, newLocation)
         // 确保页面加载时聚焦到输入框
         this.$nextTick(() => {
           this.$refs.snInput.focus();
@@ -300,21 +306,27 @@ export default {
     this.geSysList(1019, location);
     this.fetchData();
     this.getDailyDate(this.location);
+    this.intervalId = setInterval(() => {
+      this.fetchData();
+    }, 3000);
 
 
   },
   methods: {
     getBackgroundCloud() {
       // 根据当前操作类型返回不同的动画
-      if (this.currentSn.testStatus === 5) {  // 开始检测
-        return 'flashing-background-testing 2s infinite';
-      } else if (this.currentSn.testStatus === 3) {  // PASS
-        return 'flashing-background-pass 2s infinite';
-      } else if (this.currentSn.testStatus === 4) {  // FAIL
-        return 'flashing-background-fail 2s infinite';
-      } else {
-        return ''; // 无动画
+      if (this.currentSn) {
+        if (this.currentSn.testStatus === 5) {  // 开始检测
+          return 'flashing-background-testing 2s infinite';
+        } else if (this.currentSn.testStatus === 3) {  // PASS
+          return 'flashing-background-pass 2s infinite';
+        } else if (this.currentSn.testStatus === 4) {  // FAIL
+          return 'flashing-background-fail 2s infinite';
+        } else {
+          return ''; // 无动画
+        }
       }
+
     },
     initChart() {
 
@@ -375,14 +387,12 @@ export default {
       const params = {
         location: location
       };
-      console.log('getDailyDatelocation', location);
 
       this.$http({
         url: this.$http.adornUrl(`/cooker/cookerJob/getDailyDate`),  // 接口地址
         method: 'get',              //  POST 请求
         params: params,                // 使用 data 传递参数
       }).then((response) => {
-        console.log(response)
         const data = response.data.data;  // 解析后端返回的分页数据
         this.inCount = data.in;
         this.failCount = data.fail;
@@ -403,9 +413,7 @@ export default {
         method: 'post',              //  POST 请求
         data: params,                // 使用 data 传递参数
       }).then((response) => {
-        console.log(response)
         const data = response.data.data;  // 解析后端返回的分页数据
-        console.log('data', data);
 
         this.tableData = data;       // 表格数据
       }).catch((error) => {
@@ -442,9 +450,11 @@ export default {
     },
 
 
-    getBySn(sn) {
+    getBySn(sn, location) {
+      // if (!sn && !location) return
       const params = {
-        sn: sn
+        sn: sn,
+        location: location
       };
       this.$http({
         url: this.$http.adornUrl(`/cooker/cookerJob/getBySn`),
@@ -453,6 +463,15 @@ export default {
       }).then((response) => {
         const data = response.data.data;
         this.currentSn = data;
+
+        if (data) {
+          // 检测中就聚焦到pass
+          if (this.currentSn.testStatus === 5 && this.switchValue == true) {
+            this.form.operationType = 3
+          } else if ((this.currentSn.testStatus === 0 || this.currentSn.testStatus === 3 || this.currentSn.testStatus === 4) && this.switchValue == true) {
+            this.form.operationType = 5
+          }
+        }
       }).catch((error) => {
         this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
@@ -460,6 +479,15 @@ export default {
     },
 
     onSubmit(type) {
+      this.inputDisabled = true
+      // 进行扫描fail操作
+      if (this.form.sn == 'fail' && this.currentSn && this.currentSn.sn) {
+        this.form.sn = this.currentSn.sn
+        this.form.operationType = 4
+      }else if(this.form.sn == 'pass' && this.currentSn && this.currentSn.sn){
+       this.form.sn = this.currentSn.sn
+        this.form.operationType = 3
+      }
 
       if (type && this.form.operationType) {
         this.$message({
@@ -467,15 +495,17 @@ export default {
           type: 'warn',
           duration: 1000
         });
+        this.inputDisabled = false
         return
       }
 
-      if ((this.form.location == null || this.form.location == '') && type == 5 && (this.currentSn.position == null || this.currentSn.position == '')) {
+      if (!this.form.location && (this.form.operationType == 5 || type == 5)) {
         this.$message({
           message: '请先选择位置',
           type: 'warn',
           duration: 1000
         });
+        this.inputDisabled = false
         return
       }
 
@@ -486,6 +516,7 @@ export default {
             type: 'warn',
             duration: 1000
           });
+          this.inputDisabled = false
           return
         }
         if (valid) {
@@ -496,7 +527,6 @@ export default {
             handlerId: this.$store.state.user.id,
             position: this.form.location
           };
-          console.log('炒饭机任务操作', params);
 
 
           this.$http({
@@ -506,7 +536,7 @@ export default {
           }).then((response) => {
             this.fetchData();
             this.getDailyDate(this.form.location);
-            this.getBySn(this.form.sn);
+            this.getBySn(this.form.sn, null);
             this.form.sn = null;
 
             // 重新聚焦焦点
@@ -556,28 +586,27 @@ export default {
               });
             }
             else {
-              console.log('炒饭机任务操作', response);
               this.$message({
                 message: '操作成功',
                 type: 'success',
                 duration: 1000
               });
             }
-
-
-
+            this.inputDisabled = false
           }).catch((error) => {
             this.$message({
               message: '操作失败',
               type: 'error',
               duration: 1000
             });
+            this.inputDisabled = false
             console.log('操作任务状态失败：', error);
 
           });
 
 
         } else {
+          this.inputDisabled = false
           console.log('表单验证失败！');
 
         }
@@ -606,9 +635,9 @@ export default {
   height: 560px; */
 
   position: fixed;
-  left: 38%;
-  top: 55%;
-  width: 60.5%;
+  left: 35.5%;
+  top: 62%;
+  width: 64.5%;
 }
 .left-top-contain {
   /* position: fixed;
@@ -617,8 +646,7 @@ export default {
   height: 400px; */
 
   position: fixed;
-  top: 17%;
-  left: 1.5%;
+  top: 21%;
   width: 35%;
   height: 36%;
 }
@@ -627,7 +655,7 @@ export default {
   background-size: cover; /* 让背景图片覆盖整个 div */
   background-position: center; /* 图片居中 */
   width: 100%;
-  height: 250px;
+  height: 190px;
 }
 .left-bottom-contain {
   /* position: fixed;
@@ -636,10 +664,9 @@ export default {
   height: 200px; */
 
   position: fixed;
-  top: 55%;
+  top: 62%;
   width: 35%;
   height: 30%;
-  left: 1.5%;
 }
 .left-bottom-contain-table {
   overflow-y: auto;
@@ -654,18 +681,16 @@ export default {
   height: 300px; */
 
   position: fixed;
-  left: 38%;
-  top: 17%;
-  width: 60.5%;
+  left: 35.5%;
+  top: 21%;
+  width: 64.5%;
 }
 .main-contain-top {
   /* top: 95px;
   left: 800px;
   width: 1000px;
   position: fixed; */
-  top: 1.5%;
-  left: 1.5%;
-  width: 97%;
+  width: 100%;
   position: fixed;
 }
 .el-switch__core {
@@ -684,7 +709,7 @@ export default {
     background-color: rgb(101, 224, 101); /* 初始绿色 */
   }
   50% {
-    background-color: transparent; /* 中间透明 */
+    background-color: rgb(101, 224, 101); /* 中间透明 */
   }
   100% {
     background-color: rgb(101, 224, 101); /* 结束绿色 */
