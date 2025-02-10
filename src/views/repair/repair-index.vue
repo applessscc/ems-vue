@@ -59,6 +59,7 @@
 import repairListVue from './repair-list.vue'
 import * as echarts from 'echarts';
 
+import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
   name: 'Dashboard',
   components: {
@@ -94,6 +95,9 @@ export default {
     this.chart = echarts.init(this.$refs.chart)
 
 
+  },
+  creaed() {
+        saveVisitLog('CMS 报修任务首页-访问');
   },
 
 

@@ -53,6 +53,7 @@
   
   <script>
 import repairListVue from './repair-kanbanList.vue'
+import { saveVisitLog } from '@/utils/commonUtils.js'
 
 export default {
   name: 'Dashboard',
@@ -78,6 +79,9 @@ export default {
     // 这里可以添加获取表格数据的逻辑
     this.fetchData()
     this.$refs.repairList.fetchData(); // 调用子组件的方法
+  },
+  created() {
+    saveVisitLog('CMS 报修看板-访问')
   },
 
 

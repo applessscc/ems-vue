@@ -125,9 +125,13 @@
 import * as echarts from 'echarts';
 import dark from '@/theme/dark.json'
 import { now } from 'moment';
+import { saveVisitLog } from '@/utils/commonUtils.js'
 
 
 export default {
+  created() {
+        saveVisitLog('CMS 实时温度详情-访问');
+  },
   data() {
     return {
 

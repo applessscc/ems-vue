@@ -87,12 +87,17 @@
 </template>
 
 <script>
+
+import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
   props: {
     visible: {
       type: Boolean,
       required: true
     }
+  },
+  created() {
+        saveVisitLog('CMS 维修任务申请-访问');
   },
   data() {
     return {

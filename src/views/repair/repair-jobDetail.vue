@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
   name: 'jobDetail',
   components: {
@@ -89,6 +90,7 @@ export default {
     }
   },
   created() {
+        saveVisitLog('CMS 维修任务详情-访问');
     this.fetchData()
 
   },

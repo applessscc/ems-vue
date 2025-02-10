@@ -8,7 +8,7 @@
             <el-card :body-style="{ padding: '0px',paddingBottom: '3px'  }" :style="{ borderColor: getBorderClour(item.item).color } " :class="['marquee-border', getBorderClour(item.item).animationClass]" shadow="hover">
 
               <div>
-                <img src="../../assets/img/left-top-bg.jpg" class="image" @click.stop="$router.push({ name: 'cookerJob', query: { location: item.item } })">
+                <img src="../../assets/img/left-top-bg.jpg" class="image" @click.stop="openNewWindow(item.item)">
 
               </div>
 
@@ -134,7 +134,7 @@
           <el-col :span="24" class="show-item">
             <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[6].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[6].item).animationClass]"
               shadow="hover">
-              <img src="../../assets/img/left-top-bg.jpg" class="image">
+              <img src="../../assets/img/left-top-bg.jpg" class="image" @click.stop="openNewWindow(6)">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[6].value}}</div>
                 <!-- 下方显示栏 -->
@@ -163,7 +163,7 @@
           <el-col :span="24" class="show-item">
             <el-card :body-style="{ padding: '0px' ,paddingBottom: '3px'}" :style="{ borderColor: getBorderClour(this.locationOptions[7].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[7].item).animationClass]"
               shadow="hover">
-              <img src="../../assets/img/left-top-bg.jpg" class="image">
+              <img src="../../assets/img/left-top-bg.jpg" class="image"  @click.stop="openNewWindow(7)">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[7].value}}</div>
                 <!-- 下方显示栏 -->
@@ -193,7 +193,7 @@
           <el-col :span="24" class="show-item">
             <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[8].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[8].item).animationClass]"
               shadow="hover">
-              <img src="../../assets/img/left-top-bg.jpg" class="image">
+              <img src="../../assets/img/left-top-bg.jpg" class="image" @click.stop="openNewWindow(8)">
               <div claas="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[8].value}}</div>
                 <!-- 下方显示栏 -->
@@ -221,7 +221,7 @@
           <el-col :span="24" class="show-item">
             <el-card :body-style="{ padding: '0px',paddingBottom: '3px' }" :style="{ borderColor: getBorderClour(this.locationOptions[9].item).color }" :class="['marquee-border', getBorderClour(this.locationOptions[9].item).animationClass]"
               shadow="hover">
-              <img src="../../assets/img/left-top-bg.jpg" class="image">
+              <img src="../../assets/img/left-top-bg.jpg" class="image"  @click.stop="openNewWindow(9)">
 
               <div claas="right-status-container " style="margin-top: 8px;">
                 <div class="item-desc">{{this.locationOptions[9].value}}</div>
@@ -282,7 +282,7 @@
 
 <script>
 import * as echarts from 'echarts'; // 引入echarts
-
+import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
 
   data() {
@@ -334,6 +334,7 @@ export default {
 
   },
   created() {
+        saveVisitLog('CMS 炒菜机任务看板-访问');
   },
   unmounted() {
     // 清除定时器
@@ -361,6 +362,15 @@ export default {
   },
   methods: {
 
+
+  openNewWindow(locationItem) {
+      if (locationItem) {
+        const url = this.$router.resolve({ name: 'cookerJob-b8', query: { location: locationItem } }).href;
+        window.open(url, '_blank');  // 在新窗口打开链接
+      } else {
+        console.error('locationOptions[9] 或 item 不存在');
+      }
+    },
 
     getFieldDescription(fieldName) {
       switch (fieldName) {

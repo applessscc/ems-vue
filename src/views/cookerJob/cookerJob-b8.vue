@@ -15,6 +15,9 @@
 
           <el-row type="flex" justify="space-between" align="middle">
             <el-button type="primary" @click="openNew('cookerJobKanban')">任务看板</el-button>
+
+                        <!-- <el-button type="primary" @click="getView">getView</el-button> -->
+
           </el-row>
 
         </div>
@@ -145,7 +148,7 @@
 
 <script>
 import * as echarts from 'echarts'; // 引入echarts
-
+import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
 
 
@@ -272,6 +275,17 @@ export default {
       });
 
     },
+
+
+    watch: {
+      '$route.query.switchValue'(newValue, oldValue) {
+        console.log('$route.query.switchValue 发生改变', oldValue, newValue);
+        // 这里可以对 switchValue 做相应的处理
+        this.switchValue = newValue === 'true';
+      }
+    },
+
+
     "$route.query.location"(newLocation, oldLocation) {
       console.log('$route.query.location发生改变', oldLocation, newLocation);
       // 如果需要根据路由参数直接更新
@@ -296,23 +310,40 @@ export default {
 
   },
   created() {
+     saveVisitLog('CMS 炒菜机任务-访问');
+    if (this.$route.query.switchValue) {
+      this.switchValue = this.$route.query.switchValue === 'true'; // 确保是布尔值
+    }
   },
   mounted() {
     // 确保页面加载时聚焦到输入框
     this.$nextTick(() => {
       this.$refs.snInput.focus();
     });
-    const location = this.$route.query.location || (this.form.location ? this.form.location : 1) // 默认使用路由中的 location
+    const location = this.$route.query.location || (this.form.location ? this.form.location : '') // 默认使用路由中的 location
     this.geSysList(1019, location);
     this.fetchData();
     this.getDailyDate(this.location);
     this.intervalId = setInterval(() => {
       this.fetchData();
+      this.$refs.snInput.focus();
+
     }, 3000);
 
 
   },
   methods: {
+    getView() {
+      const width = window.innerWidth; // 获取视口宽度
+      const height = window.innerHeight; // 获取视口高度
+
+             this.$message({
+          message: `Width: ${width}, Height: ${height}`,
+          type: 'warn',
+          duration: 3000
+        });
+    },
+
     getBackgroundCloud() {
       // 根据当前操作类型返回不同的动画
       if (this.currentSn) {
@@ -480,12 +511,12 @@ export default {
 
     onSubmit(type) {
       this.inputDisabled = true
-      // 进行扫描fail操作
+      // 进行扫描fail操作 || pass操作
       if (this.form.sn == 'fail' && this.currentSn && this.currentSn.sn) {
         this.form.sn = this.currentSn.sn
         this.form.operationType = 4
-      }else if(this.form.sn == 'pass' && this.currentSn && this.currentSn.sn){
-       this.form.sn = this.currentSn.sn
+      } else if (this.form.sn == 'pass' && this.currentSn && this.currentSn.sn) {
+        this.form.sn = this.currentSn.sn
         this.form.operationType = 3
       }
 
@@ -536,8 +567,9 @@ export default {
           }).then((response) => {
             this.fetchData();
             this.getDailyDate(this.form.location);
-            this.getBySn(this.form.sn, null);
+            this.getBySn(null, this.form.location);
             this.form.sn = null;
+            this.$refs.snInput.focus();
 
             // 重新聚焦焦点
             if (response.data.data == 666) {
@@ -610,11 +642,6 @@ export default {
           console.log('表单验证失败！');
 
         }
-
-
-
-
-
 
       });
 
