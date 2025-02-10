@@ -138,9 +138,10 @@ export default {
       });
 
       //组装x轴
-      optionData.xAxis.data = data.page.xData.map(value => (parseInt(value) + 1).toString());
+      optionData.xAxis.data = data.page.xData.map(value => (parseInt(value)).toString());
 
       //双Y轴对齐
+      
       // this.yAxisAlignment(optionData, data.page.seriesDataBar, data.page.seriesDataLine, 5);
 
       //设置grigger回调函数
@@ -164,6 +165,7 @@ export default {
             show: true,
             position: 'top',
             formatter: '{@score}'
+            
           },
           data: markData
         }
