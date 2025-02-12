@@ -4,7 +4,7 @@
     <div class="main-contain-top">
       <el-card>
         <div style="text-align: center;" :style="{ animation: getBackgroundCloud()}">
-          <span style="font-weight: bold; font-size: 87px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
+          <span style="font-weight: bold; font-size: 86px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
         </div>
       </el-card>
     </div>
