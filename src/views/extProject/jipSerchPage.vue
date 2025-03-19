@@ -45,7 +45,7 @@ export default {
   mounted() {
     this.$refs.serchInput.focus();
   },
-  create(){
+  created(){
     saveVisitLog('夹具追溯查询');
 
   },
