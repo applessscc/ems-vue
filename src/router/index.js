@@ -25,6 +25,7 @@ const globalRoutes = [
   { path: '/equipment/ai-temp-board-detail', component: _import('equipment/ai-temp-board-detail'), name: 'ai-temp-board-detail', meta: { title: 'CMS 实时温度详情' } },
   { path: '/cookerJob/cookerJob-b8', component: _import('cookerJob/cookerJob-b8'), name: 'cookerJob-b8' , meta: { title: '炒房机任务-b8'}}, 
   { path: '/extProject/jipSerchPage', component: _import('extProject/jipSerchPage'), name: 'jipSerchPage' , meta: { title: 'jig查询页'}}, 
+  { path: '/air-condition/addKV', component: _import('air-condition/addKV'), name: 'addKV' , meta: { title: '添加空调比值键值对'}}, 
 
 
   { path: '/repair/repair-kanban', component: _import('repair/repair-kanban'), name: 'repair-kanban', meta: { title: '维修任务看板' } },

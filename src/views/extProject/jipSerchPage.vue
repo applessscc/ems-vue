@@ -47,7 +47,6 @@ export default {
   },
   created(){
     saveVisitLog('夹具追溯查询');
-
   },
   computed: {
     // 计算统计结果

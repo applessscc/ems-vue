@@ -1,7 +1,8 @@
 <template>
   <aside class="site-sidebar" :class="'site-sidebar--' + sidebarLayoutSkin">
     <div class="site-sidebar__inner">
-      <el-menu :default-active="menuActiveName || 'home'" :collapse="sidebarFold" :collapseTransition="false" class="site-sidebar__menu">
+      <el-menu :default-active="menuActiveName || 'home'" :collapse="sidebarFold" :collapseTransition="false"
+        class="site-sidebar__menu">
         <el-menu-item index="home" @click="$router.push({ name: 'home' })">
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">首页</span>
@@ -11,15 +12,15 @@
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
             <span>demo</span>
           </template>
-          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'demo-echarts' })">
-            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">echarts</span>
-          </el-menu-item>
-          <el-menu-item index="demo-ueditor" @click="$router.push({ name: 'demo-ueditor' })">
-            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
-            <span slot="title">ueditor</span>
-          </el-menu-item>
-        </el-submenu> -->
+<el-menu-item index="demo-echarts" @click="$router.push({ name: 'demo-echarts' })">
+  <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+  <span slot="title">echarts</span>
+</el-menu-item>
+<el-menu-item index="demo-ueditor" @click="$router.push({ name: 'demo-ueditor' })">
+  <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
+  <span slot="title">ueditor</span>
+</el-menu-item>
+</el-submenu> -->
         <el-submenu index="能耗分析">
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
@@ -56,11 +57,15 @@
             <span slot="title">炒饭机任务</span>
           </el-menu-item>
 
-            <el-menu-item index="demo-echarts" @click="openNew('cookerJob/cookerJob-b8')">
+          <el-menu-item index="demo-echarts" @click="openNew('cookerJob/cookerJob-b8')">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">炒饭机任务-b8</span>
           </el-menu-item>
 
+          <el-menu-item index="air-condition" @click="openNew('air-condition/addKV')">
+            <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">空调任务</span>
+          </el-menu-item>
         </el-submenu>
 
         <sub-menu v-for="menu in menuList" :key="menu.menuId" :menu="menu" :dynamicMenuRoutes="dynamicMenuRoutes">
