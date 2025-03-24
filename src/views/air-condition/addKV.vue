@@ -4,32 +4,31 @@
     <div class="logo-container">
       <span class="logo-text">VTech 温度系数比值</span>
     </div>
-
     <div class="form-container">
       <el-form :model="form" label-width="60px" :inline="true">
         <el-form-item label="sbu">
-          <el-select v-model="form.sbu" placeholder="请选择sbu" filterable style="width: 120px">
+          <el-select v-model="form.sbu" placeholder="sbu" filterable style="width: 80px">
             <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
               :label="device" :value="device">
             </el-option>
           </el-select>
         </el-form-item>
-
         <el-form-item label="ID">
-          <el-select v-model="form.id" placeholder="请选择设备" clearable filterable style="width: 200px"
+          <el-select v-model="form.id" placeholder="请选择设备" clearable filterable style="width: 170px"
             :disabled="!form.sbu">
             <el-option v-for="device in devices.filter(device => device.sbu === form.sbu)" :key="device.id"
               :label="device.id" :value="device.id">
             </el-option>
           </el-select>
         </el-form-item>
-
-
-
         <el-form-item label="系数">
-          <el-input v-model="form.coefficient" style="width: 120px" placeholder="请输入系数"   @input="validateNumber('coefficient')"></el-input>
+          <el-input v-model="form.coefficient" style="width: 100px" placeholder="coefficient"   @input="validateNumber('coefficient')"></el-input>
         </el-form-item>
         <el-form-item>
+        <el-form-item label="区域">
+          <el-input v-model="form.areaName" style="width: 100px" placeholder="areaName"   @input="validateNumber('areaName')"></el-input>
+        </el-form-item>
+        <el-form-item></el-form-item>
           <el-button type="primary" @click="onSubmit" plain>添加</el-button>
           <el-button type="danger" @click="clean" plain>一键清空</el-button>
         </el-form-item>
@@ -79,12 +78,13 @@ import { watch } from 'less';
 export default {
   data() {
     return {
+      activeName: 'second',
       devices: [],
       sbu: [],
       tableData: [
       ],
       form: {
-        expMinTem: '',
+        areaName: '',      expMinTem: '',
         expMaxTem: '',
         coefficient: '',
         sbu: '',
@@ -214,7 +214,7 @@ export default {
 .form-container {
   text-align: center;
 
-  width: 50%;
+  width: 60%;
   margin: 40px auto;
 }
 
