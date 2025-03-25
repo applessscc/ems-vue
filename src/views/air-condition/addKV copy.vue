@@ -6,15 +6,6 @@
     </div>
     <div class="form-container">
       <el-form :model="form" label-width="60px" :inline="true">
-
-        <el-form-item label="组别">
-          <el-select v-model="groupId" placeholder="已新增的组别" style="width: 150px" clearable>
-            <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
-              :value="groupId.groupId">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
         <el-form-item label="sbu">
           <el-select v-model="form.sbu" placeholder="sbu" filterable style="width: 80px">
             <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
@@ -31,11 +22,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="系数">
-          <el-input v-model="form.coefficient" style="width: 80px" placeholder="系数"
-            @input="validateNumber('coefficient')"></el-input>
+          <el-input v-model="form.coefficient" style="width: 100px" placeholder="coefficient"   @input="validateNumber('coefficient')"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-form-item></el-form-item>
+        <el-form-item label="区域">
+          <el-input v-model="form.areaName" style="width: 100px" placeholder="areaName"   @input="validateNumber('areaName')"></el-input>
+        </el-form-item>
+        <el-form-item></el-form-item>
           <el-button type="primary" @click="onSubmit" plain>添加</el-button>
           <el-button type="danger" @click="clean" plain>一键清空</el-button>
         </el-form-item>
@@ -43,11 +36,11 @@
     </div>
 
     <div class="table-container">
-      <el-table :data="tableData" border style="width: 100%" :max-height="420" :key="tableData.length">
-        <el-table-column prop="sbu" label="sbu" width="100px" align="center" show-overflow-tooltip></el-table-column>
+      <el-table :data="tableData" border style="width: 100%" :max-height="420">
+        <el-table-column prop="sbu" label="sbu" width="300px" align="center" show-overflow-tooltip></el-table-column>
         <el-table-column prop="id" label="ID" width="300px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="coefficient" label="系数" width="100px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column label="操作"  align="center">
+        <el-table-column prop="coefficient" label="系数" width align="center" show-overflow-tooltip></el-table-column>
+        <el-table-column label="操作" width="100px" align="center">
           <template slot-scope="scope">
             <el-button @click="deleteRow(scope.$index)" type="danger" size="mini" plain>删除</el-button>
           </template>
@@ -55,32 +48,25 @@
       </el-table>
     </div>
 
-    <div class="form-buttom-container" >
-      <el-form :inline="true" class="demo-form-inline" :rules="rules" ref="form" v-model="form">
-        <el-form-item label="组名称">
-          <el-input v-model="form.groupName" style="width: 120px" placeholder="groupName"></el-input>
-        </el-form-item>
+    <div class="form-buttom-container">
+      <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item label="预期温度">
-          <el-input v-model="form.expMaxTem" placeholder="min" style="display: inline-block; width: 70px;"
+          <el-input v-model="form.expMaxTem" placeholder="最小温度" style="display: inline-block; width: 90px;"
             @input="validateNumber('expMaxTem')">
           </el-input>
           <span style="display: inline-block; vertical-align: top;">C°</span>
           <span style="display: inline-block; vertical-align: top; margin-inline: 10px;">-</span>
-          <el-input v-model="form.expMinTem" placeholder="max" style="display: inline-block; width: 70px;"
+          <el-input v-model="form.expMinTem" placeholder="最大温度" style="display: inline-block; width: 90px;"
             @input="validateNumber('expMinTem')">
           </el-input>
           <span style="display: inline-block; vertical-align: top;">C°</span>
         </el-form-item>
+
       </el-form>
     </div>
 
     <div class="table-submit-container">
-      <el-button type="primary" @click="onSubmitTable" plain round size="medium " v-if="groupId == ''">新增组别</el-button>
-      <el-button type="warning" @click="onSubmitTable" plain round size="medium "
-        v-if="groupId != '' && tableData.length != 0">确认修改组别</el-button>
-      <el-button type="danger" @click="onSubmitTable" plain round size="medium "
-        v-if="groupId != '' && tableData.length == 0">确认删除组别</el-button>
-
+      <el-button type="primary" @click="onSubmitTable" plain round size="medium ">提交</el-button>
     </div>
 
   </div>
@@ -88,25 +74,17 @@
 
 <script>
 import { saveVisitLog } from '@/utils/commonUtils.js'
+import { watch } from 'less';
 export default {
   data() {
     return {
-      rules: {
-        groupName: [
-          { required: true, message: '请输入组名称', trigger: 'blur' }
-        ]
- 
-      },
-      groupId: '',
+      activeName: 'second',
       devices: [],
-      groupIds: [],
       sbu: [],
       tableData: [
       ],
       form: {
-        groupName: '',
-        areaName: '',
-        expMinTem: '',
+        areaName: '',      expMinTem: '',
         expMaxTem: '',
         coefficient: '',
         sbu: '',
@@ -117,19 +95,10 @@ export default {
 
   watch: {
 
+    // 监听 location 的变化
     "form.sbu"(n, o) {
       if (n !== o) {
         this.form.id = '';
-      }
-    },
-
-    "groupId"(n, o) {
-      if (n !== o) {
-        if (n != '') {
-          this.getThKvRecord();
-        } else {
-          this.clean();
-        }
       }
     }
 
@@ -138,8 +107,8 @@ export default {
   },
   created() {
     this.getThRecord();
-    this.getThKvRecordGroups();
     saveVisitLog('温度系数比值');
+
   },
   mounted() {
   },
@@ -148,60 +117,40 @@ export default {
       this.form[field] = this.form[field].replace(/[^0-9.]/g, ''); // Allow only numbers and decimal points
     },
     clean() {
-      this.groupId = '';
       this.tableData = [];
       this.form = {
         expMinTem: '',
         expMaxTem: '',
         coefficient: '',
-        groupName: '',
         sbu: '',
         id: ''
       };
     },
     onSubmitTable() {
-      if (this.tableData.length == 0 && this.groupId == '') {
-        this.$message.wa('请添加数据');
-        return;
-      }
-      if(this.form.groupName==''){
-        this.$message.error('请填写组名称');
+      if (this.tableData.length == 0) {
+        this.$message.error('请添加数据');
         return;
       }
       const data = {
-        groupId: this.groupId,
         tableData: this.tableData,
         expMaxTem: this.form.expMaxTem,
         expMinTem: this.form.expMinTem,
-        groupName: this.form.groupName
       };
       this.$http({
         url: this.$http.adornUrl('/extProject/addKV'),
         method: 'post',
         data: data,
       }).then((response) => {
-        if (response.data.data == false) {
-          this.$message({
-            message: '组别名称重复！',
-            type: 'warning',
-            duration: 2000
-          });
-          return;
-        }
         this.$message({
-          message: '操作成功',
+          message: '添加成功',
           type: 'success',
           duration: 2000
         });
-        this.clean();
-        this.getThKvRecordGroups();
-        if (this.groupId != '') {
-          this.getThKvRecord();
-        }
       }).catch((error) => {
         console.log('error', error);
       });
     },
+
     getThRecord() {
       const params = {
       };
@@ -222,56 +171,9 @@ export default {
       });
     },
 
-    getThKvRecordGroups() {
-      const params = {
-      };
-
-      this.$http({
-        url: this.$http.adornUrl('/extProject/getThKvRecord'),
-        method: 'post',
-        data: params,
-      }).then((response) => {
-        const data = response.data.data;
-
-        this.groupIds = data.map(item => ({
-          groupId: item.groupId,
-          groupName: item.groupName
-        }));
-
-        console.log("groupIds", this.groupIds)
-        this.groupIds = [...new Map(this.groupIds.map(item => [item.groupId, item])).values()];
-
-      }).catch((error) => {
-        console.log('Error:', error);
-      });
-    },
-
-
-    getThKvRecord() {
-      const params = {
-        groupId: this.groupId
-      };
-
-      this.$http({
-        url: this.$http.adornUrl('/extProject/getThKvRecord'),
-        method: 'post',
-        data: params,
-      }).then((response) => {
-        const data = response.data.data;
-        this.tableData = data
-        this.form.expMaxTem = data[0].expMaxTem;
-        this.form.expMinTem = data[0].expMinTem;
-        this.form.groupName = data[0].groupName;
-
-      }).catch((error) => {
-        console.log('Error:', error);
-      });
-    },
-
-
 
     onSubmit() {
-      if (!this.form.coefficient || !this.form.sbu || !this.form.id ) {
+      if (!this.form.coefficient || !this.form.sbu || !this.form.id) {
         this.$message.error('请填写完整的表单数据');
         return;
       }
@@ -280,13 +182,10 @@ export default {
         id: this.form.id,
         coefficient: this.form.coefficient
       });
-      // 延迟操作，确保表格渲染完成后再执行其他操作
-      this.$nextTick(() => {
-        this.$message.success('数据已成功添加');
-      });
-      this.getThKvRecordGroups();
-
-    },
+  // 延迟操作，确保表格渲染完成后再执行其他操作
+  this.$nextTick(() => {
+    this.$message.success('数据已成功添加');
+  });    },
     deleteRow(index) {
       this.tableData.splice(index, 1);
       this.$message.success('数据已成功删除');
@@ -320,7 +219,7 @@ export default {
 }
 
 .table-container {
-  max-width: 40%;
+  max-width: 50%;
   margin: 20px auto;
 }
 
