@@ -2,7 +2,7 @@
   <div>
 
     <div class="logo-container">
-      <span class="logo-text">VTech 温度系数比值</span>
+      <span class="logo-text">VTech 温区配置</span>
     </div>
     <div class="form-container">
       <el-form :model="form" label-width="60px" :inline="true">
@@ -44,12 +44,15 @@
 
     <div class="table-container">
       <el-table :data="tableData" border style="width: 100%" :max-height="420" :key="tableData.length">
-        <el-table-column prop="sbu" label="sbu" width="100px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="eqid" label="设备ID" width="300px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="coefficient" label="系数" width="100px" align="center"
-          show-overflow-tooltip></el-table-column>
-          <el-table-column prop="t" label="实时温度" width="100px" align="center" show-overflow-tooltip v-if="groupId != ''"></el-table-column>
-
+        <el-table-column prop="sbu" label="sbu" width="100px" align="center" ></el-table-column>
+        <el-table-column prop="eqid" label="设备ID" width="240px" align="center" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="t" label="实时温度" width="100px" align="center"  ></el-table-column>
+        <el-table-column prop="coefficient" label="系数" width="100px" align="center" ></el-table-column>
+        <el-table-column label="换算后的温度" width="120px" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.t ? (scope.row.t * scope.row.coefficient).toFixed(2) : '' }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button @click="deleteRow(scope.$index)" type="danger" size="mini" plain>删除</el-button>
@@ -74,8 +77,8 @@
           </el-input>
           <span style="display: inline-block; vertical-align: top;">C°</span>
         </el-form-item>
-        <el-form-item label="换算后的实时温度" v-if="form.coefficientT">
-          <el-tag>{{ form.t }}</el-tag>
+        <el-form-item label="温区实时温度" v-if="tableData.length != 0">
+          <el-tag type="success">{{ calculateAverageTemperature() }}</el-tag>
         </el-form-item>
 
       </el-form>
@@ -119,7 +122,7 @@ export default {
         sbu: '',
         id: '',
         t: '',
-        coefficientT:''
+        coefficientT: ''
       }
     };
   },
@@ -153,6 +156,18 @@ export default {
   mounted() {
   },
   methods: {
+
+    calculateAverageTemperature() {
+    const totalConvertedTemperature = this.tableData.reduce((acc, row) => {
+      if (row.t && row.coefficient && row.t !== '' && row.coefficient !== '') {
+        acc += row.t * row.coefficient;
+      }
+      return acc;
+    }, 0);
+
+    const count = this.tableData.length;
+    return count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '';
+  },
     validateNumber(field) {
       this.form[field] = this.form[field].replace(/[^0-9.]/g, ''); // Allow only numbers and decimal points
     },
@@ -166,7 +181,7 @@ export default {
         groupName: '',
         sbu: '',
         id: '',
-        coefficientT:''
+        coefficientT: ''
       };
     },
     onSubmitTable() {
@@ -232,6 +247,28 @@ export default {
       });
     },
 
+    getThRecord2(eqid) {
+  const params = { eqid: eqid };
+  return new Promise((resolve, reject) => {
+    this.$http({
+      url: this.$http.adornUrl('/extProject/getThRecord2'),
+      method: 'get',
+      params: params,
+    })
+    .then((response) => {
+      const data = response.data.data;
+      console.log("response", data);
+      resolve(data);  // Resolve the promise with the data
+    })
+    .catch((error) => {
+      console.log('error', error);
+      reject(error);  // Reject the promise with the error
+    });
+  });
+},
+
+
+
     getThKvRecordGroups() {
       const params = {
       };
@@ -281,21 +318,27 @@ export default {
 
 
 
-    onSubmit() {
+    async  onSubmit() {
       if (!this.form.coefficient || !this.form.sbu || !this.form.id) {
         this.$message.error('请填写完整的表单数据');
         return;
       }
+      const data = await this.getThRecord2(this.form.id);
+      console.info("data", data);
+      console.info("data",  data.t);
+
       this.tableData.push({
         sbu: this.form.sbu,
         eqid: this.form.id,
         id: this.form.id,
+        t: data.t,
         coefficient: this.form.coefficient
       });
       // 延迟操作，确保表格渲染完成后再执行其他操作
       this.$nextTick(() => {
         this.$message.success('数据已成功添加');
       });
+
       this.getThKvRecordGroups();
 
     },
