@@ -2,16 +2,17 @@
   <div>
     <!-- 查询条件表单 -->
     <el-form :inline="true" :model="queryParams" class="demo-form-inline">
-      <el-form-item >
-        <el-input v-model="queryParams.queryParam" placeholder="username/IP/request_url/response_status"></el-input>
-      </el-form-item>
+      <el-form-item>
+  <el-input v-model="queryParams.queryParam" placeholder="username/IP/request_url/response_status" :style="{ width: '350px' }"></el-input>
+</el-form-item>
+
       <el-form-item label="日期范围">
         <el-date-picker
           v-model="queryParams.dateRange"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
-          end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss"
+          end-placeholder="结束日期" value-format="yyyy-MM-dd"
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
@@ -39,7 +40,7 @@
     </el-table>
 
     <!-- 分页组件 -->
-    <el-pagination
+    <el-pagination 
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
       :current-page="currentPage"
@@ -49,6 +50,13 @@
       :total="total"
     >
     </el-pagination>
+
+
+
+        <!-- 分页组件
+        <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="totalItems" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :current-page.sync="currentPage" @current-change="handlePageChange"
+      @size-change="handleSizeChange">
+    </el-pagination> -->
   </div>
 </template>
 
@@ -98,7 +106,7 @@ export default {
     }).then((response) => {
         console.log('查询成功:', response);
         this.logList = response.data.data.list;
-        this.total = response.data.total;
+        this.total = response.data.data.total;
     }).catch(error => {
         console.error('查询失败:', error);
         this.$message.error('查询失败，请稍后重试');

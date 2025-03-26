@@ -45,9 +45,12 @@
     <div class="table-container">
       <el-table :data="tableData" border style="width: 100%" :max-height="420" :key="tableData.length">
         <el-table-column prop="sbu" label="sbu" width="100px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="id" label="ID" width="300px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="coefficient" label="系数" width="100px" align="center" show-overflow-tooltip></el-table-column>
-        <el-table-column label="操作"  align="center">
+        <el-table-column prop="eqid" label="设备ID" width="300px" align="center" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="coefficient" label="系数" width="100px" align="center"
+          show-overflow-tooltip></el-table-column>
+          <el-table-column prop="t" label="实时温度" width="100px" align="center" show-overflow-tooltip v-if="groupId != ''"></el-table-column>
+
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button @click="deleteRow(scope.$index)" type="danger" size="mini" plain>删除</el-button>
           </template>
@@ -55,7 +58,7 @@
       </el-table>
     </div>
 
-    <div class="form-buttom-container" >
+    <div class="form-buttom-container">
       <el-form :inline="true" class="demo-form-inline" :rules="rules" ref="form" v-model="form">
         <el-form-item label="组名称">
           <el-input v-model="form.groupName" style="width: 120px" placeholder="groupName"></el-input>
@@ -71,6 +74,10 @@
           </el-input>
           <span style="display: inline-block; vertical-align: top;">C°</span>
         </el-form-item>
+        <el-form-item label="换算后的实时温度" v-if="form.coefficientT">
+          <el-tag>{{ form.t }}</el-tag>
+        </el-form-item>
+
       </el-form>
     </div>
 
@@ -95,7 +102,7 @@ export default {
         groupName: [
           { required: true, message: '请输入组名称', trigger: 'blur' }
         ]
- 
+
       },
       groupId: '',
       devices: [],
@@ -110,7 +117,9 @@ export default {
         expMaxTem: '',
         coefficient: '',
         sbu: '',
-        id: ''
+        id: '',
+        t: '',
+        coefficientT:''
       }
     };
   },
@@ -156,7 +165,8 @@ export default {
         coefficient: '',
         groupName: '',
         sbu: '',
-        id: ''
+        id: '',
+        coefficientT:''
       };
     },
     onSubmitTable() {
@@ -164,7 +174,7 @@ export default {
         this.$message.wa('请添加数据');
         return;
       }
-      if(this.form.groupName==''){
+      if (this.form.groupName == '') {
         this.$message.error('请填写组名称');
         return;
       }
@@ -262,6 +272,7 @@ export default {
         this.form.expMaxTem = data[0].expMaxTem;
         this.form.expMinTem = data[0].expMinTem;
         this.form.groupName = data[0].groupName;
+        this.form.coefficientT = data[0].coefficientT;
 
       }).catch((error) => {
         console.log('Error:', error);
@@ -271,12 +282,13 @@ export default {
 
 
     onSubmit() {
-      if (!this.form.coefficient || !this.form.sbu || !this.form.id ) {
+      if (!this.form.coefficient || !this.form.sbu || !this.form.id) {
         this.$message.error('请填写完整的表单数据');
         return;
       }
       this.tableData.push({
         sbu: this.form.sbu,
+        eqid: this.form.id,
         id: this.form.id,
         coefficient: this.form.coefficient
       });
