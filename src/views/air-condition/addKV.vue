@@ -78,7 +78,7 @@
           <span style="display: inline-block; vertical-align: top;">C°</span>
         </el-form-item>
         <el-form-item label="温区实时温度" v-if="tableData.length != 0">
-          <el-tag type="success">{{ calculateAverageTemperature() }}</el-tag>
+          <el-tag type="success">{{ calculateAverageTemperature()}}C°</el-tag>
         </el-form-item>
 
       </el-form>

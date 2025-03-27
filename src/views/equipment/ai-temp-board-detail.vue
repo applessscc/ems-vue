@@ -42,7 +42,7 @@
     <!-- 顶部容器 -->
     <div class="echart-list-div">
 
-      <el-card style="height: 300px">
+      <!-- <el-card style="height: 300px"> -->
 
 
 
@@ -55,15 +55,15 @@
           <!-- <div class="title">温度异常列表</div> -->
         </template>
 
-        <el-table :data="tableData2" border style="width: 100% " :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }" height="180" 
+        <el-table :data="tableData2" border style="width: 90% ;" :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }" height="180" 
          :row-class-name="rowClassName" size="mini"  empty-text="暂无数据">
           <el-table-column prop="aiName" label="AI名称" width="200px">
           </el-table-column>
           <el-table-column prop="currentRealTimeValue" label="实时温度" width="115" :formatter="(row, column, cellValue) => `${cellValue}℃`">
           </el-table-column>
-          <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数" width="115"></el-table-column>
+          <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数" ></el-table-column>
         </el-table>
-      </el-card>
+      <!-- </el-card> -->
     </div>
 
     <div class="table-head">
@@ -332,7 +332,6 @@ export default {
           ? this.searchForm.dateRange[1]
           : null,
       };
-      console.log(params)
       this.$http({
         url: this.$http.adornUrl(`/equipment/transformer/getAIList`),  // 接口地址
         method: 'post',              //  POST 请求
@@ -356,7 +355,6 @@ export default {
           // https://www.microsoft.com/zh-cn/download/details.aspx?id=16614
           // https://learn.microsoft.com/zh-cn/dotnet/core/install/windows#net-installer
 
-          console.log(response.data)
 
           // 处理导出的文件
           const blob = response.data;
@@ -372,7 +370,6 @@ export default {
 
 
         } else {
-          console.log(response.data.data)
           const data = response.data.data.aiList;  // 解析后端返回的分页数据
           this.series = response.data.data.seriesList;
           const xaxisData = response.data.data.xaxisData;
@@ -392,10 +389,11 @@ export default {
           //   }
           // })
 
+          this.tableData2 = [];
 
         this.tableData2 = data.forEach(element => {
-          console.log(element.dayUnqualifiedMinutes)
-          console.log(element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0)
+          // console.log(element.dayUnqualifiedMinutes)
+          // console.log(element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0)
           if (element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0) {
             this.tableData2.push(element);
           }

@@ -269,13 +269,11 @@ export default {
           ? this.searchForm.dateRange[1]
           : null,
       };
-      console.log(params)
       this.$http({
         url: this.$http.adornUrl(`/equipment/transformer/getAIList`),  // 接口地址
         method: 'post',              //  POST 请求
         data: params,                // 使用 data 传递参数
       }).then((response) => {
-        console.log(response.data.data)
         const data = response.data.data.aiList;  // 解析后端返回的分页数据
         this.series = response.data.data.seriesList;
         const xaxisData = response.data.data.xaxisData;
@@ -312,7 +310,7 @@ export default {
         }
       }).catch((error) => {
         this.loading = false;
-        this.$message.error('加载数据失败');
+        // this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },
