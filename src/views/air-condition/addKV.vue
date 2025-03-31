@@ -6,25 +6,27 @@
     </div>
 
     <div>
-      <!-- <div class="workCalendarButton" v-if="true">
+      <div class="workCalendarButton" v-if="true">
         <el-button @click="workCalendar()">工作日历</el-button>
       </div>
-      <el-dialog title="提示" :visible.sync="workCalendarDigStatus" width="50%">
-        <span>这是一段信息</span>
+      <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
+
+        sbu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<el-select v-model="calendarSbu" placeholder="sbu" filterable
+          style="width: 80px">
+          <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
+            :label="device" :value="device">
+          </el-option>
+        </el-select>
+        <el-button @click="flashCalender()" style="margin-left: 20px;">刷新日历</el-button>
+
         <el-calendar>
           <template slot="dateCell" slot-scope="{ date, data }">
-            <p :class="data.isSelected || isWorkDate(date) ? 'is-selected' : ''" @click="handleDateClick(date)">
-              {{ data.day.split('-')[2] }}
-              <span v-if="data.isSelected || isWorkDate(date)">✔️</span>
+            <p @click="handleDateClick(date)">
+              {{ data.day.split('-')[2] }}{{ isWorkDate(date) ? '✔️' : '' }}
             </p>
           </template>
         </el-calendar>
-
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="workCalendarDigStatus = false">取 消</el-button>
-          <el-button type="primary" @click="workCalendarDigStatus = false">确 定</el-button>
-        </span>
-      </el-dialog> -->
+      </el-dialog>
     </div>
 
 
@@ -41,8 +43,7 @@
         </el-form-item>
 
         <el-form-item label="sbu">
-          <el-select v-model="form.sbu" placeholder="sbu" filterable style="width: 80px"
-            >
+          <el-select v-model="form.sbu" placeholder="sbu" filterable style="width: 80px">
             <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
               :label="device" :value="device">
             </el-option>
@@ -149,18 +150,23 @@
 
         <el-row>
           <el-col :span="8">
-            <el-form-item label="groupSBU">
-              <el-input v-model="form.groupSbu" placeholder="groupSBU"  style="width: 120px"></el-input>
+            <el-form-item label="温区sbu">
+
+              <el-select v-model="form.groupSbu" placeholder="温区sbu" filterable style="width: 120px">
+                <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
+                  :label="device" :value="device">
+                </el-option>
+              </el-select>
             </el-form-item>
           </el-col>
 
           <el-col :span="8">
             <el-form-item label="温区名称">
-              <el-input v-model="form.groupName" style="width: 120px" placeholder="groupName"></el-input>
+              <el-input v-model="form.groupName" style="width: 170px" placeholder="groupName"></el-input>
             </el-form-item>
           </el-col>
 
-       
+
           <el-col :span="8">
             <el-form-item label="空调设备">
               <el-select v-model="form.appGroup.appId" placeholder="请选择设备" clearable filterable style="width: 170px">
@@ -242,9 +248,8 @@ import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
   data() {
     return {
+      calendarSbu: 2,
       workDateList: [
-        new Date('2025-03-07'),
-        new Date('2025-03-05')
       ],
       workCalendarDigStatus: false,
       rules: {
@@ -288,6 +293,11 @@ export default {
 
   watch: {
 
+    "calendarSbu"(n, o) {
+      if (n !== o) {
+        this.getWorkDayList();
+      }
+    },
     "form.sbu"(n, o) {
       if (n !== o) {
         this.form.id = '';
@@ -311,13 +321,126 @@ export default {
     this.getAppInfoList();
     this.getThRecord();
     this.getThKvRecordGroups();
+    this.getWorkDayList();
     saveVisitLog('温度系数比值');
   },
   mounted() {
   },
   methods: {
+    flashCalender() {
+      this.getWorkDayList();
+    },
+    getWorkDayList() {
+      const params = {
+        sbu: this.calendarSbu,
+      };
+      this.$http({
+        url: this.$http.adornUrl('/extProject/getWorkDayList'),
+        method: 'get',
+        params: params,
+      }).then((response) => {
+        const data = response.data.data;
+        // 使用 item.workDate，并格式化为 "yyyy-MM-dd"
+        // this.workDateList = data.map(item => this.formatDate(new Date(item.workDate)));
+        this.workDateList = [...data.map(item => this.formatDate(new Date(item.workDate)))];
+
+        console.log('workDateList', this.workDateList);
+      }).catch((error) => {
+        console.log('error', error);
+      });
+    },
+
+    formatDate(date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从 0 开始，所以需要加 1
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
+
+    addWorkDay(date) {
+      const params = {
+        workDay: date,
+        sbu: this.calendarSbu,
+
+      };
+      return new Promise((resolve, reject) => {
+        this.$http({
+          url: this.$http.adornUrl('/extProject/addWorkDay'),
+          method: 'get',
+          params: params,
+        }).then((response) => {
+          const data = response.data.data;
+          if (data) {
+            this.$message.success('添加成功');
+            resolve(data);  // 成功时调用 resolve
+          } else {
+            this.$message.error('添加失败');
+            reject('添加失败');  // 失败时调用 reject
+          }
+        }).catch((error) => {
+          console.log('error', error);
+          reject(error);  // 出现异常时调用 reject
+        });
+      });
+    },
+    deleteWorkDay(date) {
+      const params = {
+        workDay: date,
+        sbu: this.calendarSbu,
+      };
+      return new Promise((resolve, reject) => {
+        this.$http({
+          url: this.$http.adornUrl('/extProject/deleteWorkDay'),
+          method: 'get',
+          params: params,
+        }).then((response) => {
+          const data = response.data.data;
+          if (data) {
+            this.$message.success('删除成功');
+            resolve(data);  // 成功时调用 resolve
+          } else {
+            this.$message.error('删除失败');
+            reject('删除失败');  // 失败时调用 reject
+          }
+        }).catch((error) => {
+          console.log('error', error);
+          reject(error);  // 出现异常时调用 reject
+        });
+      });
+    }
+    ,
+    async handleDateClick(date) {
+      const dateString = this.formatDate(date);
+      const isExisting = this.workDateList.some(d => d === dateString);
+
+      console.log('handleDateClick', dateString);
+
+      try {
+        if (!isExisting) {
+          await this.addWorkDay(dateString);  // 等待添加工作日操作完成
+        } else {
+          await this.deleteWorkDay(dateString);  // 等待删除工作日操作完成
+        }
+
+        this.getWorkDayList();  // 在操作完成后调用获取工作日列表
+      } catch (error) {
+        console.log('操作失败', error);
+      }
+    },
 
 
+    isWorkDate(date) {
+      // console.log(this.formatDate(date), this.workDateList.some(workDate => {
+      //   return workDate === this.formatDate(date)
+      // }));
+      return this.workDateList.some(workDate => {
+        return workDate === this.formatDate(date)
+      });
+    }
+    ,
+    workCalendar() {
+      this.workCalendarDigStatus = true;
+    },
     calculateAverageTemperature() {
       const totalConvertedTemperature = this.tableData.reduce((acc, row) => {
         if (row.t && row.coefficient && row.t !== '' && row.coefficient !== '') {
@@ -638,5 +761,10 @@ export default {
   display: flex;
   justify-content: center;
   /* 居中列内的内容 */
+}
+
+.workCalendarButton {
+  text-align: left;
+  margin-left: 40px;
 }
 </style>
