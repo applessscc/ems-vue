@@ -4,28 +4,36 @@
     <div class="logo-container">
       <span class="logo-text">VTech 温区配置</span>
     </div>
+
     <div>
-
-      <el-dialog title="提示" :visible.sync="workCalendarDigStatus" width="30%">
+      <!-- <div class="workCalendarButton" v-if="true">
+        <el-button @click="workCalendar()">工作日历</el-button>
+      </div>
+      <el-dialog title="提示" :visible.sync="workCalendarDigStatus" width="50%">
         <span>这是一段信息</span>
-
-
-        <el-calendar v-model="value" :day-style="dayStyle">
+        <el-calendar>
+          <template slot="dateCell" slot-scope="{ date, data }">
+            <p :class="data.isSelected || isWorkDate(date) ? 'is-selected' : ''" @click="handleDateClick(date)">
+              {{ data.day.split('-')[2] }}
+              <span v-if="data.isSelected || isWorkDate(date)">✔️</span>
+            </p>
+          </template>
         </el-calendar>
 
         <span slot="footer" class="dialog-footer">
           <el-button @click="workCalendarDigStatus = false">取 消</el-button>
           <el-button type="primary" @click="workCalendarDigStatus = false">确 定</el-button>
         </span>
-      </el-dialog>
-
-      <el-butttton type="primary" @click="workCalendar()">工作日历</el-butttton>
+      </el-dialog> -->
     </div>
+
+
+
     <div class="form-container">
       <el-form :model="form" label-width="60px" :inline="true">
 
-        <el-form-item label="组别">
-          <el-select v-model="groupId" placeholder="已新增的组别" style="width: 150px" clearable>
+        <el-form-item label="温区">
+          <el-select v-model="groupId" placeholder="已添加的温区" style="width: 150px" clearable>
             <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
               :value="groupId.groupId">
             </el-option>
@@ -33,7 +41,8 @@
         </el-form-item>
 
         <el-form-item label="sbu">
-          <el-select v-model="form.sbu" placeholder="sbu" filterable style="width: 80px">
+          <el-select v-model="form.sbu" placeholder="sbu" filterable style="width: 80px"
+            >
             <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
               :label="device" :value="device">
             </el-option>
@@ -140,23 +149,25 @@
 
         <el-row>
           <el-col :span="8">
-            <el-form-item label="组名称">
-              <el-input v-model="form.groupName" style="width: 230px" placeholder="groupName"></el-input>
+            <el-form-item label="groupSBU">
+              <el-input v-model="form.groupSbu" placeholder="groupSBU"  style="width: 120px"></el-input>
             </el-form-item>
           </el-col>
+
           <el-col :span="8">
+            <el-form-item label="温区名称">
+              <el-input v-model="form.groupName" style="width: 120px" placeholder="groupName"></el-input>
+            </el-form-item>
+          </el-col>
 
-
+       
+          <el-col :span="8">
             <el-form-item label="空调设备">
-
               <el-select v-model="form.appGroup.appId" placeholder="请选择设备" clearable filterable style="width: 170px">
                 <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
                   :value="airDevice.appId">
                 </el-option>
               </el-select>
-
-
-
               <!-- <el-input  v-model="form.appGroup.appId" style="width: 200px" placeholder="空调设备ID"></el-input> -->
             </el-form-item>
           </el-col>
@@ -216,11 +227,11 @@
     </div>
 
     <div class="table-submit-container">
-      <el-button type="primary" @click="onSubmitTable" plain round size="medium " v-if="groupId == ''">新增组别</el-button>
+      <el-button type="success" @click="onSubmitTable" plain round size="medium " v-if="groupId == ''">新增温区</el-button>
       <el-button type="warning" @click="onSubmitTable" plain round size="medium "
-        v-if="groupId != '' && tableData.length != 0">确认修改组别</el-button>
+        v-if="groupId != '' && tableData.length != 0">确认修改温区</el-button>
       <el-button type="danger" @click="onSubmitTable" plain round size="medium "
-        v-if="groupId != '' && tableData.length == 0">确认删除组别</el-button>
+        v-if="groupId != '' && tableData.length == 0">确认删除温区</el-button>
     </div>
 
   </div>
@@ -231,16 +242,14 @@ import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
   data() {
     return {
-
-      value: new Date(),
-      markedDates: [
-        new Date('2025-03-01'),
+      workDateList: [
+        new Date('2025-03-07'),
         new Date('2025-03-05')
       ],
       workCalendarDigStatus: false,
       rules: {
         groupName: [
-          { required: true, message: '请输入组名称', trigger: 'blur' }
+          { required: true, message: '请输入温区名称', trigger: 'blur' }
         ]
 
       },
@@ -253,6 +262,7 @@ export default {
       ],
       form: {
         groupName: '',
+        groupSbu: '',
         areaName: '',
         expMinTem: '',
         expMaxTem: '',
@@ -308,25 +318,6 @@ export default {
   methods: {
 
 
-    dayStyle(date) {
-      // 格式化日期，确保可以与集合中的日期匹配
-      const formattedDate = new Date(date).toLocaleDateString();
-      for (let markedDate of this.markedDates) {
-        if (new Date(markedDate).toLocaleDateString() === formattedDate) {
-          return {
-            backgroundColor: '#409EFF',  // 设置标记的日期的背景颜色
-            color: 'white',              // 设置字体颜色
-            borderRadius: '50%',         // 让勾选圆形
-          };
-        }
-      }
-      return {};
-    },
-  
-
-    workCalendar() {
-      this.workCalendarDigStatus = true;
-    },
     calculateAverageTemperature() {
       const totalConvertedTemperature = this.tableData.reduce((acc, row) => {
         if (row.t && row.coefficient && row.t !== '' && row.coefficient !== '') {
@@ -363,6 +354,7 @@ export default {
       this.groupId = '';
       this.tableData = [];
       this.form = {
+        groupSbu: '',
         expMinTem: '',
         expMaxTem: '',
         expMinH: '',
@@ -401,6 +393,7 @@ export default {
         expMaxH: this.form.expMaxH,
         expMinH: this.form.expMinH,
         groupName: this.form.groupName,
+        groupSbu: this.form.groupSbu,
         appId: this.form.appGroup.appId,
         mStartTime: this.form.mStartTime,
         mEndTime: this.form.mEndTime,
@@ -417,7 +410,7 @@ export default {
       }).then((response) => {
         if (response.data.data == false) {
           this.$message({
-            message: '组别名称重复！',
+            message: '温区名称重复！',
             type: 'warning',
             duration: 2000
           });
@@ -536,11 +529,13 @@ export default {
       }).then((response) => {
         const data = response.data.data;
         this.tableData = data
+        this.form.sbu = data[0].sbu;
         this.form.expMaxTem = data[0].expMaxTem;
         this.form.expMinTem = data[0].expMinTem;
         this.form.expMaxH = data[0].expMaxH;
         this.form.expMinH = data[0].expMinH;
         this.form.groupName = data[0].groupName;
+        this.form.groupSbu = data[0].groupSbu;
         this.form.coefficientT = data[0].coefficientT;
         this.form.mStartTime = data[0].mStartTime;
         this.form.mEndTime = data[0].mEndTime;
