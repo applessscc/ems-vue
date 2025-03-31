@@ -21,11 +21,14 @@
 
         <el-calendar>
           <template slot="dateCell" slot-scope="{ date, data }">
-            <p @click="handleDateClick(date)">
-              {{ data.day.split('-')[2] }}{{ isWorkDate(date) ? '✔️' : '' }}
-            </p>
+            <div class="el-calendar-day" @click="handleDateClick(date)">
+              <p>
+                {{ data.day.split('-')[2] }}{{ isWorkDate(date) ? '✔️' : '' }}
+              </p>
+            </div>
           </template>
         </el-calendar>
+
       </el-dialog>
     </div>
 
