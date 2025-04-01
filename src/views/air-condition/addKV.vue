@@ -6,8 +6,8 @@
     </div>
 
     <div>
-      <div class="workCalendarButton" v-if="true">
-        <el-button @click="workCalendar()">工作日历</el-button>
+      <div class="workCalendarButton">
+        <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
       </div>
       <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
 
@@ -85,6 +85,12 @@
         <el-table-column prop="eqid" label="设备ID" width="240px" align="center" show-overflow-tooltip></el-table-column>
 
         <el-table-column prop="t" label="实时温度" width="100px" align="center"></el-table-column>
+        <!-- <el-table-column label="温度系数" width="100px" align="center">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.coefficient" size="mini" @input="updateTemperature(scope.row)" />
+          </template>
+        </el-table-column> -->
+
         <el-table-column prop="coefficient" label="温度系数" width="100px" align="center"></el-table-column>
         <el-table-column label="换算后的温度" width="120px" align="center">
           <template slot-scope="scope">
@@ -94,6 +100,13 @@
 
 
         <el-table-column prop="h" label="实时湿度" width="100px" align="center"></el-table-column>
+        
+        <!-- <el-table-column label="湿度系数" width="100px" align="center">
+          <template slot-scope="scope">
+            <el-input v-model="scope.row.coefficientH" size="mini" @input="updateHumidity(scope.row)" />
+          </template>
+        </el-table-column> -->
+
         <el-table-column prop="coefficientH" label="温度系数" width="100px" align="center"></el-table-column>
         <el-table-column label="换算后的温度" width="120px" align="center">
           <template slot-scope="scope">
@@ -325,11 +338,24 @@ export default {
     this.getThRecord();
     this.getThKvRecordGroups();
     this.getWorkDayList();
-    saveVisitLog('温度系数比值');
+    // saveVisitLog('温度系数比值');
   },
   mounted() {
   },
   methods: {
+
+
+  
+    updateTemperature(row) {
+      // 强制 Vue 更新表格中的数据
+      this.$forceUpdate();
+    },
+
+    updateHumidity(row) {
+      // 强制 Vue 更新表格中的数据
+      this.$forceUpdate();
+    },
+
     flashCalender() {
       this.getWorkDayList();
     },
@@ -446,8 +472,10 @@ export default {
     },
     calculateAverageTemperature() {
       const totalConvertedTemperature = this.tableData.reduce((acc, row) => {
-        if (row.t && row.coefficient && row.t !== '' && row.coefficient !== '') {
-          acc += row.t * row.coefficient;
+        if (row.t && !isNaN(Number(row.t))) {
+          acc += Number(row.t * row.coefficient);  // 将 row.h 转换为数字后累加
+        } else {
+          console.warn("Invalid row.h value:", row.t);  // 输出无效的值
         }
         return acc;
       }, 0);
@@ -466,7 +494,6 @@ export default {
         }
         return acc;
       }, 0);
-
       const count = this.tableData.length;
       return count > 0 ? (totalHumidity / count).toFixed(2) : '';
     }
@@ -512,6 +539,7 @@ export default {
         return;
       }
       const data = {
+        userId:this.$store.state.user.id,
         groupId: this.groupId,
         tableData: this.tableData,
         expMaxTem: this.form.expMaxTem,
