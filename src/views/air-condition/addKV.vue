@@ -10,19 +10,20 @@
         <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
       </div>
       <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
-
-        sbu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<el-select v-model="calendarSbu" placeholder="sbu" filterable
-          style="width: 80px">
+        sbu<el-select v-model="calendarSbu" placeholder="sbu" filterable
+          style="width: 80px;margin-left: 10px;">
           <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
             :label="device" :value="device">
           </el-option>
         </el-select>
-        <el-button @click="flashCalender()" style="margin-left: 20px;">刷新日历</el-button>
+        <el-button @click="flashCalender()" style="margin-left: 10px;">刷新日历</el-button>
+        <el-button @click="selectWeekDaysOfMonth(selectedDate)">一键勾选当月工作日</el-button>
 
-        <el-calendar>
+        <el-calendar v-model="selectedDate" @change="handleDateChange">
           <template slot="dateCell" slot-scope="{ date, data }">
             <div class="el-calendar-day" @click="handleDateClick(date)">
               <p>
+
                 {{ data.day.split('-')[2] }}{{ isWorkDate(date) ? '✔️' : '' }}
               </p>
             </div>
@@ -100,7 +101,7 @@
 
 
         <el-table-column prop="h" label="实时湿度" width="100px" align="center"></el-table-column>
-        
+
         <!-- <el-table-column label="湿度系数" width="100px" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.coefficientH" size="mini" @input="updateHumidity(scope.row)" />
@@ -260,10 +261,10 @@
 </template>
 
 <script>
-import { saveVisitLog } from '@/utils/commonUtils.js'
 export default {
   data() {
     return {
+      selectedDate: new Date(),
       calendarSbu: 2,
       workDateList: [
       ],
@@ -344,8 +345,50 @@ export default {
   },
   methods: {
 
+    handleDateChange(date) {
+      this.selectedDate = date;  // 更新选中的日期
+    },
+  async selectWeekDaysOfMonth(date) {
+  const currentMonth = date.getMonth();  // 获取当前日期的月份
+  const currentYear = date.getFullYear();  // 获取当前日期的年份
 
-  
+  const targetMonth = currentMonth;  // 默认是当前月
+  const firstDayOfMonth = new Date(currentYear, targetMonth, 1);  // 获取目标月的第一天
+  const lastDayOfMonth = new Date(currentYear, targetMonth + 1, 0);  // 获取目标月的最后一天
+
+  let currentDateIter = new Date(firstDayOfMonth);
+  const workDays = [];
+
+  // 获取目标月的所有周一到周五日期
+  while (currentDateIter <= lastDayOfMonth) {
+    const dayOfWeek = currentDateIter.getDay();
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {  // 周一到周五
+      const formattedDate = this.formatDate(currentDateIter);
+      workDays.push(formattedDate);
+    }
+    currentDateIter.setDate(currentDateIter.getDate() + 1);
+  }
+
+  // 使用 for...of 保证异步操作顺序执行
+  for (const date of workDays) {
+    const isExisting = this.workDateList.some(d => d === date);
+    if (!isExisting) {
+      try {
+        await this.addWorkDay(date);  // 添加工作日
+      } catch (error) {
+        console.error('添加工作日失败:', error);
+      }
+    }
+  }
+
+  // 所有添加工作日操作完成后，再刷新日期列表
+  await this.getWorkDayList();
+
+  // 发送成功消息
+  this.$message.success('添加成功');
+},
+
+
     updateTemperature(row) {
       // 强制 Vue 更新表格中的数据
       this.$forceUpdate();
@@ -357,7 +400,13 @@ export default {
     },
 
     flashCalender() {
-      this.getWorkDayList();
+      try {
+        this.getWorkDayList();
+        this.$message.success('刷新成功！');
+      } catch (error) {
+        this.$message.error('刷新失败！');
+        console.error('Error setting selected date:', error);
+      }
     },
     getWorkDayList() {
       const params = {
@@ -372,7 +421,6 @@ export default {
         // 使用 item.workDate，并格式化为 "yyyy-MM-dd"
         // this.workDateList = data.map(item => this.formatDate(new Date(item.workDate)));
         this.workDateList = [...data.map(item => this.formatDate(new Date(item.workDate)))];
-
         console.log('workDateList', this.workDateList);
       }).catch((error) => {
         console.log('error', error);
@@ -400,7 +448,7 @@ export default {
         }).then((response) => {
           const data = response.data.data;
           if (data) {
-            this.$message.success('添加成功');
+            // this.$message.success('添加成功');
             resolve(data);  // 成功时调用 resolve
           } else {
             this.$message.error('添加失败');
@@ -425,7 +473,7 @@ export default {
         }).then((response) => {
           const data = response.data.data;
           if (data) {
-            this.$message.success('删除成功');
+            // this.$message.success('删除成功');
             resolve(data);  // 成功时调用 resolve
           } else {
             this.$message.error('删除失败');
@@ -447,8 +495,10 @@ export default {
       try {
         if (!isExisting) {
           await this.addWorkDay(dateString);  // 等待添加工作日操作完成
+          this.$message.success('添加成功！');
         } else {
           await this.deleteWorkDay(dateString);  // 等待删除工作日操作完成
+          this.$message.warning('删除成功！');
         }
 
         this.getWorkDayList();  // 在操作完成后调用获取工作日列表
@@ -539,7 +589,7 @@ export default {
         return;
       }
       const data = {
-        userId:this.$store.state.user.id,
+        userId: this.$store.state.user.id,
         groupId: this.groupId,
         tableData: this.tableData,
         expMaxTem: this.form.expMaxTem,
