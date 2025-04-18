@@ -448,7 +448,7 @@ export default {
 
         this.tableData = data;       // 表格数据
       }).catch((error) => {
-        this.$message.error('加载数据失败');
+        // this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },
@@ -504,7 +504,7 @@ export default {
           }
         }
       }).catch((error) => {
-        this.$message.error('加载数据失败');
+        // this.$message.error('加载数据失败');
         console.log('获取数据失败：', error);
       });
     },

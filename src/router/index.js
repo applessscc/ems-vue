@@ -59,6 +59,9 @@ const mainRoutes = {
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
     { path: '/formdetail', component: _import('modules/site/formdetail'), name: 'formdetail', meta: { title: '问题单详情', isTab: true } },
     { path: '/repair-index', component: _import('repair/repair-index'), name: 'repair-index' , meta: { title: '报修表单'}}, 
+    { path: '/device-maintenance', component: _import('extProject/device-maintenance'), name: 'device-maintenance' , meta: { title: '设备维护'}}, 
+    { path: '/instruct-task', component: _import('repair/instruct-task'), name: 'instruct-task' , meta: { title: '自动化任务'}}, 
+    { path: '/sendEmail', component: _import('modules/email/sendEmail'), name: 'sendEmail' , meta: { title: '发送邮箱'}}, 
     { path: '/cookerJob', component: _import('cookerJob/cookerJob'), name: 'cookerJob' , meta: { title: '炒房机任务'}}, 
 
     { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply' , meta: { title: '报修表单'}}, 

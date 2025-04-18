@@ -7,6 +7,9 @@
 
     <div>
       <div class="workCalendarButton">
+        <div>
+    <button @click="send" style="width:100px; height:100px" v-show="false">发送邮件</button>
+  </div>
         <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
       </div>
       <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
@@ -345,6 +348,33 @@ export default {
   },
   methods: {
 
+    send() {
+  const params = {
+    sysUrl: 'http://10.97.245.114/XX/login.html', // 系统入口链接, 可不传
+    subject: "您有重要邮件通知待处理", // 邮件主题
+    body: "Dear Boss,\n这是测试发送邮件内容,\n请尽快处理, 期待您的回复, 谢谢!\n\n\n", // 邮件内容
+    sendBy: "PIGER WAY", // 发件人
+    sendto: "PIGER WAY,YABING XIE", // 收件人, 多人英文的逗号隔开
+    copyto: "ERIC WAI", // 抄送人, 多人英文的逗号隔开
+    filePath: "" // 附件服务器磁盘的绝对路径, 可不传
+  };
+
+  this.$http({
+    url: 'http://10.97.245.114/lsmSystem/sendEmail.do',
+    method: 'get',
+    params: params,
+    withCredentials: true
+  }).then((response) => {
+    if (response.data.code !== "0") {
+      console.info("发送失败: " + response.data.msg);
+    } else {
+      alert("发送成功");
+    }
+  }).catch((error) => {
+    console.info("错误: ",error);
+  });
+}
+,
     handleDateChange(date) {
       this.selectedDate = date;  // 更新选中的日期
     },

@@ -1,6 +1,6 @@
 <template>
   <div id="data-view">
-
+    
     <div class="main-header">
 
       <el-form :inline="true" :model="searchForm" class="search-form">
