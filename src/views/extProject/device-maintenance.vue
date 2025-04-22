@@ -2,7 +2,7 @@
     <div>
         <el-form :inline="true" :model="{ searchForm: searchForm }" class="search-form">
             <el-form-item label="">
-                <el-input v-model="searchForm" placeholder="请输入设备ID/名称" style="width: 300px;"></el-input>
+                <el-input v-model="searchForm" placeholder="请输入appId/name" style="width: 300px;"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="fetchAppInfo()" plain>查询</el-button>
@@ -15,10 +15,9 @@
 
 
             <el-table-column label="appId" prop="appId" width="150">
-
                 <template slot-scope="scope">
-                    <el-input v-model="scope.row.appId" size="small" placeholder="请输入设备ID"></el-input>
-                </template>
+                    {{ scope.row.ip == "" &&  scope.row.address == ""?"":scope.row.ip+"+"+scope.row.address }}
+                </template> 
             </el-table-column>
 
             <el-table-column label="name" prop="name" width="150">

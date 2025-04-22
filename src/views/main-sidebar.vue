@@ -67,6 +67,10 @@
             <span slot="title">温区配置</span>
           </el-menu-item>
 
+          <el-menu-item index="demo-echarts" @click="openNew('air-condition/kangban')">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            <span slot="title">温区看板</span>
+          </el-menu-item>
 
           <el-menu-item index="air-condition" @click="$router.push({ name: 'device-maintenance' })">
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
