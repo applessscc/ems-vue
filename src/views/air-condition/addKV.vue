@@ -8,13 +8,12 @@
     <div>
       <div class="workCalendarButton">
         <div>
-    <button @click="send" style="width:100px; height:100px" v-show="false">发送邮件</button>
-  </div>
+          <button @click="send" style="width:100px; height:100px" v-show="false">发送邮件</button>
+        </div>
         <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
       </div>
       <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
-        sbu<el-select v-model="calendarSbu" placeholder="sbu" filterable
-          style="width: 80px;margin-left: 10px;">
+        sbu<el-select v-model="calendarSbu" placeholder="sbu" filterable style="width: 80px;margin-left: 10px;">
           <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
             :label="device" :value="device">
           </el-option>
@@ -86,7 +85,18 @@
     <div class="table-container">
       <el-table :data="tableData" border style="width: 100%" :max-height="420" :key="tableData.length">
         <el-table-column prop="sbu" label="sbu" width="100px" align="center"></el-table-column>
-        <el-table-column prop="eqid" label="设备ID" width="240px" align="center" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="eqid" label="设备ID" width="240px" align="center" show-overflow-tooltip>
+          <template slot-scope="scope">
+            <a :href="'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID' + scope.row.eqid" target="_blank"
+              :style="{
+                color: Boolean(scope.row.isOnline) ? '#409EFF' : '#F56C6C',
+                textDecoration: 'none'
+              }" @mouseover="e => e.target.style.textDecoration = 'underline'"
+                @mouseout="e => e.target.style.textDecoration = 'none'">
+              {{ Boolean(scope.row.isOnline) ?scope.row.eqid : scope.row.eqid + '（离线）' }}
+            </a>
+          </template>
+        </el-table-column>
 
         <el-table-column prop="t" label="实时温度" width="100px" align="center"></el-table-column>
         <!-- <el-table-column label="温度系数" width="100px" align="center">
@@ -349,74 +359,74 @@ export default {
   methods: {
 
     send() {
-  const params = {
-    sysUrl: 'http://10.97.245.114/XX/login.html', // 系统入口链接, 可不传
-    subject: "您有重要邮件通知待处理", // 邮件主题
-    body: "Dear Boss,\n这是测试发送邮件内容,\n请尽快处理, 期待您的回复, 谢谢!\n\n\n", // 邮件内容
-    sendBy: "PIGER WAY", // 发件人
-    sendto: "PIGER WAY,YABING XIE", // 收件人, 多人英文的逗号隔开
-    copyto: "ERIC WAI", // 抄送人, 多人英文的逗号隔开
-    filePath: "" // 附件服务器磁盘的绝对路径, 可不传
-  };
+      const params = {
+        sysUrl: 'http://10.97.245.114/XX/login.html', // 系统入口链接, 可不传
+        subject: "您有重要邮件通知待处理", // 邮件主题
+        body: "Dear Boss,\n这是测试发送邮件内容,\n请尽快处理, 期待您的回复, 谢谢!\n\n\n", // 邮件内容
+        sendBy: "PIGER WAY", // 发件人
+        sendto: "PIGER WAY,YABING XIE", // 收件人, 多人英文的逗号隔开
+        copyto: "ERIC WAI", // 抄送人, 多人英文的逗号隔开
+        filePath: "" // 附件服务器磁盘的绝对路径, 可不传
+      };
 
-  this.$http({
-    url: 'http://10.97.245.114/lsmSystem/sendEmail.do',
-    method: 'get',
-    params: params,
-    withCredentials: true
-  }).then((response) => {
-    if (response.data.code !== "0") {
-      console.info("发送失败: " + response.data.msg);
-    } else {
-      alert("发送成功");
+      this.$http({
+        url: 'http://10.97.245.114/lsmSystem/sendEmail.do',
+        method: 'get',
+        params: params,
+        withCredentials: true
+      }).then((response) => {
+        if (response.data.code !== "0") {
+          console.info("发送失败: " + response.data.msg);
+        } else {
+          alert("发送成功");
+        }
+      }).catch((error) => {
+        console.info("错误: ", error);
+      });
     }
-  }).catch((error) => {
-    console.info("错误: ",error);
-  });
-}
-,
+    ,
     handleDateChange(date) {
       this.selectedDate = date;  // 更新选中的日期
     },
-  async selectWeekDaysOfMonth(date) {
-  const currentMonth = date.getMonth();  // 获取当前日期的月份
-  const currentYear = date.getFullYear();  // 获取当前日期的年份
+    async selectWeekDaysOfMonth(date) {
+      const currentMonth = date.getMonth();  // 获取当前日期的月份
+      const currentYear = date.getFullYear();  // 获取当前日期的年份
 
-  const targetMonth = currentMonth;  // 默认是当前月
-  const firstDayOfMonth = new Date(currentYear, targetMonth, 1);  // 获取目标月的第一天
-  const lastDayOfMonth = new Date(currentYear, targetMonth + 1, 0);  // 获取目标月的最后一天
+      const targetMonth = currentMonth;  // 默认是当前月
+      const firstDayOfMonth = new Date(currentYear, targetMonth, 1);  // 获取目标月的第一天
+      const lastDayOfMonth = new Date(currentYear, targetMonth + 1, 0);  // 获取目标月的最后一天
 
-  let currentDateIter = new Date(firstDayOfMonth);
-  const workDays = [];
+      let currentDateIter = new Date(firstDayOfMonth);
+      const workDays = [];
 
-  // 获取目标月的所有周一到周五日期
-  while (currentDateIter <= lastDayOfMonth) {
-    const dayOfWeek = currentDateIter.getDay();
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {  // 周一到周五
-      const formattedDate = this.formatDate(currentDateIter);
-      workDays.push(formattedDate);
-    }
-    currentDateIter.setDate(currentDateIter.getDate() + 1);
-  }
-
-  // 使用 for...of 保证异步操作顺序执行
-  for (const date of workDays) {
-    const isExisting = this.workDateList.some(d => d === date);
-    if (!isExisting) {
-      try {
-        await this.addWorkDay(date);  // 添加工作日
-      } catch (error) {
-        console.error('添加工作日失败:', error);
+      // 获取目标月的所有周一到周五日期
+      while (currentDateIter <= lastDayOfMonth) {
+        const dayOfWeek = currentDateIter.getDay();
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) {  // 周一到周五
+          const formattedDate = this.formatDate(currentDateIter);
+          workDays.push(formattedDate);
+        }
+        currentDateIter.setDate(currentDateIter.getDate() + 1);
       }
-    }
-  }
 
-  // 所有添加工作日操作完成后，再刷新日期列表
-  await this.getWorkDayList();
+      // 使用 for...of 保证异步操作顺序执行
+      for (const date of workDays) {
+        const isExisting = this.workDateList.some(d => d === date);
+        if (!isExisting) {
+          try {
+            await this.addWorkDay(date);  // 添加工作日
+          } catch (error) {
+            console.error('添加工作日失败:', error);
+          }
+        }
+      }
 
-  // 发送成功消息
-  this.$message.success('添加成功');
-},
+      // 所有添加工作日操作完成后，再刷新日期列表
+      await this.getWorkDayList();
+
+      // 发送成功消息
+      this.$message.success('添加成功');
+    },
 
 
     updateTemperature(row) {
@@ -560,7 +570,9 @@ export default {
         return acc;
       }, 0);
 
-      const count = this.tableData.length;
+      // const count = this.tableData.length;
+      const count = this.tableData.filter(row => row.t && row.t !== 0).length;
+
       return count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '';
     },
 
@@ -574,7 +586,8 @@ export default {
         }
         return acc;
       }, 0);
-      const count = this.tableData.length;
+      // const count = this.tableData.length;
+      const count = this.tableData.filter(row => row.h && row.h !== 0).length;
       return count > 0 ? (totalHumidity / count).toFixed(2) : '';
     }
     ,
@@ -791,7 +804,6 @@ export default {
         return;
       }
       const data = await this.getThRecord2(this.form.id);
-
       this.tableData.push({
         sbu: this.form.sbu,
         eqid: this.form.id,
@@ -799,7 +811,8 @@ export default {
         t: data.t,
         h: data.h,
         coefficient: this.form.coefficient,
-        coefficientH: this.form.coefficientH
+        coefficientH: this.form.coefficientH,
+        isOnline: data.isOnline,
       });
       // 延迟操作，确保表格渲染完成后再执行其他操作
       this.$nextTick(() => {
