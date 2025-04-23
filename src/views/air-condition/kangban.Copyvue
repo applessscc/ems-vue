@@ -26,7 +26,7 @@
 
 <script>
 import * as echarts from 'echarts';  // 导入 echarts
-import _ from 'lodash';
+import { name } from 'file-loader';
 
 export default {
     name: 'MyChart',
@@ -97,17 +97,6 @@ export default {
             var dom = document.getElementById("container");
             var myChart = echarts.init(dom);
 
-
-            
-            const airGroupByAppId = _.groupBy(this.airStatusLogList, 'appId');
-            for (const airObject in groupedByAppId) {
-                const air = groupedByAppId[appId];
-    
-
-            }
-
-            console.log(groupedByAppId);
-
             // x轴
             const allTimes = this.xdate.map(item => this.formatTime(item));
 
@@ -126,6 +115,12 @@ export default {
                         data.status;
                 return status;
             });
+
+
+            // const statusList = this.airStatusLogList.map(item => {
+            //     const data = item.status = item.status.includes('on/') ? 'on' : item.status.includes('off/') ? 'off' : item.status;  // 确保 status 只有 'on' 或 'off'
+            //     return data;  // 如果该时间有数据，使用开关值，否则使用 null
+            // });
 
             // y轴（人流量）
             const curentTotal = allTimes.map(time => {
@@ -192,7 +187,7 @@ export default {
                     // y轴（温度）
                     {
                         type: 'value',
-                        name: 't (°C)',
+                        name: 'temperature (°C)',
                         position: 'left',
                         axisLabel: {
                             formatter: '{value} °C'
@@ -225,8 +220,9 @@ export default {
                 ],
                 grid: {
                     top: '10%',
-                    bottom: '10%',
+                    bottom: '7%',
                     containLabel: false,
+                    backgroundColor: 'red',  // 设置网格区域的背景颜色为红色
                 },
                 series: [
                     {
@@ -272,36 +268,6 @@ export default {
             };
 
             myChart.setOption(option);
-
-            // 监听图例选择变化的事件
-            // myChart.on('legendselectchanged', (params) => {
-            //     console.log('图例选择变化:', params);
-            //     const selectedSeries = params.name; // 获取被点击的系列名称
-            //     const isSelected = params.selected; // 获取该系列是否被选中
-
-            //     console.log(' isSelected, ',isSelected);
-            //     // 在这里，你可以根据被选中的系列来更新你的 x 轴数据 allTimes
-            //     // 注意：你需要根据你的业务逻辑来决定如何基于图例的选择来修改 x 轴数据
-            //     // 例如，你可能需要根据不同的系列展示不同的时间粒度或者不同的时间范围
-
-            //     // 示例：假设你希望在只选中 'status' 时，x 轴只显示特定的时间点
-            //     let newAllTimes = this.xdate.map(item => this.formatTime(item)); // 默认使用全部时间
-
-            //     if (selectedSeries === 'status' && isSelected) {
-            //         newAllTimes = ['Time A', 'Time B', 'Time C']; // 替换为 status 特定的时间点
-            //     } else if (selectedSeries === 'status' && !isSelected) {
-            //         // 如果取消选中 'status'，可能恢复到默认的全部时间
-            //     }
-
-            //     // 更新图表的配置项，重新设置 x 轴数据
-            //     myChart.setOption({
-            //         xAxis: {
-            //             data: newAllTimes
-            //         }
-            //     });
-            // });
-
-
         },
         getAirStatusKanban() {
             this.$http({
