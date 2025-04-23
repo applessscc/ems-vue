@@ -99,7 +99,6 @@ export default {
 
             // x轴
             const allTimes = this.xdate.map(item => this.formatTime(item));
-            console.info("allTimes:", allTimes);
 
             // y轴（温度）
             const temperatures = allTimes.map(time => {
@@ -144,32 +143,48 @@ export default {
                 tooltip: {
                     trigger: 'axis',
                     formatter: function (params) {
-                        // 过滤掉 null 值，确保 tooltip 只显示有效数据
-                        const dataIndex = params[0].dataIndex;
-                        const data = this.airStatusLogList[dataIndex];
-                        if (!data) return ''; // 如果没有数据，返回空字符串，避免显示无效信息
-                        return `
-                appId: ${data.appId} <br>
-                datetime: ${data.createTime} <br>
-                t: ${data.t !== null ? data.t + ' °C' : ''} <br>
-                h: ${data.h !== null ? data.h + '%' : ''} <br>
-                status: ${data.status !== null ? data.status : ''}<br>
-                mode: ${data.mode !== null ? data.mode : ''}<br>
-                handle: ${data.handle !== null ? data.handle : ''}
-              `;
+                        let tooltipContent = `时间: ${this.xdate[params[0].dataIndex]} <br>`; // 显示通用的 x 轴时间
+                        params.forEach(item => {
+                            if (item.seriesName === 'temperature') {
+                                const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
+                                if (data) {
+                                    tooltipContent += `温度: ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += `湿度: ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += `状态: ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += `模式: ${data.mode !== null ? data.mode : ''} <br>`;
+                                    tooltipContent += `操作: ${data.handle !== null ? data.handle : ''} <br>`;
+                                }
+                            } else if (item.seriesName === 'flowTotal') {
+                                const data = this.vmsEntityList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
+                                if (data) {
+                                    tooltipContent += `人流量: ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
+                                }
+                            }
+                        });
+
+                        return tooltipContent;
                     }.bind(this),
                 },
                 xAxis: {
                     type: 'category',
                     data: allTimes,
                     axisLabel: {
-                        interval: 1,  // 每隔5个时间点显示一个标签
+                        formatter: function (value, index) {
+                            // 根据索引或其他条件隐藏某些标签
+                            if (index % 2 === 0) {
+                                return value;  // 显示标签
+                            } else {
+                                return '';  // 隐藏标签
+                            }
+                        },
                         rotate: 45
-                    }
+                    },
+                    gridIndex: 0
+
                 },
 
-                // y轴（温度）
                 yAxis: [
+                    // y轴（温度）
                     {
                         type: 'value',
                         name: 'temperature (°C)',
@@ -177,7 +192,8 @@ export default {
                         axisLabel: {
                             formatter: '{value} °C'
                         },
-                        offset: 0  // Set the offset for the first axis (temperature)
+                        gridIndex: 0,
+                        offset: 0
                     },
                     // y轴（开关状态）
                     {
@@ -185,7 +201,8 @@ export default {
                         name: 'on/off',
                         position: 'left',
                         data: ['off', 'on'],
-                        offset: 50  // Set the offset for the second axis (on/off)
+                        gridIndex: 0,
+                        offset: 50
                     },
 
                     // y轴（人流量）
@@ -193,14 +210,19 @@ export default {
                         type: 'value',
                         name: 'total',
                         position: 'reight',
-
+                        gridIndex: 0,
+                        offset: 0,
+                        axisLabel: {
+                            formatter: '{value} people'
+                        },
                     },
 
                 ],
                 grid: {
                     top: '10%',
                     bottom: '7%',
-                    containLabel: true
+                    containLabel: false,
+                    backgroundColor: 'red',  // 设置网格区域的背景颜色为红色
                 },
                 series: [
                     {
@@ -239,7 +261,7 @@ export default {
                         lineStyle: {
                             type: 'solid'
                         },
-
+                        xAxisIndex: 0,
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
                 ]
