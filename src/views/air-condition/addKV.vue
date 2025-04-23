@@ -7,11 +7,11 @@
 
     <div>
       <div class="workCalendarButton">
-        <div>
-          <button @click="send" style="width:100px; height:100px" v-show="false">发送邮件</button>
-        </div>
         <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
-      </div>
+        <el-button @click="openNewWindow()"><i class="el-icon-date"></i> 温区看板</el-button>
+
+    </div>
+
       <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
         sbu<el-select v-model="calendarSbu" placeholder="sbu" filterable style="width: 80px;margin-left: 10px;">
           <el-option v-for="device in Array.from(new Set(devices.map(device => device.sbu))).sort()" :key="device"
@@ -141,13 +141,13 @@
 
         <el-row>
           <el-col :span="6">
-            <el-form-item label="温区实时温度" v-if="tableData.length != 0">
-              <el-tag type="success">{{ calculateAverageTemperature() }}C°</el-tag>
+            <el-form-item label="温区实时温度" v-if="tableData.length != 0" >
+              <el-tag type="success"  @click.stop="openNewWindow()">{{ calculateAverageTemperature() }}C° </el-tag>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="温区实时湿度" v-if="tableData.length != 0">
-              <el-tag type="success">{{ calculateAverageHumidity() }}%</el-tag>
+              <el-tag  type="success"  @click.stop="openNewWindow()">{{ calculateAverageHumidity() }}%</el-tag>
             </el-form-item>
           </el-col>
         </el-row>
@@ -358,6 +358,10 @@ export default {
   },
   methods: {
 
+    openNewWindow(){
+      const url = this.$router.resolve({ name: 'air-condition' }).href;
+      window.open(url, '_blank');  // 在新窗口打开链接
+    },
     send() {
       const params = {
         sysUrl: 'http://10.97.245.114/XX/login.html', // 系统入口链接, 可不传

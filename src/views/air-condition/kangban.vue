@@ -3,13 +3,13 @@
 
         <div class="header">
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                <el-form-item label="日期" style="margin-right: 50px;">
-                    <el-date-picker v-model="formInline.createTime" type="date" placeholder="选择日期"
+                <el-form-item label="Date" style="margin-right: 50px;">
+                    <el-date-picker v-model="formInline.createTime" type="date" placeholder="Select date"
                         value-format="yyyy-MM-dd" style="width: 150px">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="空调设备">
-                    <el-select v-model="formInline.appId" placeholder="请选择设备" filterable style="width: 150px">
+                <el-form-item label="Device">
+                    <el-select v-model="formInline.appId" placeholder="Select device" filterable style="width: 150px">
                         <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
                             :value="airDevice.appId">
                         </el-option>
@@ -112,7 +112,7 @@ export default {
             });
 
             const statusList = this.chartData.map(item => {
-                const data = item.status = item.status.includes('on/') ? 'on' : item.status.includes('off/') ? 'off' : null;  // 确保 status 只有 'on' 或 'off'
+                const data = item.status = item.status.includes('on/') ? 'on' : item.status.includes('off/') ? 'off' : item.status;  // 确保 status 只有 'on' 或 'off'
                 return data;  // 如果该时间有数据，使用开关值，否则使用 null
             });
             // const minItem = this.chartData.reduce((min, item) => item.t < min.t ? item : min).t + 5;
@@ -120,12 +120,12 @@ export default {
 
             var option = {
                 legend: {
-                    data: ['温度', '状态']
+                    data: ['temperature', 'status'],
                 },
 
                 title: {
                     // text: '温度与开关状态',
-                    left:'6%',
+                    left: '6%',
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -135,10 +135,13 @@ export default {
                         const data = this.chartData[dataIndex];
                         if (!data) return ''; // 如果没有数据，返回空字符串，避免显示无效信息
                         return `
-                时间: ${data.createTime} <br>
-                温度: ${data.t !== null ? data.t + ' °C' : '无数据'} <br>
-                开关状态: ${data.status !== null ? data.status : '无数据'} <br>
-                湿度: ${data.h !== null ? data.h + '%' : '无数据'}
+                appId: ${data.appId} <br>
+                datetime: ${data.createTime} <br>
+                t: ${data.t !== null ? data.t + ' °C' : ''} <br>
+                h: ${data.h !== null ? data.h + '%' : ''} <br>
+                status: ${data.status !== null ? data.status : '' }<br>
+                mode: ${data.mode !== null ? data.mode : '' }<br>
+                handle: ${data.handle !== null ? data.handle : '' }
               `;
                     }.bind(this),
                 },
@@ -149,7 +152,7 @@ export default {
                 yAxis: [
                     {
                         type: 'value',
-                        name: '温度 (°C)',
+                        name: 'temperature (°C)',
                         position: 'left',
                         // min: 10,
                         // max: 35,
@@ -161,7 +164,7 @@ export default {
                     },
                     {
                         type: 'category',
-                        name: '开关on/off',
+                        name: 'on/off',
                         position: 'right',
                         data: ['off', 'on']
                     }
@@ -173,7 +176,7 @@ export default {
                 },
                 series: [
                     {
-                        name: '温度',
+                        name: 'temperature',
                         data: temperatures,
                         type: 'line',
                         smooth: true,
@@ -184,7 +187,7 @@ export default {
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
                     {
-                        name: '状态',
+                        name: 'status',
                         data: statusList,
                         type: 'line',
                         smooth: false,
