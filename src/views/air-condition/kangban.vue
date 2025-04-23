@@ -46,14 +46,10 @@ export default {
                 appId: '',
                 createTime: new Date().toISOString().split('T')[0],
             },
-            chartData: [
-                { createTime: '00:00', t: 20, status: 'on', h: 60 },
-                { createTime: '01:00', t: 25, status: 'off', h: 55 },
-                { createTime: '02:00', t: 30, status: 'on', h: 50 },
-                { createTime: '12:00', t: 30, status: 'on', h: 50 },
-                { createTime: '18:00', t: 26, status: 'off', h: 50 },
-                // 继续你的数据...
-            ]
+            vmsEntityList: [],
+            airStatusLogList: [],
+            xdate: [],
+
         };
     },
     created() {
@@ -95,7 +91,6 @@ export default {
             const d = new Date(date);
             const hours = String(d.getHours()).padStart(2, '0'); // 补齐小时
             const minutes = String(d.getMinutes()).padStart(2, '0'); // 补齐分钟
-            console.info("date:", date, `${hours}:${minutes}`);
             return `${hours}:${minutes}`;
         },
         initChart() {
@@ -103,25 +98,41 @@ export default {
             var myChart = echarts.init(dom);
 
             // x轴
-            const allTimes = this.chartData.map(item => this.formatTime(item.createTime));
+            const allTimes = this.xdate.map(item => this.formatTime(item));
+            console.info("allTimes:", allTimes);
 
             // y轴（温度）
             const temperatures = allTimes.map(time => {
-                const data = this.chartData.find(item => this.formatTime(item.createTime) === time);
+                const data = this.airStatusLogList.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.t : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
 
             // y轴（开关状态）
-            const statusList = this.chartData.map(item => {
-                const data = item.status = item.status.includes('on/') ? 'on' : item.status.includes('off/') ? 'off' : item.status;  // 确保 status 只有 'on' 或 'off'
-                return data;  // 如果该时间有数据，使用开关值，否则使用 null
+            const statusList = allTimes.map(time => {
+                const data = this.airStatusLogList.find(item => this.formatTime(item.createTime) === time);
+                if (!data) return null;
+                const status = data.status.includes('on/') ? 'on' :
+                    data.status.includes('off/') ? 'off' :
+                        data.status;
+                return status;
             });
 
+
+            // const statusList = this.airStatusLogList.map(item => {
+            //     const data = item.status = item.status.includes('on/') ? 'on' : item.status.includes('off/') ? 'off' : item.status;  // 确保 status 只有 'on' 或 'off'
+            //     return data;  // 如果该时间有数据，使用开关值，否则使用 null
+            // });
+
             // y轴（人流量）
+            const curentTotal = allTimes.map(time => {
+                const data = this.vmsEntityList.find(item => this.formatTime(item.createTime) === time);
+                return data ? data.currentTotal : null;  // 如果该时间有数据，使用温度值，否则使用 null
+            });
+
 
             var option = {
                 legend: {
-                    data: ['temperature', 'status'],
+                    data: ['temperature', 'status', "flowTotal"],
                 },
 
                 title: {
@@ -135,22 +146,26 @@ export default {
                     formatter: function (params) {
                         // 过滤掉 null 值，确保 tooltip 只显示有效数据
                         const dataIndex = params[0].dataIndex;
-                        const data = this.chartData[dataIndex];
+                        const data = this.airStatusLogList[dataIndex];
                         if (!data) return ''; // 如果没有数据，返回空字符串，避免显示无效信息
                         return `
                 appId: ${data.appId} <br>
                 datetime: ${data.createTime} <br>
                 t: ${data.t !== null ? data.t + ' °C' : ''} <br>
                 h: ${data.h !== null ? data.h + '%' : ''} <br>
-                status: ${data.status !== null ? data.status : '' }<br>
-                mode: ${data.mode !== null ? data.mode : '' }<br>
-                handle: ${data.handle !== null ? data.handle : '' }
+                status: ${data.status !== null ? data.status : ''}<br>
+                mode: ${data.mode !== null ? data.mode : ''}<br>
+                handle: ${data.handle !== null ? data.handle : ''}
               `;
                     }.bind(this),
                 },
                 xAxis: {
                     type: 'category',
-                    data: allTimes  // 使用 24 小时的时间刻度
+                    data: allTimes,
+                    axisLabel: {
+                        interval: 1,  // 每隔5个时间点显示一个标签
+                        rotate: 45
+                    }
                 },
 
                 // y轴（温度）
@@ -162,19 +177,29 @@ export default {
                         axisLabel: {
                             formatter: '{value} °C'
                         },
-
+                        offset: 0  // Set the offset for the first axis (temperature)
                     },
                     // y轴（开关状态）
                     {
                         type: 'category',
                         name: 'on/off',
                         position: 'left',
-                        data: ['off', 'on']
-                    }
+                        data: ['off', 'on'],
+                        offset: 50  // Set the offset for the second axis (on/off)
+                    },
+
+                    // y轴（人流量）
+                    {
+                        type: 'value',
+                        name: 'total',
+                        position: 'reight',
+
+                    },
+
                 ],
                 grid: {
-                    top: '15%',
-                    bottom: '10%',
+                    top: '10%',
+                    bottom: '7%',
                     containLabel: true
                 },
                 series: [
@@ -204,7 +229,19 @@ export default {
                             }
                         },
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
-                    }
+                    },
+                    {
+                        name: 'flowTotal',
+                        data: curentTotal,
+                        type: 'line',
+                        smooth: false,
+                        yAxisIndex: 2,
+                        lineStyle: {
+                            type: 'solid'
+                        },
+
+                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                    },
                 ]
             };
 
@@ -220,8 +257,10 @@ export default {
                 }
             }).then((response) => {
                 if (response.data.code === 200) {
-                    this.chartData = response.data.data.airStatusLogList;
-                    console.log("this.chartData:", this.chartData);
+                    this.airStatusLogList = response.data.data.airStatusLogList;
+                    this.vmsEntityList = response.data.data.vmsEntityList;
+                    this.xdate = response.data.data.xdate;
+                    console.log("this.airStatusLogList:", this.airStatusLogList);
                     this.initChart(); // 更新图表数据
                 } else {
                     this.$message.error(response.data.msg);
