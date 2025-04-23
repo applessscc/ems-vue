@@ -105,18 +105,19 @@ export default {
             // x轴
             const allTimes = this.chartData.map(item => this.formatTime(item.createTime));
 
-            // 数据源
+            // y轴（温度）
             const temperatures = allTimes.map(time => {
                 const data = this.chartData.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.t : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
 
+            // y轴（开关状态）
             const statusList = this.chartData.map(item => {
                 const data = item.status = item.status.includes('on/') ? 'on' : item.status.includes('off/') ? 'off' : item.status;  // 确保 status 只有 'on' 或 'off'
                 return data;  // 如果该时间有数据，使用开关值，否则使用 null
             });
-            // const minItem = this.chartData.reduce((min, item) => item.t < min.t ? item : min).t + 5;
-            // const maxItem = this.chartData.reduce((max, item) => item.t > max.t ? item : max).t - 5;
+
+            // y轴（人流量）
 
             var option = {
                 legend: {
@@ -124,9 +125,11 @@ export default {
                 },
 
                 title: {
-                    // text: '温度与开关状态',
                     left: '6%',
                 },
+
+
+                // 悬浮提示框
                 tooltip: {
                     trigger: 'axis',
                     formatter: function (params) {
@@ -149,23 +152,23 @@ export default {
                     type: 'category',
                     data: allTimes  // 使用 24 小时的时间刻度
                 },
+
+                // y轴（温度）
                 yAxis: [
                     {
                         type: 'value',
                         name: 'temperature (°C)',
                         position: 'left',
-                        // min: 10,
-                        // max: 35,
                         axisLabel: {
                             formatter: '{value} °C'
                         },
-                        // splitNumber: 10  // 设置刻度的数量为 5
 
                     },
+                    // y轴（开关状态）
                     {
                         type: 'category',
                         name: 'on/off',
-                        position: 'right',
+                        position: 'left',
                         data: ['off', 'on']
                     }
                 ],
