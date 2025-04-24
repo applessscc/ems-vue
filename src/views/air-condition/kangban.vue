@@ -18,8 +18,7 @@
 
                 <el-form-item label="AirCondition">
                     <el-select v-model="formInline.id" placeholder="Select device" filterable style="width: 150px">
-                        <el-option v-for="air in airCondition" :key="air.id" :label="air.id"
-                            :value="air.id">
+                        <el-option v-for="air in airCondition" :key="air.id" :label="air.id" :value="air.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -168,12 +167,12 @@ export default {
             // y轴（空调状态）
             const airStatusList = allTimes.map(time => {
                 const data = this.airconStatuses.find(item => this.formatTime(item.time) === time);
-                return data ? data.status : null; 
+                return data ? data.status : null;
             });
 
             var option = {
                 legend: {
-                    data: ['temperature', 'status', "flowTotal","airStatus"],
+                    data: ['temperature', 'status', "flowTotal", "airStatus"],
                 },
 
                 title: {
@@ -184,28 +183,31 @@ export default {
                 // 悬浮提示框
                 tooltip: {
                     trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
                     formatter: function (params) {
-                        let tooltipContent = `时间: ${this.xdate[params[0].dataIndex]} <br>`; // 显示通用的 x 轴时间
+                        let tooltipContent = `<span style="font-family: 'Your Fancy Time Font', sans-serif; color: #333; font-weight: bold;">时间:</span> ${this.xdate[params[0].dataIndex]} <br>`;
                         params.forEach(item => {
                             console.log("item", item.seriesName);
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `温度: ${data.t !== null ? data.t + ' °C' : ''} <br>`;
-                                    tooltipContent += `湿度: ${data.h !== null ? data.h + '%' : ''} <br>`;
-                                    tooltipContent += `控制状态: ${data.status !== null ? data.status : ''} <br>`;
-                                    tooltipContent += `模式: ${data.mode !== null ? data.mode : ''} <br>`;
-                                    tooltipContent += `操作: ${data.handle !== null ? data.handle : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif; color: #007bff;">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', sans-serif; color: #28a745;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Control Font', monospace; color: #dc3545;">控制状态:</span> ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', cursive; color: #ffc107;">模式:</span> ${data.mode !== null ? data.mode : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Operation Font', fantasy; color: #6c757d;">操作:</span> ${data.handle !== null ? data.handle : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'flowTotal') {
                                 const data = this.vmsEntityList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `人流量: ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Flow Font', sans-serif; color: #17a2b8;">人流量:</span> ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
                                 }
-                            }else if (item.seriesName === 'airStatus') {
+                            } else if (item.seriesName === 'airStatus') {
                                 const data = this.airconStatuses.find(aItem => this.formatTime(aItem.time) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `空调实时开关状态: ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #fd7e14;">空调实时开关状态:</span> ${data.status !== null ? data.status : ''} <br>`;
                                 }
                             }
                         });
@@ -328,11 +330,12 @@ export default {
                         type: 'line',
                         smooth: false,
                         yAxisIndex: 3,
+                        xAxisIndex: 0,
                         lineStyle: {
                             type: 'solid'
                         },
-                        xAxisIndex: 0,
-                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+
+                        connectNulls: true
                     },
                 ]
             };
