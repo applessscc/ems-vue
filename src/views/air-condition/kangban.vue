@@ -8,10 +8,18 @@
                         value-format="yyyy-MM-dd" style="width: 150px">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="Device">
+                <el-form-item label="Device" style="margin-right: 50px;">
                     <el-select v-model="formInline.appId" placeholder="Select device" filterable style="width: 150px">
                         <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
                             :value="airDevice.appId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="AirCondition">
+                    <el-select v-model="formInline.id" placeholder="Select device" filterable style="width: 150px">
+                        <el-option v-for="air in airCondition" :key="air.id" :label="air.id"
+                            :value="air.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -36,18 +44,24 @@ export default {
         },
         "formInline.appId"(n, o) {
             this.getAirStatusKanban();
+        },
+        "formInline.id"(n, o) {
+            this.getAirStatusKanban();
         }
     },
 
     data() {
         return {
             airDevices: [],
+            airCondition: [],
             formInline: {
                 appId: '',
+                id: '',
                 createTime: new Date().toISOString().split('T')[0],
             },
             vmsEntityList: [],
             airStatusLogList: [],
+            airconStatuses: [],
             xdate: [],
 
         };
@@ -58,6 +72,7 @@ export default {
 
         this.$nextTick(() => {
             this.getAppInfoList();
+            this.getAirCondition();
             this.getAirStatusKanban();
         });
     },
@@ -84,6 +99,27 @@ export default {
                 console.log('error', error);
             });
         },
+        getAirCondition() {
+            const params = {
+            };
+            this.$http({
+                url: this.$http.adornUrl('/extProject/getAirCondition'),
+                method: 'get',
+                params: params,
+            }).then((response) => {
+                const data = response.data.data;
+                if (data) {
+                    this.airCondition = data.map(item => ({
+                        id: item.id,
+                    }));
+                }
+                if (this.airCondition.length > 0) {
+                    this.formInline.id = this.airCondition[0].id;
+                }
+            }).catch((error) => {
+                console.log('error', error);
+            });
+        },
         onSubmit() {
             this.getAirStatusKanban();
         },
@@ -98,15 +134,11 @@ export default {
             var myChart = echarts.init(dom);
 
 
-            
-            const airGroupByAppId = _.groupBy(this.airStatusLogList, 'appId');
-            for (const airObject in groupedByAppId) {
-                const air = groupedByAppId[appId];
-    
 
-            }
-
-            console.log(groupedByAppId);
+            // const airGroupByAppId = _.groupBy(this.airStatusLogList, 'appId');
+            // for (const airObject in airGroupByAppId) {
+            //     const air = airGroupByAppId[appId];
+            // }
 
             // x轴
             const allTimes = this.xdate.map(item => this.formatTime(item));
@@ -133,10 +165,15 @@ export default {
                 return data ? data.currentTotal : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
 
+            // y轴（空调状态）
+            const airStatusList = allTimes.map(time => {
+                const data = this.airconStatuses.find(item => this.formatTime(item.time) === time);
+                return data ? data.status : null; 
+            });
 
             var option = {
                 legend: {
-                    data: ['temperature', 'status', "flowTotal"],
+                    data: ['temperature', 'status', "flowTotal","airStatus"],
                 },
 
                 title: {
@@ -150,12 +187,13 @@ export default {
                     formatter: function (params) {
                         let tooltipContent = `时间: ${this.xdate[params[0].dataIndex]} <br>`; // 显示通用的 x 轴时间
                         params.forEach(item => {
+                            console.log("item", item.seriesName);
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
                                     tooltipContent += `温度: ${data.t !== null ? data.t + ' °C' : ''} <br>`;
                                     tooltipContent += `湿度: ${data.h !== null ? data.h + '%' : ''} <br>`;
-                                    tooltipContent += `状态: ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += `控制状态: ${data.status !== null ? data.status : ''} <br>`;
                                     tooltipContent += `模式: ${data.mode !== null ? data.mode : ''} <br>`;
                                     tooltipContent += `操作: ${data.handle !== null ? data.handle : ''} <br>`;
                                 }
@@ -163,6 +201,11 @@ export default {
                                 const data = this.vmsEntityList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
                                     tooltipContent += `人流量: ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
+                                }
+                            }else if (item.seriesName === 'airStatus') {
+                                const data = this.airconStatuses.find(aItem => this.formatTime(aItem.time) === item.axisValue);
+                                if (data) {
+                                    tooltipContent += `空调实时开关状态: ${data.status !== null ? data.status : ''} <br>`;
                                 }
                             }
                         });
@@ -174,14 +217,14 @@ export default {
                     type: 'category',
                     data: allTimes,
                     axisLabel: {
-                        formatter: function (value, index) {
-                            // 根据索引或其他条件隐藏某些标签
-                            if (index % 2 === 0) {
-                                return value;  // 显示标签
-                            } else {
-                                return '';  // 隐藏标签
-                            }
-                        },
+                        // formatter: function (value, index) {
+                        //     // 根据索引或其他条件隐藏某些标签
+                        //     if (index % 2 === 0) {
+                        //         return value;  // 显示标签
+                        //     } else {
+                        //         return '';  // 隐藏标签
+                        //     }
+                        // },
                         rotate: 45
                     },
                     gridIndex: 0
@@ -203,11 +246,11 @@ export default {
                     // y轴（开关状态）
                     {
                         type: 'category',
-                        name: 'on/off',
+                        name: 'airConStatus',
                         position: 'left',
                         data: ['off', 'on'],
                         gridIndex: 0,
-                        offset: 50
+                        offset: 60
                     },
 
                     // y轴（人流量）
@@ -220,6 +263,16 @@ export default {
                         axisLabel: {
                             formatter: '{value} people'
                         },
+                    },
+
+                    // y轴（空调状态）
+                    {
+                        type: 'category',
+                        name: 'airStatus',
+                        position: 'left',
+                        data: ['0', '1'],
+                        gridIndex: 0,
+                        offset: 125
                     },
 
                 ],
@@ -268,6 +321,19 @@ export default {
                         xAxisIndex: 0,
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
+
+                    {
+                        name: 'airStatus',
+                        data: airStatusList,
+                        type: 'line',
+                        smooth: false,
+                        yAxisIndex: 3,
+                        lineStyle: {
+                            type: 'solid'
+                        },
+                        xAxisIndex: 0,
+                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                    },
                 ]
             };
 
@@ -309,12 +375,14 @@ export default {
                 method: 'post',
                 data: {
                     appId: this.formInline.appId,
+                    id: this.formInline.id,
                     createTime: this.formInline.createTime,
                 }
             }).then((response) => {
                 if (response.data.code === 200) {
                     this.airStatusLogList = response.data.data.airStatusLogList;
                     this.vmsEntityList = response.data.data.vmsEntityList;
+                    this.airconStatuses = response.data.data.airconStatuses;
                     this.xdate = response.data.data.xdate;
                     console.log("this.airStatusLogList:", this.airStatusLogList);
                     this.initChart(); // 更新图表数据
