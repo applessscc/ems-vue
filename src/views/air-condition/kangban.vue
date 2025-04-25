@@ -168,7 +168,7 @@ export default {
                 return data ? data.currentTotal : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
             const filteredValues = curentTotal.filter(value => value !== null);
-            const flowMaxValue = Math.max(...filteredValues);
+            const flowMaxValue = Math.max(...filteredValues) ;
             const flowMinValue = Math.min(...filteredValues);
 
             // y轴（空调状态）
@@ -204,7 +204,7 @@ export default {
                         show: false,
                         type: 'continuous',
                         inRange: {
-                            color: ['#FFAA00', '#CC8800']
+                            color: ['#FFF9E6', '#FFEC99', '#FFDD66', '#FFCC33']
                         },
                         seriesIndex: 2,
                         min: flowMinValue,
