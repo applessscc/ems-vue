@@ -204,7 +204,7 @@ export default {
                         show: false,
                         type: 'continuous',
                         inRange: {
-                            color: ['#FFF9E6', '#FFEC99', '#FFDD66', '#FFCC33']
+                            color: ['#FFAA00', '#CC8800']
                         },
                         seriesIndex: 2,
                         min: flowMinValue,
