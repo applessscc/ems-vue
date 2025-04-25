@@ -69,6 +69,10 @@ export default {
     },
     mounted() {
 
+        this.intervalId = setInterval(() => {
+            this.getAirStatusKanban();
+
+        }, 20000); // 5000 毫秒，即 5 秒
         this.$nextTick(() => {
             this.getAppInfoList();
             this.getAirCondition();
@@ -163,6 +167,9 @@ export default {
                 const data = this.vmsEntityList.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.currentTotal : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
+            const filteredValues = curentTotal.filter(value => value !== null);
+            const flowMaxValue = Math.max(...filteredValues);
+            const flowMinValue = Math.min(...filteredValues);
 
             // y轴（空调状态）
             const airStatusList = allTimes.map(time => {
@@ -172,14 +179,53 @@ export default {
 
             var option = {
                 legend: {
-                    data: ['temperature', 'status', "flowTotal", "airStatus"],
+                    color: ['#FFF1A1', '#FFDA4D', '#FFB11A', '#FF8C00']
                 },
 
                 title: {
                     left: '6%',
                 },
 
+                visualMap: [
 
+                    {
+                        seriesIndex: 1,      // 适配 airStatus
+                        type: 'continuous',  // 使用 continuous 类型
+                        dimension: 1,         // 适配 y 轴
+                        inRange: {
+                            color: ['red', 'green']
+                        },
+                        min: 0,
+                        max: 1,
+                        show: false,           // 不显示 visualMap
+
+                    },
+                    {
+                        show: false,
+                        type: 'continuous',
+                        inRange: {
+                            color: ['#FFF9E6', '#FFEC99', '#FFDD66', '#FFCC33']
+                        },
+                        seriesIndex: 2,
+                        min: flowMinValue,
+                        max: flowMaxValue,
+                    },
+
+                    {
+                        seriesIndex: 3,      // 适配 airStatus
+                        type: 'continuous',  // 使用 continuous 类型
+                        dimension: 1,         // 适配 y 轴
+                        data: [0, 1],  // 映射的数据类别
+
+                        inRange: {
+                            color: ['red', 'green']
+                        },
+                        min: 0,
+                        max: 1,
+                        show: false,           // 不显示 visualMap
+                    }
+
+                ],
                 // 悬浮提示框
                 tooltip: {
                     trigger: 'axis',
@@ -272,7 +318,7 @@ export default {
                         type: 'category',
                         name: 'airStatus',
                         position: 'left',
-                        data: ['0', '1'],
+                        data: ['0', '', '1'],
                         gridIndex: 0,
                         offset: 125
                     },
@@ -281,7 +327,7 @@ export default {
                 grid: {
                     top: '10%',
                     bottom: '10%',
-                    containLabel: false,
+                    containLabel: true,
                 },
                 series: [
                     {
@@ -291,7 +337,7 @@ export default {
                         smooth: true,
                         yAxisIndex: 0,
                         lineStyle: {
-                            type: 'dashed'
+                            type: 'solid'
                         },
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
@@ -302,7 +348,7 @@ export default {
                         smooth: false,
                         yAxisIndex: 1,
                         lineStyle: {
-                            type: 'dashed'
+                            type: 'solid'
                         },
                         itemStyle: {
                             color: function (params) {
@@ -337,40 +383,11 @@ export default {
 
                         connectNulls: true
                     },
-                ]
+
+                ],
             };
 
             myChart.setOption(option);
-
-            // 监听图例选择变化的事件
-            // myChart.on('legendselectchanged', (params) => {
-            //     console.log('图例选择变化:', params);
-            //     const selectedSeries = params.name; // 获取被点击的系列名称
-            //     const isSelected = params.selected; // 获取该系列是否被选中
-
-            //     console.log(' isSelected, ',isSelected);
-            //     // 在这里，你可以根据被选中的系列来更新你的 x 轴数据 allTimes
-            //     // 注意：你需要根据你的业务逻辑来决定如何基于图例的选择来修改 x 轴数据
-            //     // 例如，你可能需要根据不同的系列展示不同的时间粒度或者不同的时间范围
-
-            //     // 示例：假设你希望在只选中 'status' 时，x 轴只显示特定的时间点
-            //     let newAllTimes = this.xdate.map(item => this.formatTime(item)); // 默认使用全部时间
-
-            //     if (selectedSeries === 'status' && isSelected) {
-            //         newAllTimes = ['Time A', 'Time B', 'Time C']; // 替换为 status 特定的时间点
-            //     } else if (selectedSeries === 'status' && !isSelected) {
-            //         // 如果取消选中 'status'，可能恢复到默认的全部时间
-            //     }
-
-            //     // 更新图表的配置项，重新设置 x 轴数据
-            //     myChart.setOption({
-            //         xAxis: {
-            //             data: newAllTimes
-            //         }
-            //     });
-            // });
-
-
         },
         getAirStatusKanban() {
             this.$http({
