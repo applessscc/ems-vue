@@ -3,43 +3,49 @@
 
         <div class="header">
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                <el-form-item label="Date" style="margin-right: 50px;">
-                    <el-date-picker v-model="formInline.createTime" type="date" placeholder="Select date"
-                        value-format="yyyy-MM-dd" style="width: 150px">
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="Device" style="margin-right: 50px;">
-                    <el-select v-model="formInline.appId" placeholder="Select device" style="width: 150px">
-                        <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
-                            :value="airDevice.appId">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+    <el-form-item label="Date" style="margin-right: 20px;">
+        <el-date-picker v-model="formInline.createTime" type="date" placeholder="Select date"
+            value-format="yyyy-MM-dd" style="width: 150px">
+        </el-date-picker>
+    </el-form-item>
 
-                <el-form-item label="AirCondition">
-                    <el-select v-model="formInline.id" placeholder="Select device" style="width: 150px">
-                        <el-option v-for="air in airCondition" :key="air.id" :label="air.id" :value="air.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+    <el-form-item label="flowData" style="margin-right: 20px;">
+        <el-switch v-model="formInline.flowSwitch" active-color="#13ce66" inactive-color="#ff4949">
+        </el-switch>
+    </el-form-item>
 
-                <el-form-item label="group">
-                    <el-select v-model="formInline.groupId" placeholder="select group" style="width: 150px" clearable>
-                        <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
-                            :value="groupId.groupId">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+    <el-form-item label="Device" style="margin-right: 20px;">
+        <el-select v-model="formInline.appId" placeholder="Select device" style="width: 150px" clearable>
+            <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
+                :value="airDevice.appId">
+            </el-option>
+        </el-select>
+    </el-form-item>
 
-                <el-form-item label="sensor">
-                    <el-select v-model="formInline.iotThRecordId" placeholder="select sensor" clearable filterable
-                        style="width: 170px">
-                        <el-option v-for="device in devices" :key="device.id"
-                            :label="device.id" :value="device.id">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-            </el-form>
+    <el-form-item label="AirCondition" style="margin-right: 20px;">
+        <el-select v-model="formInline.id" placeholder="Select device" style="width: 150px" clearable>
+            <el-option v-for="air in airCondition" :key="air.id" :label="air.id" :value="air.id">
+            </el-option>
+        </el-select>
+    </el-form-item>
+
+    <el-form-item label="group" style="margin-right: 20px;">
+        <el-select v-model="formInline.groupId" placeholder="select group" style="width: 150px" clearable>
+            <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
+                :value="groupId.groupId">
+            </el-option>
+        </el-select>
+    </el-form-item>
+
+    <el-form-item label="sensor" style="margin-right: 20px;">
+        <el-select v-model="formInline.iotThRecordId" placeholder="select sensor" clearable filterable
+            style="width: 170px">
+            <el-option v-for="device in devices" :key="device.id" :label="device.id" :value="device.id">
+            </el-option>
+        </el-select>
+    </el-form-item>
+</el-form>
+
         </div>
 
         <div id="container">
@@ -50,6 +56,7 @@
 
 <script>
 import * as echarts from 'echarts';  // 导入 echarts
+import { data } from 'jquery';
 import _ from 'lodash';
 
 export default {
@@ -70,6 +77,11 @@ export default {
         "formInline.iotThRecordId"(n, o) {
             this.getAirStatusKanban();
         },
+
+        "formInline.flowSwitch"(n, o) {
+            this.getAirStatusKanban();
+        },
+        
         '$route.query.groupId': function (n, o) {
             this.formInline.groupId = n;
             this.getAirStatusKanban();
@@ -87,11 +99,14 @@ export default {
                 id: '',
                 groupId: this.$route.query.groupId,
                 iotThRecordId: '',
+                flowSwitch: true,
                 createTime: new Date().toISOString().split('T')[0],
             },
             vmsEntityList: [],
             airStatusLogList: [],
             airconStatuses: [],
+            thKvRecordTasks: [],
+            thRecords: [],
             xdate: [],
 
         };
@@ -251,6 +266,18 @@ export default {
                 return data ? data.status : null;
             });
 
+
+            // y轴（传感器温度）
+            const thRecords = allTimes.map(time => {
+                const data = this.thRecords.find(item => this.formatTime(item.createTime) === time);
+                return data ? data.t : null;  // 如果该时间有数据，使用温度值，否则使用 null
+            });
+
+            // y轴（温区温度）
+            const thKvRecordTasks = allTimes.map(time => {
+                const data = this.thKvRecordTasks.find(item => this.formatTime(item.createTime) === time);
+                return data ? data.temp : null;  // 如果该时间有数据，使用温度值，否则使用 null
+            });
             var option = {
                 legend: {
                     color: ['#FFF1A1', '#FFDA4D', '#FFB11A', '#FF8C00']
@@ -260,46 +287,46 @@ export default {
                     left: '6%',
                 },
 
-                visualMap: [
+                // visualMap: [
 
-                    {
-                        seriesIndex: 1,      // 适配 airStatus
-                        type: 'continuous',  // 使用 continuous 类型
-                        dimension: 1,         // 适配 y 轴
-                        inRange: {
-                            color: ['red', 'green']
-                        },
-                        min: 0,
-                        max: 1,
-                        show: false,           // 不显示 visualMap
+                //     {
+                //         seriesIndex: 1,      // 适配 airStatus
+                //         type: 'continuous',  // 使用 continuous 类型
+                //         dimension: 1,         // 适配 y 轴
+                //         inRange: {
+                //             color: ['red', 'green']
+                //         },
+                //         min: 0,
+                //         max: 1,
+                //         show: false,           // 不显示 visualMap
 
-                    },
-                    {
-                        show: false,
-                        type: 'continuous',
-                        inRange: {
-                            color: ['#FFF9E6', '#FFEC99', '#FFDD66', '#FFCC33']
-                        },
-                        seriesIndex: 2,
-                        min: flowMinValue,
-                        max: flowMaxValue,
-                    },
+                //     },
+                //     {
+                //         show: false,
+                //         type: 'continuous',
+                //         inRange: {
+                //             color: ['#FFF9E6', '#FFEC99', '#FFDD66', '#FFCC33']
+                //         },
+                //         seriesIndex: 2,
+                //         min: flowMinValue,
+                //         max: flowMaxValue,
+                //     },
 
-                    {
-                        seriesIndex: 3,      // 适配 airStatus
-                        type: 'continuous',  // 使用 continuous 类型
-                        dimension: 1,         // 适配 y 轴
-                        data: [0, 1],  // 映射的数据类别
+                //     {
+                //         seriesIndex: 3,      // 适配 airStatus
+                //         type: 'continuous',  // 使用 continuous 类型
+                //         dimension: 1,         // 适配 y 轴
+                //         data: [0, 1],  // 映射的数据类别
 
-                        inRange: {
-                            color: ['red', 'green']
-                        },
-                        min: 0,
-                        max: 1,
-                        show: false,           // 不显示 visualMap
-                    }
+                //         inRange: {
+                //             color: ['red', 'green']
+                //         },
+                //         min: 0,
+                //         max: 1,
+                //         show: false,           // 不显示 visualMap
+                //     }
 
-                ],
+                // ],
                 // 悬浮提示框
                 tooltip: {
                     trigger: 'axis',
@@ -410,7 +437,11 @@ export default {
                         smooth: true,
                         yAxisIndex: 0,
                         lineStyle: {
+                            color: '#007bff',
                             type: 'solid'
+                        },
+                        itemStyle: {
+                            color: '#007bff'
                         },
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
@@ -421,12 +452,12 @@ export default {
                         smooth: false,
                         yAxisIndex: 1,
                         lineStyle: {
+                            color: '#28a745',
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: function (params) {
-                                return params.value === 'on' ? 'green' : 'red';
-                            }
+                            color: '#28a745',
+
                         },
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
@@ -437,7 +468,11 @@ export default {
                         smooth: false,
                         yAxisIndex: 2,
                         lineStyle: {
+                            color: '#ffc107',
                             type: 'solid'
+                        },
+                        itemStyle: {
+                            color: '#ffc107'
                         },
                         xAxisIndex: 0,
                         connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
@@ -451,10 +486,44 @@ export default {
                         yAxisIndex: 3,
                         xAxisIndex: 0,
                         lineStyle: {
+                            color: '#dc3545',
                             type: 'solid'
                         },
-
+                        itemStyle: {
+                            color: '#dc3545',
+                        },
                         connectNulls: true
+                    },
+
+                    {
+                        name: 'groupTemperature',
+                        data: thKvRecordTasks,
+                        type: 'line',
+                        smooth: true,
+                        yAxisIndex: 0,
+                        lineStyle: {
+                            color: '#fd7e14',
+                            type: 'solid'
+                        },
+                        itemStyle: {
+                            color: '#fd7e14'
+                        },
+                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                    },
+                    {
+                        name: 'sensorTemperature',
+                        data: thRecords,
+                        type: 'line',
+                        smooth: true,
+                        yAxisIndex: 0,
+                        lineStyle: {
+                            color: '#00bfff',
+                            type: 'solid'
+                        },
+                        itemStyle: {
+                            color: '#00bfff',
+                        },
+                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
                     },
 
                 ],
@@ -472,12 +541,15 @@ export default {
                     createTime: this.formInline.createTime,
                     groupId: this.formInline.groupId,
                     iotThRecordId: this.formInline.iotThRecordId,
+                    flowSwitch: this.formInline.flowSwitch,
                 }
             }).then((response) => {
                 if (response.data.code === 200) {
                     this.airStatusLogList = response.data.data.airStatusLogList;
                     this.vmsEntityList = response.data.data.vmsEntityList;
                     this.airconStatuses = response.data.data.airconStatuses;
+                    this.thKvRecordTasks = response.data.data.thKvRecordTasks;
+                    this.thRecords = response.data.data.thRecords;
                     this.xdate = response.data.data.xdate;
                     this.initChart(); // 更新图表数据
                 } else {
