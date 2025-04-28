@@ -10,7 +10,7 @@
         <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
         <el-button @click="openNewWindow()"><i class="el-icon-date"></i> 温区看板</el-button>
 
-    </div>
+      </div>
 
       <el-dialog :visible.sync="workCalendarDigStatus" width="40%">
         sbu<el-select v-model="calendarSbu" placeholder="sbu" filterable style="width: 80px;margin-left: 10px;">
@@ -87,13 +87,13 @@
         <el-table-column prop="sbu" label="sbu" width="100px" align="center"></el-table-column>
         <el-table-column prop="eqid" label="设备ID" width="240px" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
-            <a :href="'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID' + scope.row.eqid" target="_blank"
+            <a :href="'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + scope.row.eqid" target="_blank"
               :style="{
-                color: scope.row.isOnline === 'true'? '#409EFF' : '#F56C6C',
+                color: scope.row.isOnline === 'true' ? '#409EFF' : '#F56C6C',
                 textDecoration: 'none'
               }" @mouseover="e => e.target.style.textDecoration = 'underline'"
-                @mouseout="e => e.target.style.textDecoration = 'none'">
-              {{ scope.row.isOnline === 'true' ?scope.row.eqid : scope.row.eqid + '（离线）' }}
+              @mouseout="e => e.target.style.textDecoration = 'none'">
+              {{ scope.row.isOnline === 'true' ? scope.row.eqid : scope.row.eqid + '（离线）' }}
             </a>
           </template>
         </el-table-column>
@@ -141,13 +141,13 @@
 
         <el-row>
           <el-col :span="6">
-            <el-form-item label="温区实时温度" v-if="tableData.length != 0" >
-              <el-tag type="success"  @click.stop="openNewWindow()">{{ calculateAverageTemperature() }}C° </el-tag>
+            <el-form-item label="温区实时温度" v-if="tableData.length != 0">
+              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageTemperature() }}C° </el-tag>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="温区实时湿度" v-if="tableData.length != 0">
-              <el-tag  type="success"  @click.stop="openNewWindow()">{{ calculateAverageHumidity() }}%</el-tag>
+              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageHumidity() }}%</el-tag>
             </el-form-item>
           </el-col>
         </el-row>
@@ -277,6 +277,7 @@
 export default {
   data() {
     return {
+      offlineDevice: [],
       selectedDate: new Date(),
       calendarSbu: 2,
       workDateList: [
@@ -352,13 +353,18 @@ export default {
     this.getThRecord();
     this.getThKvRecordGroups();
     this.getWorkDayList();
+    this.getExceptionThKvRecord()
+
     // saveVisitLog('温度系数比值');
   },
   mounted() {
+    this.intervalId = setInterval(() => {
+      this.getExceptionThKvRecord()
+    }, 20000);
   },
   methods: {
 
-    openNewWindow(){
+    openNewWindow() {
       const url = this.$router.resolve({ name: 'air-condition' }).href;
       window.open(url, '_blank');  // 在新窗口打开链接
     },
@@ -575,7 +581,7 @@ export default {
       }, 0);
 
       // const count = this.tableData.length;
-      const count = this.tableData.filter(row => row.t && row.t != 0 ).length;
+      const count = this.tableData.filter(row => row.t && row.t != 0).length;
 
       return count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '';
     },
@@ -829,7 +835,40 @@ export default {
     deleteRow(index) {
       this.tableData.splice(index, 1);
       this.$message.success('数据已成功删除');
-    }
+    },
+    getExceptionThKvRecord() {
+      this.$http({
+        url: this.$http.adornUrl('/extProject/getExceptionThKvRecord'),
+        method: 'get',
+        params: {
+
+        },
+      }).then((response) => {
+        response.data.data.filter(row => row.isOnline == "false").forEach(element => {
+          console.log("!offlineDevice.some(device => device.eqid === element.eqid)", !this.offlineDevice.some(device => device.eqid === element.eqid));
+          if (!this.offlineDevice.some(device => device.eqid === element.eqid)) {
+            this.offlineDevice.push(element);
+            this.$notify.error({
+              dangerouslyUseHTMLString: true,  // 允许解析 HTML 字符串
+              title: '设备离线通知',
+              message: 
+              "温区：" + element.groupName + "<br>" + 
+              "设备：" + element.eqid+"<br>" + 
+              "最后一次上线时间：" + element.lastTime
+
+              ,
+              duration: 0,
+              onClose: () => {
+                this.offlineDevice = this.offlineDevice.filter(device => device.eqid !== element.eqid);
+              }
+            });
+          }
+        });
+
+      }).catch((error) => {
+        console.error('Error fetching table data:', error);
+      });
+    },
   }
 
 }
