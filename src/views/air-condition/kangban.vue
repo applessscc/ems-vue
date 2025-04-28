@@ -235,7 +235,6 @@ export default {
                     formatter: function (params) {
                         let tooltipContent = `<span style="font-family: 'Your Fancy Time Font', sans-serif; color: #333; font-weight: bold;">时间:</span> ${this.xdate[params[0].dataIndex]} <br>`;
                         params.forEach(item => {
-                            console.log("item", item.seriesName);
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
@@ -404,7 +403,6 @@ export default {
                     this.vmsEntityList = response.data.data.vmsEntityList;
                     this.airconStatuses = response.data.data.airconStatuses;
                     this.xdate = response.data.data.xdate;
-                    console.log("this.airStatusLogList:", this.airStatusLogList);
                     this.initChart(); // 更新图表数据
                 } else {
                     this.$message.error(response.data.msg);

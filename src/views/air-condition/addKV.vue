@@ -89,11 +89,11 @@
           <template slot-scope="scope">
             <a :href="'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID' + scope.row.eqid" target="_blank"
               :style="{
-                color: Boolean(scope.row.isOnline) ? '#409EFF' : '#F56C6C',
+                color: scope.row.isOnline === 'true'? '#409EFF' : '#F56C6C',
                 textDecoration: 'none'
               }" @mouseover="e => e.target.style.textDecoration = 'underline'"
                 @mouseout="e => e.target.style.textDecoration = 'none'">
-              {{ Boolean(scope.row.isOnline) ?scope.row.eqid : scope.row.eqid + '（离线）' }}
+              {{ scope.row.isOnline === 'true' ?scope.row.eqid : scope.row.eqid + '（离线）' }}
             </a>
           </template>
         </el-table-column>
@@ -575,7 +575,7 @@ export default {
       }, 0);
 
       // const count = this.tableData.length;
-      const count = this.tableData.filter(row => row.t && row.t !== 0).length;
+      const count = this.tableData.filter(row => row.t && row.t != 0 ).length;
 
       return count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '';
     },
@@ -591,7 +591,7 @@ export default {
         return acc;
       }, 0);
       // const count = this.tableData.length;
-      const count = this.tableData.filter(row => row.h && row.h !== 0).length;
+      const count = this.tableData.filter(row => row.h && row.h != 0).length;
       return count > 0 ? (totalHumidity / count).toFixed(2) : '';
     }
     ,
