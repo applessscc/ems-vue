@@ -9,7 +9,7 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="Device" style="margin-right: 50px;">
-                    <el-select v-model="formInline.appId" placeholder="Select device" filterable style="width: 150px">
+                    <el-select v-model="formInline.appId" placeholder="Select device" style="width: 150px">
                         <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
                             :value="airDevice.appId">
                         </el-option>
@@ -17,8 +17,25 @@
                 </el-form-item>
 
                 <el-form-item label="AirCondition">
-                    <el-select v-model="formInline.id" placeholder="Select device" filterable style="width: 150px">
+                    <el-select v-model="formInline.id" placeholder="Select device" style="width: 150px">
                         <el-option v-for="air in airCondition" :key="air.id" :label="air.id" :value="air.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="group">
+                    <el-select v-model="formInline.groupId" placeholder="select group" style="width: 150px" clearable>
+                        <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
+                            :value="groupId.groupId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+
+                <el-form-item label="sensor">
+                    <el-select v-model="formInline.iotThRecordId" placeholder="select sensor" clearable filterable
+                        style="width: 170px">
+                        <el-option v-for="device in devices" :key="device.id"
+                            :label="device.id" :value="device.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -46,16 +63,30 @@ export default {
         },
         "formInline.id"(n, o) {
             this.getAirStatusKanban();
+        },
+        "formInline.groupId"(n, o) {
+            this.getAirStatusKanban();
+        },
+        "formInline.iotThRecordId"(n, o) {
+            this.getAirStatusKanban();
+        },
+        '$route.query.groupId': function (n, o) {
+            this.formInline.groupId = n;
+            this.getAirStatusKanban();
         }
     },
 
     data() {
         return {
             airDevices: [],
+            groupIds: [],
+            devices: [],
             airCondition: [],
             formInline: {
                 appId: '',
                 id: '',
+                groupId: this.$route.query.groupId,
+                iotThRecordId: '',
                 createTime: new Date().toISOString().split('T')[0],
             },
             vmsEntityList: [],
@@ -68,18 +99,61 @@ export default {
     created() {
     },
     mounted() {
+        this.$nextTick(() => {
+            this.getThKvRecordGroups();
+            this.getThRecord();
+            this.getAppInfoList();
+            this.getAirCondition();
+            this.getAirStatusKanban();
+        });
 
         this.intervalId = setInterval(() => {
             this.getAirStatusKanban();
 
         }, 20000); // 5000 毫秒，即 5 秒
-        this.$nextTick(() => {
-            this.getAppInfoList();
-            this.getAirCondition();
-            this.getAirStatusKanban();
-        });
     },
     methods: {
+
+
+        getThRecord() {
+            const params = {
+            };
+            this.$http({
+                url: this.$http.adornUrl('/extProject/getThRecord'),
+                method: 'get',
+                params: params,
+            }).then((response) => {
+                const data = response.data.data;
+                if (data) {
+                    this.devices = data.map(item => ({
+                        id: item.id,
+                        sbu: item.sbu,
+                    }));
+                }
+            }).catch((error) => {
+                console.log('error', error);
+            });
+        },
+        getThKvRecordGroups() {
+            const params = {
+            };
+
+            this.$http({
+                url: this.$http.adornUrl('/extProject/getThKvRecord'),
+                method: 'post',
+                data: params,
+            }).then((response) => {
+                const data = response.data.data;
+                this.groupIds = data.map(item => ({
+                    groupId: item.groupId,
+                    groupName: item.groupName
+                }));
+                this.groupIds = [...new Map(this.groupIds.map(item => [item.groupId, item])).values()];
+            }).catch((error) => {
+                console.log('Error:', error);
+            });
+        },
+
         getAppInfoList() {
             const params = {
             };
@@ -168,7 +242,7 @@ export default {
                 return data ? data.currentTotal : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
             const filteredValues = curentTotal.filter(value => value !== null);
-            const flowMaxValue = Math.max(...filteredValues) ;
+            const flowMaxValue = Math.max(...filteredValues);
             const flowMinValue = Math.min(...filteredValues);
 
             // y轴（空调状态）
@@ -396,6 +470,8 @@ export default {
                     appId: this.formInline.appId,
                     id: this.formInline.id,
                     createTime: this.formInline.createTime,
+                    groupId: this.formInline.groupId,
+                    iotThRecordId: this.formInline.iotThRecordId,
                 }
             }).then((response) => {
                 if (response.data.code === 200) {

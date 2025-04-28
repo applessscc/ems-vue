@@ -363,9 +363,8 @@ export default {
     }, 20000);
   },
   methods: {
-
     openNewWindow() {
-      const url = this.$router.resolve({ name: 'air-condition' }).href;
+      const url = this.$router.resolve({ name: 'air-condition' , query: { groupId: this.groupId }}).href;
       window.open(url, '_blank');  // 在新窗口打开链接
     },
     send() {
