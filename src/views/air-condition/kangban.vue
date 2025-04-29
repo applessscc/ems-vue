@@ -107,11 +107,15 @@ export default {
             airconStatuses: [],
             thKvRecordTasks: [],
             thRecords: [],
+            thRecords2: [],
+            thRecords3: [],
             xdate: [],
+            myChart: null,
 
         };
     },
     created() {
+
     },
     mounted() {
         this.$nextTick(() => {
@@ -128,8 +132,6 @@ export default {
         }, 20000); // 5000 毫秒，即 5 秒
     },
     methods: {
-
-
         getThRecord() {
             const params = {
             };
@@ -223,15 +225,11 @@ export default {
         },
         initChart() {
             var dom = document.getElementById("container");
-            var myChart = echarts.init(dom);
+            this.myChart = echarts.init(dom);
 
 
-
-            // const airGroupByAppId = _.groupBy(this.airStatusLogList, 'appId');
-            // for (const airObject in airGroupByAppId) {
-            //     const air = airGroupByAppId[appId];
-            // }
-
+            const series = [];
+            const legendData = [];
             // x轴
             const allTimes = this.xdate.map(item => this.formatTime(item));
 
@@ -240,6 +238,25 @@ export default {
                 const data = this.airStatusLogList.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.t : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
+            if (this.airStatusLogList.length > 0) {
+                legendData.push('temperature');
+                series.push({
+                    name: 'temperature',
+                    data: temperatures,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 0,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        color: '#1E90FF',  // 深蓝色
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        color: '#1E90FF'
+                    },
+                    connectNulls: true
+                })
+            }
 
             // y轴（开关状态）
             const statusList = allTimes.map(time => {
@@ -250,21 +267,76 @@ export default {
                         data.status;
                 return status;
             });
+            if (this.airStatusLogList.length > 0) {
+                legendData.push('airConStatus');
+                series.push({
+                    name: 'airConStatus',
+                    data: statusList,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 1,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        color: '#32CD32',  // 石灰绿
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        color: '#32CD32',
+                    },
+                    connectNulls: true
+                });
+            }
 
             // y轴（人流量）
             const curentTotal = allTimes.map(time => {
                 const data = this.vmsEntityList.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.currentTotal : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
-            const filteredValues = curentTotal.filter(value => value !== null);
-            const flowMaxValue = Math.max(...filteredValues);
-            const flowMinValue = Math.min(...filteredValues);
+            if (this.vmsEntityList.length > 0) {
+                legendData.push('flowTotal');
+                series.push({
+                    name: 'flowTotal',
+                    data: curentTotal,
+                    type: 'line',
+                    smooth: true,
+                    yAxisIndex: 2,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        color: '#FFD700',  // 金黄色
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        color: '#FFD700'
+                    },
+                    xAxisIndex: 0,
+                    connectNulls: true
+                });
+            }
 
             // y轴（空调状态）
             const airStatusList = allTimes.map(time => {
                 const data = this.airconStatuses.find(item => this.formatTime(item.time) === time);
                 return data ? data.status : null;
             });
+            if (this.airconStatuses.length > 0) {
+                legendData.push('airStatus');
+                series.push({
+                    name: 'airStatus',
+                    data: airStatusList,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 3,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        color: '#9C27B0',  // 番茄红
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        color: '#9C27B0',
+                    },
+                    connectNulls: true
+                })
+            }
 
 
             // y轴（传感器温度）
@@ -272,15 +344,143 @@ export default {
                 const data = this.thRecords.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.t : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
+            if (this.thRecords.length > 0) {
+                legendData.push('sensorTemperature');
+                series.push({
+                    name: 'sensorTemperature',
+                    data: thRecords,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 0,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        color: '#00CED1',  // 深天蓝
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        color: '#00CED1',
+                    },
+                    connectNulls: true
+                });
+            }
 
-            // y轴（温区温度）
+
+            // y轴（温区平均温度）
             const thKvRecordTasks = allTimes.map(time => {
                 const data = this.thKvRecordTasks.find(item => this.formatTime(item.createTime) === time);
                 return data ? data.temp : null;  // 如果该时间有数据，使用温度值，否则使用 null
             });
+            if (this.thKvRecordTasks.length > 0) {
+                legendData.push('groupTemperature');
+                series.push({
+
+                    name: 'groupTemperature',
+                    data: thKvRecordTasks,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 0,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        color: '#FF4500',  // 橙红色
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        color: '#FF4500'
+                    },
+                    connectNulls: true
+
+                })
+            }
+
+
+            // y轴（温区温度和气象温度）
+            const thRecords2t = allTimes.map(time => {
+                const data = this.thRecords2.find(item => this.formatTime(item.createTime) === time);
+                return data ? data.t : null;  // 如果该时间有数据，使用温度值，否则使用 null
+            });
+
+            if (this.thRecords2.length > 0) {
+                legendData.push('groupTemperature2');
+                series.push({
+                    name: 'groupTemperature2',
+                    data: thRecords2t,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 0,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        // color: '#FF69B4',  // 深粉色
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        // color: '#FF69B4',
+                    },
+                    connectNulls: true
+                });
+            }
+
+
+            const thRecords2h = allTimes.map(time => {
+                const data = this.thRecords2.find(item => this.formatTime(item.createTime) === time);
+                return data ? data.h : null;  // 如果该时间有数据，使用温度值，否则使用 null
+            });
+            if (this.thRecords2.length > 0) {
+                legendData.push('groupExtTemperature');
+                series.push({
+                    name: 'groupExtTemperature',
+                    data: thRecords2h,
+                    type: 'line',
+                    smooth: false,
+                    yAxisIndex: 0,
+                    xAxisIndex: 0,
+                    lineStyle: {
+                        // color: '#FF1493',  // 深粉色
+                        type: 'solid'
+                    },
+                    itemStyle: {
+                        // color: '#FF1493',
+                    },
+                    connectNulls: true
+                });
+            }
+
+
+
+
+            // y轴（温区传感器温度）
+            const groupedById = _.groupBy(this.thRecords3, 'id');
+            Object.entries(groupedById).forEach(([id, records]) => {
+                console.log('records', records);
+                const thRecords = allTimes.map(time => {
+                    const data = records.find(item => this.formatTime(item.createTime) === time);
+                    return data ? data.h : null;
+                });
+
+                if (records.length > 0) {
+                    legendData.push(id);
+                    series.push({
+                        name: id,
+                        data: thRecords,
+                        type: 'line',
+                        smooth: false,
+                        yAxisIndex: 0,
+                        xAxisIndex: 0,
+                        lineStyle: {
+                            type: 'solid'
+                        },
+                        itemStyle: {
+                        },
+                        connectNulls: true
+                    });
+                }
+
+            });
+            console.log('legendData', legendData);
+            console.log('series', series);
             var option = {
                 legend: {
-                    data: ['temperature', 'airConStatus', 'flowTotal', 'airStatus', 'groupTemperature', 'sensorTemperature'],
+                    data: legendData,
+                    // data: ['temperature', 'airConStatus', 'flowTotal', 'airStatus', 'groupTemperature', 'groupTemperature2', 'groupExtTemperature', 'sensorTemperature'],
                     textStyle: {
                         color: '#333',
                         fontSize: 14,
@@ -292,46 +492,6 @@ export default {
                     left: '6%',
                 },
 
-                // visualMap: [
-
-                //     {
-                //         seriesIndex: 1,      // 适配 airStatus
-                //         type: 'continuous',  // 使用 continuous 类型
-                //         dimension: 1,         // 适配 y 轴
-                //         inRange: {
-                //             color: ['red', 'green']
-                //         },
-                //         min: 0,
-                //         max: 1,
-                //         show: false,           // 不显示 visualMap
-
-                //     },
-                //     {
-                //         show: false,
-                //         type: 'continuous',
-                //         inRange: {
-                //             color: ['#FFF9E6', '#FFEC99', '#FFDD66', '#FFCC33']
-                //         },
-                //         seriesIndex: 2,
-                //         min: flowMinValue,
-                //         max: flowMaxValue,
-                //     },
-
-                //     {
-                //         seriesIndex: 3,      // 适配 airStatus
-                //         type: 'continuous',  // 使用 continuous 类型
-                //         dimension: 1,         // 适配 y 轴
-                //         data: [0, 1],  // 映射的数据类别
-
-                //         inRange: {
-                //             color: ['red', 'green']
-                //         },
-                //         min: 0,
-                //         max: 1,
-                //         show: false,           // 不显示 visualMap
-                //     }
-
-                // ],
                 // 悬浮提示框
                 tooltip: {
                     trigger: 'axis',
@@ -365,8 +525,14 @@ export default {
                                 const data = this.thKvRecordTasks.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
                                     tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区名称:</span> ${data.groupName !== null ? data.groupName : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区温度:</span> ${data.temp !== null ? data.temp + ' °C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区温度:</span> ${data.temp !== null ? data.temp + '°C' : ''} <br>`;
                                     tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                }
+                            } else if (item.seriesName === 'groupTemperature2') {
+                                const data = this.thRecords2.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
+                                if (data) {
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区温度2:</span> ${data.t !== null ? data.t + '°C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">气象温度:</span> ${data.h !== null ? data.h + '°C' : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'sensorTemperature') {
                                 const data = this.thRecords.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
@@ -452,106 +618,15 @@ export default {
                     bottom: '10%',
                     containLabel: true,
                 },
-                series: [
-                    {
-                        name: 'temperature',
-                        data: temperatures,
-                        type: 'line',
-                        smooth: false,
-                        yAxisIndex: 0,
-                        lineStyle: {
-                            color: '#1E90FF',  // 深蓝色
-                            type: 'solid'
-                        },
-                        itemStyle: {
-                            color: '#1E90FF'
-                        },
-                        connectNulls: true
-                    },
-                    {
-                        name: 'airConStatus',
-                        data: statusList,
-                        type: 'line',
-                        smooth: false,
-                        yAxisIndex: 1,
-                        lineStyle: {
-                            color: '#32CD32',  // 石灰绿
-                            type: 'solid'
-                        },
-                        itemStyle: {
-                            color: '#32CD32',
-                        },
-                        connectNulls: true
-                    },
-                    {
-                        name: 'flowTotal',
-                        data: curentTotal,
-                        type: 'line',
-                        smooth: true,
-                        yAxisIndex: 2,
-                        lineStyle: {
-                            color: '#FFD700',  // 金黄色
-                            type: 'solid'
-                        },
-                        itemStyle: {
-                            color: '#FFD700'
-                        },
-                        xAxisIndex: 0,
-                        connectNulls: true
-                    },
-                    {
-                        name: 'airStatus',
-                        data: airStatusList,
-                        type: 'line',
-                        smooth: false,
-                        yAxisIndex: 3,
-                        xAxisIndex: 0,
-                        lineStyle: {
-                            color: '#9C27B0',  // 番茄红
-                            type: 'solid'
-                        },
-                        itemStyle: {
-                            color: '#9C27B0',
-                        },
-                        connectNulls: true
-                    },
-                    {
-                        name: 'groupTemperature',
-                        data: thKvRecordTasks,
-                        type: 'line',
-                        smooth: false,
-                        yAxisIndex: 0,
-                        lineStyle: {
-                            color: '#FF4500',  // 橙红色
-                            type: 'solid'
-                        },
-                        itemStyle: {
-                            color: '#FF4500'
-                        },
-                        connectNulls: true
-                    },
-                    {
-                        name: 'sensorTemperature',
-                        data: thRecords,
-                        type: 'line',
-                        smooth: false,
-                        yAxisIndex: 0,
-                        lineStyle: {
-                            color: '#00CED1',  // 深天蓝
-                            type: 'solid'
-                        },
-                        itemStyle: {
-                            color: '#00CED1',
-                        },
-                        connectNulls: true
-                    }
-                ]
-
+                series: series
             };
 
-            myChart.setOption(option);
+            this.myChart.setOption(option, true);
         },
         getAirStatusKanban() {
+            // if (this.myChart) {
+            //     this.myChart.clear(); // 在获取新数据并更新图表之前清除之前的图表
+            // }
             this.$http({
                 url: this.$http.adornUrl('/extProject/getAirStatusKanban'),
                 method: 'post',
@@ -570,6 +645,8 @@ export default {
                     this.airconStatuses = response.data.data.airconStatuses;
                     this.thKvRecordTasks = response.data.data.thKvRecordTasks;
                     this.thRecords = response.data.data.thRecords;
+                    this.thRecords2 = response.data.data.thRecords2;
+                    this.thRecords3 = response.data.data.thRecords3;
                     this.xdate = response.data.data.xdate;
                     this.initChart(); // 更新图表数据
                 } else {
