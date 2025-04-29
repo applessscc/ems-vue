@@ -3,48 +3,48 @@
 
         <div class="header">
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
-    <el-form-item label="Date" style="margin-right: 20px;">
-        <el-date-picker v-model="formInline.createTime" type="date" placeholder="Select date"
-            value-format="yyyy-MM-dd" style="width: 150px">
-        </el-date-picker>
-    </el-form-item>
+                <el-form-item label="Date" style="margin-right: 20px;">
+                    <el-date-picker v-model="formInline.createTime" type="date" placeholder="Select date"
+                        value-format="yyyy-MM-dd" style="width: 150px">
+                    </el-date-picker>
+                </el-form-item>
 
-    <el-form-item label="flowData" style="margin-right: 20px;">
-        <el-switch v-model="formInline.flowSwitch" active-color="#13ce66" inactive-color="#ff4949">
-        </el-switch>
-    </el-form-item>
+                <el-form-item label="flowData" style="margin-right: 20px;">
+                    <el-switch v-model="formInline.flowSwitch" active-color="#13ce66" inactive-color="#ff4949">
+                    </el-switch>
+                </el-form-item>
 
-    <el-form-item label="Device" style="margin-right: 20px;">
-        <el-select v-model="formInline.appId" placeholder="Select device" style="width: 150px" clearable>
-            <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
-                :value="airDevice.appId">
-            </el-option>
-        </el-select>
-    </el-form-item>
+                <el-form-item label="Device" style="margin-right: 20px;">
+                    <el-select v-model="formInline.appId" placeholder="Select device" style="width: 150px" clearable>
+                        <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
+                            :value="airDevice.appId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
 
-    <el-form-item label="AirCondition" style="margin-right: 20px;">
-        <el-select v-model="formInline.id" placeholder="Select device" style="width: 150px" clearable>
-            <el-option v-for="air in airCondition" :key="air.id" :label="air.id" :value="air.id">
-            </el-option>
-        </el-select>
-    </el-form-item>
+                <el-form-item label="AirCondition" style="margin-right: 20px;">
+                    <el-select v-model="formInline.id" placeholder="Select device" style="width: 150px" clearable>
+                        <el-option v-for="air in airCondition" :key="air.id" :label="air.id" :value="air.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
 
-    <el-form-item label="group" style="margin-right: 20px;">
-        <el-select v-model="formInline.groupId" placeholder="select group" style="width: 150px" clearable>
-            <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
-                :value="groupId.groupId">
-            </el-option>
-        </el-select>
-    </el-form-item>
+                <el-form-item label="group" style="margin-right: 20px;">
+                    <el-select v-model="formInline.groupId" placeholder="select group" style="width: 150px" clearable>
+                        <el-option v-for="groupId in groupIds" :key="groupId.groupId" :label="groupId.groupName"
+                            :value="groupId.groupId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
 
-    <el-form-item label="sensor" style="margin-right: 20px;">
-        <el-select v-model="formInline.iotThRecordId" placeholder="select sensor" clearable filterable
-            style="width: 170px">
-            <el-option v-for="device in devices" :key="device.id" :label="device.id" :value="device.id">
-            </el-option>
-        </el-select>
-    </el-form-item>
-</el-form>
+                <el-form-item label="sensor" style="margin-right: 20px;">
+                    <el-select v-model="formInline.iotThRecordId" placeholder="select sensor" clearable filterable
+                        style="width: 170px">
+                        <el-option v-for="device in devices" :key="device.id" :label="device.id" :value="device.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
 
         </div>
 
@@ -81,7 +81,7 @@ export default {
         "formInline.flowSwitch"(n, o) {
             this.getAirStatusKanban();
         },
-        
+
         '$route.query.groupId': function (n, o) {
             this.formInline.groupId = n;
             this.getAirStatusKanban();
@@ -280,7 +280,12 @@ export default {
             });
             var option = {
                 legend: {
-                    color: ['#FFF1A1', '#FFDA4D', '#FFB11A', '#FF8C00']
+                    data: ['temperature', 'airConStatus', 'flowTotal', 'airStatus', 'groupTemperature', 'sensorTemperature'],
+                    textStyle: {
+                        color: '#333',
+                        fontSize: 14,
+                        fontFamily: 'Arial, sans-serif',
+                    },
                 },
 
                 title: {
@@ -398,19 +403,22 @@ export default {
                         position: 'left',
                         data: ['off', 'on'],
                         gridIndex: 0,
-                        offset: 60
+                        offset: 65
                     },
 
                     // y轴（人流量）
                     {
                         type: 'value',
-                        name: 'total',
+                        name: 'flowTotal',
                         position: 'reight',
                         gridIndex: 0,
                         offset: 0,
                         axisLabel: {
-                            formatter: '{value} people'
+                            formatter: '{value}'
                         },
+                        nameTextStyle: {
+                            fontSize: 12
+                        }
                     },
 
                     // y轴（空调状态）
@@ -420,7 +428,7 @@ export default {
                         position: 'left',
                         data: ['0', '', '1'],
                         gridIndex: 0,
-                        offset: 125
+                        offset: 140
                     },
 
                 ],
@@ -434,50 +442,48 @@ export default {
                         name: 'temperature',
                         data: temperatures,
                         type: 'line',
-                        smooth: true,
+                        smooth: false,
                         yAxisIndex: 0,
                         lineStyle: {
-                            color: '#007bff',
+                            color: '#1E90FF',  // 深蓝色
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#007bff'
+                            color: '#1E90FF'
                         },
-                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                        connectNulls: true
                     },
                     {
-                        name: 'status',
+                        name: 'airConStatus',
                         data: statusList,
                         type: 'line',
                         smooth: false,
                         yAxisIndex: 1,
                         lineStyle: {
-                            color: '#28a745',
+                            color: '#32CD32',  // 石灰绿
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#28a745',
-
+                            color: '#32CD32',
                         },
-                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                        connectNulls: true
                     },
                     {
                         name: 'flowTotal',
                         data: curentTotal,
                         type: 'line',
-                        smooth: false,
+                        smooth: true,
                         yAxisIndex: 2,
                         lineStyle: {
-                            color: '#ffc107',
+                            color: '#FFD700',  // 金黄色
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#ffc107'
+                            color: '#FFD700'
                         },
                         xAxisIndex: 0,
-                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                        connectNulls: true
                     },
-
                     {
                         name: 'airStatus',
                         data: airStatusList,
@@ -486,47 +492,46 @@ export default {
                         yAxisIndex: 3,
                         xAxisIndex: 0,
                         lineStyle: {
-                            color: '#dc3545',
+                            color: '#FF6347',  // 番茄红
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#dc3545',
+                            color: '#FF6347',
                         },
                         connectNulls: true
                     },
-
                     {
                         name: 'groupTemperature',
                         data: thKvRecordTasks,
                         type: 'line',
-                        smooth: true,
+                        smooth: false,
                         yAxisIndex: 0,
                         lineStyle: {
-                            color: '#fd7e14',
+                            color: '#FF4500',  // 橙红色
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#fd7e14'
+                            color: '#FF4500'
                         },
-                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
+                        connectNulls: true
                     },
                     {
                         name: 'sensorTemperature',
                         data: thRecords,
                         type: 'line',
-                        smooth: true,
+                        smooth: false,
                         yAxisIndex: 0,
                         lineStyle: {
-                            color: '#00bfff',
+                            color: '#00CED1',  // 深天蓝
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#00bfff',
+                            color: '#00CED1',
                         },
-                        connectNulls: true  // 设置为 true 以确保跳过 null 值并连线
-                    },
+                        connectNulls: true
+                    }
+                ]
 
-                ],
             };
 
             myChart.setOption(option);
@@ -566,7 +571,7 @@ export default {
 <style scoped>
 #container {
     width: 100%;
-    height: 700px;
+    height: 500px;
 }
 
 .header {
