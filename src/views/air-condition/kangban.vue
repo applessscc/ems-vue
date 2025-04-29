@@ -344,21 +344,36 @@ export default {
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif; color: #007bff;">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', sans-serif; color: #28a745;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Control Font', monospace; color: #dc3545;">控制状态:</span> ${data.status !== null ? data.status : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', cursive; color: #ffc107;">模式:</span> ${data.mode !== null ? data.mode : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Operation Font', fantasy; color: #6c757d;">操作:</span> ${data.handle !== null ? data.handle : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif; color: #1E90FF">appID:</span> ${data.appId !== null ? data.appId : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif; color: #1E90FF">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif; color: #1E90FF;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', serif; color: #1E90FF;">模式:</span> ${data.mode !== null ? data.mode : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Operation Font', serif; color: #1E90FF;">操作:</span> ${data.handle !== null ? data.handle : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Control Font', serif; color: #32CD32">控制状态:</span> ${data.status !== null ? data.status : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'flowTotal') {
                                 const data = this.vmsEntityList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Flow Font', sans-serif; color: #17a2b8;">人流量:</span> ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Flow Font', sans-serif; color: #FFD700;">人流量:</span> ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'airStatus') {
                                 const data = this.airconStatuses.find(aItem => this.formatTime(aItem.time) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #fd7e14;">空调实时开关状态:</span> ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #9C27B0;">空调实时开关状态:</span> ${data.status !== null ? data.status : ''} <br>`;
+                                }
+                            } else if (item.seriesName === 'groupTemperature') {
+                                const data = this.thKvRecordTasks.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
+                                if (data) {
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区名称:</span> ${data.groupName !== null ? data.groupName : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区温度:</span> ${data.temp !== null ? data.temp + ' °C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                }
+                            } else if (item.seriesName === 'sensorTemperature') {
+                                const data = this.thRecords.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
+                                if (data) {
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #00CED1;">设备ID:</span> ${data.id !== null ? data.id : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #00CED1;">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #00CED1;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
                                 }
                             }
                         });
@@ -492,11 +507,11 @@ export default {
                         yAxisIndex: 3,
                         xAxisIndex: 0,
                         lineStyle: {
-                            color: '#FF6347',  // 番茄红
+                            color: '#9C27B0',  // 番茄红
                             type: 'solid'
                         },
                         itemStyle: {
-                            color: '#FF6347',
+                            color: '#9C27B0',
                         },
                         connectNulls: true
                     },

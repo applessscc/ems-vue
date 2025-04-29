@@ -46,6 +46,8 @@
               :value="groupId.groupId">
             </el-option>
           </el-select>
+          <el-button @click="openNewWindow()" :disabled="!groupId"><i class="el-icon-date"></i> 温区看板</el-button>
+
         </el-form-item>
 
         <el-form-item label="sbu">
@@ -364,7 +366,7 @@ export default {
   },
   methods: {
     openNewWindow() {
-      const url = this.$router.resolve({ name: 'air-condition' , query: { groupId: this.groupId }}).href;
+      const url = this.$router.resolve({ name: 'air-condition' , query: { groupId: this.groupId ,onlyGroup:true}}).href;
       window.open(url, '_blank');  // 在新窗口打开链接
     },
     send() {
@@ -854,9 +856,8 @@ export default {
               "温区：" + element.groupName + "<br>" + 
               "设备：" + element.eqid+"<br>" + 
               "最后一次上线时间：" + element.lastTime
-
               ,
-              duration: 0,
+              duration: 15000,
               onClose: () => {
                 this.offlineDevice = this.offlineDevice.filter(device => device.eqid !== element.eqid);
               }
