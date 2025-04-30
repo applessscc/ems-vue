@@ -446,14 +446,13 @@ export default {
 
 
 
-
             // y轴（温区传感器温度）
             const groupedById = _.groupBy(this.thRecords3, 'id');
             Object.entries(groupedById).forEach(([id, records]) => {
                 console.log('records', records);
                 const thRecords = allTimes.map(time => {
                     const data = records.find(item => this.formatTime(item.createTime) === time);
-                    return data ? data.h : null;
+                    return data ? data.t : null;
                 });
 
                 if (records.length > 0) {
@@ -493,53 +492,91 @@ export default {
                 },
 
                 // 悬浮提示框
+
+
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
                         type: 'shadow'
                     },
+                    position: function (point, params, dom, rect, size) {
+                        // point 是鼠标当前的位置 [x, y]
+                        // 可以通过调整 y 值来让 tooltip 出现在鼠标下方
+                        return [point[0], point[1] + 10]; // 向下偏移 10px
+                    },
                     formatter: function (params) {
+                        function getColorDot(color) {
+                            return `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${color};"></span>`;
+                        }
+
                         let tooltipContent = `<span style="font-family: 'Your Fancy Time Font', sans-serif; color: #333; font-weight: bold;">时间:</span> ${this.xdate[params[0].dataIndex]} <br>`;
+
                         params.forEach(item => {
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif; color: #1E90FF">appID:</span> ${data.appId !== null ? data.appId : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif; color: #1E90FF">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif; color: #1E90FF;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', serif; color: #1E90FF;">模式:</span> ${data.mode !== null ? data.mode : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Operation Font', serif; color: #1E90FF;">操作:</span> ${data.handle !== null ? data.handle : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Control Font', serif; color: #32CD32">控制状态:</span> ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;  font-weight: bold;>appID:</span> ${data.appId} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;>温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif;>湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', serif;">模式:</span> ${data.mode} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Operation Font', serif;">操作:</span> ${data.handle} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Control Font', serif; ">控制状态:</span> ${data.status} <br>`;
                                 }
                             } else if (item.seriesName === 'flowTotal') {
                                 const data = this.vmsEntityList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Flow Font', sans-serif; color: #FFD700;">人流量:</span> ${data.currentTotal !== null ? data.currentTotal : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Flow Font', sans-serif;  font-weight: bold;">人流量:</span> ${data.currentTotal} <br>`;
                                 }
                             } else if (item.seriesName === 'airStatus') {
                                 const data = this.airconStatuses.find(aItem => this.formatTime(aItem.time) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #9C27B0;">空调实时开关状态:</span> ${data.status !== null ? data.status : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;  font-weight: bold;">空调实时开关状态:</span> ${data.status} <br>`;
                                 }
                             } else if (item.seriesName === 'groupTemperature') {
                                 const data = this.thKvRecordTasks.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区名称:</span> ${data.groupName !== null ? data.groupName : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区温度:</span> ${data.temp !== null ? data.temp + '°C' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;  font-weight: bold;">温区名称:</span> ${data.groupName} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;">温区温度:</span> ${data.temp !== null ? data.temp + '°C' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">温区湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'groupTemperature2') {
                                 const data = this.thRecords2.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">温区温度2:</span> ${data.t !== null ? data.t + '°C' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #FF4500;">气象温度:</span> ${data.h !== null ? data.h + '°C' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;">温区温度2:</span> ${data.t !== null ? data.t + '°C' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;">气象温度:</span> ${data.h !== null ? data.h + '°C' : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'sensorTemperature') {
                                 const data = this.thRecords.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #00CED1;">设备ID:</span> ${data.id !== null ? data.id : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #00CED1;">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; color: #00CED1;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;  font-weight: bold;">设备ID:</span> ${data.id} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                }
+                            } else {
+                                const data = this.thRecords3.find(aItem => this.formatTime(aItem.createTime) === item.axisValue && aItem.id === item.seriesName);
+                                if (data) {
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Sensor Font', sans-serif;  font-weight: bold;">传感器ID:</span> ${data.id} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Sensor Font', sans-serif; ">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    tooltipContent += getColorDot(item.color);
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Sensor Font', sans-serif;">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
                                 }
                             }
                         });
@@ -547,6 +584,7 @@ export default {
                         return tooltipContent;
                     }.bind(this),
                 },
+
                 xAxis: {
                     type: 'category',
                     data: allTimes,
@@ -622,6 +660,9 @@ export default {
             };
 
             this.myChart.setOption(option, true);
+        },
+        getColorDot(color) {
+            return `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${color};"></span>`;
         },
         getAirStatusKanban() {
             // if (this.myChart) {
