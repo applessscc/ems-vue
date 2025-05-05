@@ -352,8 +352,6 @@ export default {
     //查询最近变压器数据（功耗和温度）
     queryTransformerNowByDict() {
 
-      console.log("Mounted, pieBottomChart:", this.$refs.pieBottomChart);
-      console.log("Mounted, pieTopChart:", this.$refs.pieTopChart.refreshChart());
 
       const requestData = {
         bu_name: this.form.bu_name,  // 从 form 中获取 bu_name 数组
