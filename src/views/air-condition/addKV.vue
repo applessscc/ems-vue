@@ -46,7 +46,8 @@
               :value="groupId.groupId">
             </el-option>
           </el-select>
-          <el-button @click="openNewWindow()" :disabled="!groupId"><i class="el-icon-date"></i> 温区看板</el-button>
+          <el-button @click="openNewWindow('air-condition')" :disabled="!groupId"><i class="el-icon-date"></i>
+            温区看板</el-button>
 
         </el-form-item>
 
@@ -89,8 +90,8 @@
         <el-table-column prop="sbu" label="sbu" width="100px" align="center"></el-table-column>
         <el-table-column prop="eqid" label="设备ID" width="240px" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
-            <a :href="'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + scope.row.eqid" target="_blank"
-              :style="{
+            <a :href="'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + scope.row.eqid"
+              target="_blank" :style="{
                 color: scope.row.isOnline === 'true' ? '#409EFF' : '#F56C6C',
                 textDecoration: 'none'
               }" @mouseover="e => e.target.style.textDecoration = 'underline'"
@@ -154,7 +155,7 @@
           </el-col>
           <el-col :span="6">
             <el-form-item label="气象温度" v-if="tableData.length != 0">
-              <el-tag type="success" @click.stop="openNewWindow()">{{ form.extT }}C°</el-tag>
+              <el-tag type="success" @click.stop="openNewWindow('airtemp')">{{ form.extT }}C°</el-tag>
             </el-form-item>
           </el-col>
         </el-row>
@@ -371,10 +372,26 @@ export default {
     }, 20000);
   },
   methods: {
-    openNewWindow() {
-      const url = this.$router.resolve({ name: 'air-condition' , query: { groupId: this.groupId ,onlyGroup:true,groupName:this.form.groupName}}).href;
-      window.open(url, '_blank');  // 在新窗口打开链接
+    openNewWindow(type) {
+      let url = ''; // 用 let，表示这个变量之后可能会重新赋值
+      if (type == 'air-condition') {
+        url = this.$router.resolve({
+          name: 'air-condition',
+          query: {
+            groupId: this.groupId,
+            onlyGroup: true,
+            groupName: this.form.groupName
+          }
+        }).href;
+      } else if (type == 'airtemp') {
+        url = 'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + 'airtemp';
+      }else{
+        url = 'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + this.form.groupName;
+
+      }
+      window.open(url, '_blank'); // 在新窗口打开链接
     },
+
     send() {
       const params = {
         sysUrl: 'http://10.97.245.114/XX/login.html', // 系统入口链接, 可不传
@@ -859,10 +876,10 @@ export default {
             this.$notify.error({
               dangerouslyUseHTMLString: true,  // 允许解析 HTML 字符串
               title: '设备离线通知',
-              message: 
-              "温区：" + element.groupName + "<br>" + 
-              "设备：" + element.eqid+"<br>" + 
-              "最后一次上线时间：" + element.lastTime
+              message:
+                "温区：" + element.groupName + "<br>" +
+                "设备：" + element.eqid + "<br>" +
+                "最后一次上线时间：" + element.lastTime
               ,
               duration: 15000,
               onClose: () => {

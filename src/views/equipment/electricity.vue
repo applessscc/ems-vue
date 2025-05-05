@@ -6,24 +6,29 @@
           <el-switch v-model="pageTimerSwitch" active-text="实时数据" @change="pageTimerSwitchChange($event)" />
         </div>
         <div>
-          <el-select v-model="form.bu_name" placeholder="请选择BU" @change="selectChange()" :clearable="true" multiple collapse-tags>
+          <el-select v-model="form.bu_name" placeholder="请选择BU" @change="selectChange()" :clearable="true" multiple
+            collapse-tags>
             <el-option v-for="op in buNameOptions" :key="op.item" :label="op.value" :value="op.item" />
           </el-select>
         </div>
         <div>
-          <el-select v-model="form.position_name" placeholder="请选择位置" @change="selectChange()" :clearable="true" multiple collapse-tags>
+          <el-select v-model="form.position_name" placeholder="请选择位置" @change="selectChange()" :clearable="true"
+            multiple collapse-tags>
             <el-option v-for="op in positionNameOptions" :key="op.item" :label="op.value" :value="op.value" />
           </el-select>
         </div>
         <div class="mh-middle">CMS 能耗看板</div>
         <div>
-          <el-select v-model="form.counter_type" placeholder="请选择类型" @change="selectChange()" :clearable="true" multiple collapse-tags>
+          <el-select v-model="form.counter_type" placeholder="请选择类型" @change="selectChange()" :clearable="true" multiple
+            collapse-tags>
             <el-option v-for="op in counterTypeOptions" :key="op.item" :label="op.value" :value="op.item" />
           </el-select>
         </div>
         <div>
-          <el-select v-model="form.counter_id" style="width:250px" @change="selectChange()" @focus="queryCounterSelect()" :clearable="true" placeholder="请选择电表" multiple collapse-tags filterable>
-            <el-option v-for="op in counterIdOptions" :key="op.counterId" :label="op.counterName" :value="op.counterId" />
+          <el-select v-model="form.counter_id" style="width:250px" @change="selectChange()"
+            @focus="queryCounterSelect()" :clearable="true" placeholder="请选择电表" multiple collapse-tags filterable>
+            <el-option v-for="op in counterIdOptions" :key="op.counterId" :label="op.counterName"
+              :value="op.counterId" />
           </el-select>
         </div>
         <div class="mh-right">
@@ -45,7 +50,7 @@
             </div>
           </dv-border-box-10>
 
-          <dv-border-box-10 class="top-right-container" v-if="showTransformer">
+          <dv-border-box-10 class="top-right-container" v-show="showTransformer">
             <el-row :gutter="10" style="height:50%;">
               <el-col :span="15" style="height:100%;">
                 <!-- <dv-water-level-pond :config="{data: [66],waveHeight:0}" style="width:60%;height:60%" /> -->
@@ -57,15 +62,18 @@
                 <!-- <dv-percent-pond :config="{value: 66, colors: ['#ffab91', '#fb7293'], formatter:'{value} °C'}" style="margin-top:25%;width:100%;height:50%;" /> -->
                 <!-- <wendu-bar ref="wenduBarTop" /> -->
                 <!-- <pie-chart :data="pieTopData"/> -->
-                <wendu-text :load="loadValueTop" :loadRate="loadRateValueTop" :wendu="wenduValueTop" :shidu="shiduValueTop" />
+                <wendu-text :load="loadValueTop" :loadRate="loadRateValueTop" :wendu="wenduValueTop"
+                  :shidu="shiduValueTop" />
               </el-col>
             </el-row>
             <el-row :gutter="10" style="height:50%;">
               <el-col :span="15" style="height:100%;">
-                <pie-chart :title="pieBottomTitle" :form="form" :data="pieBottomData" radius="68%" ref="pieBottomChart" />
+                <pie-chart :title="pieBottomTitle" :form="form" :data="pieBottomData" radius="68%"
+                  ref="pieBottomChart" />
               </el-col>
               <el-col :span="9" style="height:100%;">
-                <wendu-text :load="loadValueBottom" :loadRate="loadRateValueBottom" :wendu="wenduValueBottom" :shidu="shiduValueBottom" />
+                <wendu-text :load="loadValueBottom" :loadRate="loadRateValueBottom" :wendu="wenduValueBottom"
+                  :shidu="shiduValueBottom" />
                 <!-- <wendu-bar ref="wenduBarBottom" /> -->
                 <!-- <pie-chart :data="pieTopData"/> -->
               </el-col>
@@ -345,6 +353,7 @@ export default {
     queryTransformerNowByDict() {
 
       console.log("Mounted, pieBottomChart:", this.$refs.pieBottomChart);
+      console.log("Mounted, pieTopChart:", this.$refs.pieTopChart.refreshChart());
 
       const requestData = {
         bu_name: this.form.bu_name,  // 从 form 中获取 bu_name 数组
@@ -532,6 +541,7 @@ export default {
     .top-left-container {
       width: 73%;
     }
+
     .top-right-container {
       width: 27%;
       margin-left: 10px;
@@ -564,6 +574,7 @@ export default {
     .bottom-left-container {
       width: 50%;
     }
+
     .bottom-right-container {
       width: 50%;
       margin-left: 10px;
