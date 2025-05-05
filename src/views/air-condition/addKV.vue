@@ -152,6 +152,11 @@
               <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageHumidity() }}%</el-tag>
             </el-form-item>
           </el-col>
+          <el-col :span="6">
+            <el-form-item label="气象温度" v-if="tableData.length != 0">
+              <el-tag type="success" @click.stop="openNewWindow()">{{ form.extT }}C°</el-tag>
+            </el-form-item>
+          </el-col>
         </el-row>
 
         <el-row>
@@ -316,6 +321,7 @@ export default {
         aEndTime: '',
         eStartTime: '',
         eEndTime: '',
+        extT: '',
         coefficientT: '',
         appGroup: {
           appId: ''
@@ -366,7 +372,7 @@ export default {
   },
   methods: {
     openNewWindow() {
-      const url = this.$router.resolve({ name: 'air-condition' , query: { groupId: this.groupId ,onlyGroup:true}}).href;
+      const url = this.$router.resolve({ name: 'air-condition' , query: { groupId: this.groupId ,onlyGroup:true,groupName:this.form.groupName}}).href;
       window.open(url, '_blank');  // 在新窗口打开链接
     },
     send() {
@@ -802,6 +808,7 @@ export default {
         this.form.eStartTime = data[0].eStartTime;
         this.form.eEndTime = data[0].eEndTime;
         this.form.appGroup = data[0].appGroup;
+        this.form.extT = data[0].extT
       }).catch((error) => {
         console.log('Error:', error);
       });

@@ -85,7 +85,12 @@ export default {
         '$route.query.groupId': function (n, o) {
             this.formInline.groupId = n;
             this.getAirStatusKanban();
+        },
+        '$route.query.groupName': function (n, o) {
+            this.formInline.id = n;
+            this.getAirStatusKanban();
         }
+
     },
 
     data() {
@@ -96,7 +101,7 @@ export default {
             airCondition: [],
             formInline: {
                 appId: '',
-                id: '',
+                id: this.$route.query.groupName,
                 groupId: this.$route.query.groupId,
                 iotThRecordId: '',
                 flowSwitch: true,
@@ -207,9 +212,6 @@ export default {
                         id: item.id,
                     }));
                 }
-                if (this.airCondition.length > 0) {
-                    this.formInline.id = this.airCondition[0].id;
-                }
             }).catch((error) => {
                 console.log('error', error);
             });
@@ -229,6 +231,7 @@ export default {
 
 
             const series = [];
+
             const legendData = [];
             // x轴
             const allTimes = this.xdate.map(item => this.formatTime(item));
