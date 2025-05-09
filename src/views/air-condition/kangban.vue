@@ -515,15 +515,14 @@ export default {
                         let tooltipContent = `<span style="font-family: 'Your Fancy Time Font', sans-serif; color: #333; font-weight: bold;">时间:</span> ${this.xdate[params[0].dataIndex]} <br>`;
 
                         params.forEach(item => {
+                            console.log('item', item);
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
                                     tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;  font-weight: bold;>appID:</span> ${data.appId} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;">温度:</span> ${ data.t + ' °C' } <br>`;
                                     tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;>温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
-                                    tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif;>湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif;">湿度:</span> ${ data.h + '%' } <br>`;
                                     tooltipContent += getColorDot(item.color);
                                     tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', serif;">模式:</span> ${data.mode} <br>`;
                                     tooltipContent += getColorDot(item.color);
