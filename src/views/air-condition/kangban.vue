@@ -151,6 +151,9 @@ export default {
                         id: item.id,
                         sbu: item.sbu,
                     }));
+                    console.log('devices', this.devices);
+                    const defaultDevice = this.devices.find(device => device.id === 'airtemp')
+                    this.formInline.iotThRecordId = defaultDevice ? defaultDevice.id : '';
                 }
             }).catch((error) => {
                 console.log('error', error);
@@ -452,7 +455,6 @@ export default {
             // y轴（温区传感器温度）
             const groupedById = _.groupBy(this.thRecords3, 'id');
             Object.entries(groupedById).forEach(([id, records]) => {
-                console.log('records', records);
                 const thRecords = allTimes.map(time => {
                     const data = records.find(item => this.formatTime(item.createTime) === time);
                     return data ? data.t : null;
@@ -515,14 +517,13 @@ export default {
                         let tooltipContent = `<span style="font-family: 'Your Fancy Time Font', sans-serif; color: #333; font-weight: bold;">时间:</span> ${this.xdate[params[0].dataIndex]} <br>`;
 
                         params.forEach(item => {
-                            console.log('item', item);
                             if (item.seriesName === 'temperature') {
                                 const data = this.airStatusLogList.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);
                                 if (data) {
                                     tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;">温度:</span> ${ data.t + ' °C' } <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Temperature Font', serif;">温度:</span> ${data.t + ' °C'} <br>`;
                                     tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif;">湿度:</span> ${ data.h + '%' } <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Humidity Font', serif;">湿度:</span> ${data.h + '%'} <br>`;
                                     tooltipContent += getColorDot(item.color);
                                     tooltipContent += `<span style="font-family: 'Your Fancy Mode Font', serif;">模式:</span> ${data.mode} <br>`;
                                     tooltipContent += getColorDot(item.color);
