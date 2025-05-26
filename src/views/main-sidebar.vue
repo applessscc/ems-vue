@@ -42,7 +42,17 @@
 
         </el-submenu>
 
-        <el-submenu index="任务管理">
+        <el-submenu index="炒饭机任务">
+          <template slot="title">
+            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
+            <span>炒菜机任务</span>
+          </template>          <el-menu-item index="demo-echarts" @click="openNew('cookerJob/cookerJob-b8')">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            炒菜机-b8
+          </el-menu-item>
+        </el-submenu>
+
+        <!-- <el-submenu index="任务管理">
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
             <span>任务管理</span>
@@ -50,13 +60,13 @@
           <el-menu-item index="stop" @click="$router.push({ name: 'repair-index' })">
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">任务</span>
-          </el-menu-item>
+          </el-menu-item> -->
 
-          <!-- <el-menu-item index="stop" @click="$router.push({ name: 'cookerJob' })">
+        <!-- <el-menu-item index="stop" @click="$router.push({ name: 'cookerJob' })">
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">炒饭机任务</span>
           </el-menu-item> -->
-
+        <!-- 
           <el-menu-item index="demo-echarts" @click="openNew('cookerJob/cookerJob-b8')">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">炒饭机任务-b8</span>
@@ -80,13 +90,13 @@
           <el-menu-item index="demo-echarts" @click="openNew('extProject/jipSerchPage')">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">夹具追溯查询</span>
-          </el-menu-item>
-          <!-- <el-menu-item index="stop" @click="$router.push({ name: 'sendEmail' })">
+          </el-menu-item> -->
+        <!-- <el-menu-item index="stop" @click="$router.push({ name: 'sendEmail' })">
             <icon-svg name="editor" class="site-sidebar__menu-icon"></icon-svg>
             <span slot="title">邮箱</span>
           </el-menu-item>
          -->
-        </el-submenu>
+        <!-- </el-submenu> -->
 
         <sub-menu v-for="menu in menuList" :key="menu.menuId" :menu="menu" :dynamicMenuRoutes="dynamicMenuRoutes">
         </sub-menu>
