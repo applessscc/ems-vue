@@ -27,6 +27,7 @@
     "gulp-load-plugins": "2.0.5",
     "gulp-replace": "1.0.0",
     "gulp-shell": "0.8.0",
+    "hls.js": "^1.6.2",
     "jquery": "^3.7.1",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
