@@ -46,9 +46,18 @@
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
             <span>炒菜机任务</span>
-          </template>          <el-menu-item index="demo-echarts" @click="openNew('cookerJob/cookerJob-b8')">
+          </template> <el-menu-item index="demo-echarts" @click="openNew('cookerJob/cookerJob-b8')">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             炒菜机-b8
+          </el-menu-item>
+        </el-submenu>
+        <el-submenu index="视频">
+          <template slot="title">
+            <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
+            <span>视频</span>
+          </template> <el-menu-item index="demo-echarts" @click="openNew('modules/extProject/video')">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            video
           </el-menu-item>
         </el-submenu>
 

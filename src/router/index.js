@@ -38,7 +38,9 @@ const globalRoutes = [
   { path: '/kanban/machine-state', component: _import('kanban/machine-state'), name: 'machine-state', meta: { title: 'CMS 设备看板' } },
   { path: '/kanban/machine-state-item', component: _import('kanban/machine-state-item'), name: 'machine-state-item', meta: { title: 'SN 查询' } },
   { path: '/kanban/machine-state-rep', component: _import('kanban/machine-state-rep'), name: 'machine-state-rep', meta: { title: '测试报表 查询' } },
+  { path: '/modules/extProject/video', component: _import('modules/extProject/video'), name: 'video', meta: { title: 'video' } },
   { path: '/demo/test', component: _import('demo/test'), name: 'test', meta: { title: '看板测试' } }
+
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
