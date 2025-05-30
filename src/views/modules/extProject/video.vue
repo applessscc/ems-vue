@@ -10,20 +10,54 @@
         <video ref="thermalPlayer" autoplay muted playsinline></video>
       </div>
     </div>
+
     <div class="button-group">
-      <el-button type="success" plain @click="startCamera" v-if="startCameraStatus">连接摄像头</el-button>
-      <el-button type="danger" plain @click="stopCamera" v-if="stopCameraStatus">断开摄像头连接</el-button>
+      <div v-if="startCameraStatus" class="form-wrapper">
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-form-item label="name" style="width: 250px;">
+            <el-select v-model="videoInfo" placeholder="请选择摄像头名称" :clearable="true">
+              <el-option v-for="item in videoInfoList" :key="item.name" :label="item.name" :value="item">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="ip" style="width: 250px;">
+            <el-input v-model="form.ip" placeholder="请输入摄像头IP地址"></el-input>
+          </el-form-item>
+          <el-form-item label="password" style="width: 250px;">
+            <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
+          </el-form-item>
+          <el-form-item style="width: 250px;">
+            <el-button type="success" plain @click="startCamera">连接摄像头</el-button>
+          </el-form-item>
+        </el-form>
+
+      </div>
+
+      <div v-if="stopCameraStatus" class="form-wrapper">
+        <el-button type="danger" plain @click="stopCamera">断开摄像头连接</el-button>
+      </div>
+
     </div>
+
   </div>
 </template>
 
 <script>
 import Hls from 'hls.js';
+import { watch } from 'less';
 
 export default {
   name: 'LiveVideo',
   data() {
     return {
+      videoInfo: {},
+      form: {
+        name: '',
+        ip: '',
+        password: ''
+      },
+      videoInfoList: [],
+      searchForm: '',
       startCameraStatus: false,
       stopCameraStatus: false,
       m3u8Url: this.$http.adornUrl(`/videos/stream.m3u8`),
@@ -39,16 +73,29 @@ export default {
     }
   },
   mounted() {
-
+    this.fetchVideoInfo();
     this.getActiveStreams();  // 先调用一次
     this.intervalId = setInterval(() => {
       this.getActiveStreams();
-    }, 10000);  // 10秒
+      this.fetchVideoInfo();
+
+    }, 15000);  // 10秒
     this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
     this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
   },
+
+  watch: {
+    videoInfo(newVal) {
+      this.form.ip = newVal.ip || '';
+      this.form.password = newVal.password || '';
+      this.form.name = newVal.name || '';
+    }
+  },
+
   methods: {
+
     initPlayer(videoElement, url) {
+
       if (Hls.isSupported()) {
         const hls = new Hls({
           startPosition: -1,        // 默认直播行为，从最新位置开始播放
@@ -73,14 +120,27 @@ export default {
     startCamera() {
       this.$http({
         url: this.$http.adornUrl(`/extProject/startVideo`),
-        method: 'get'
-      }).then(() => {
-        this.$message({
-          message: '摄像头已连接',
-          type: 'success',
-          duration: 800
-        });
+        method: 'get',
+        params: {
+          ip: this.form.ip,
+          password: this.form.password,
+        }
+      }).then((response) => {
+        if (response.data.code === 200) {
+          this.$message({
+            message: '摄像头已连接',
+            type: 'success',
+            duration: 800
+          });
+        } else {
+          this.$message({
+            message: '摄像头连接失败！',
+            type: 'error',
+            duration: 1000
+          });
+        }
         this.getActiveStreams();
+
       }).catch(() => {
         this.$message({
           message: '连接摄像头失败',
@@ -130,7 +190,25 @@ export default {
       }).catch((error) => {
         console.error('getActiveStreams', error);
       });
-    }
+    },
+
+    fetchVideoInfo() {
+      this.$http({
+        url: this.$http.adornUrl('/extProject/getVideoInfoList'),
+        method: 'get',
+        params: {
+          searchForm: this.searchForm
+        }
+      }).then((response) => {
+        if (response.data.code === 200) {
+          this.videoInfoList = response.data.data;
+        } else {
+          this.$message.error(response.data.msg);
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
+    },
 
   }
 };
@@ -140,7 +218,7 @@ export default {
 .button-group {
   text-align: center;
   margin: 30px 0;
-  margin-top: 90px;
+  margin-top: 50px;
 }
 
 .button-group .el-button:first-child {
@@ -168,5 +246,10 @@ video {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.form-wrapper {
+  display: flex;
+  justify-content: center;
 }
 </style>
