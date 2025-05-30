@@ -10,7 +10,7 @@
         <video ref="thermalPlayer" autoplay muted playsinline></video>
       </div>
     </div>
-        <div class="button-group">
+    <div class="button-group">
       <el-button type="success" plain @click="startCamera" v-if="startCameraStatus">连接摄像头</el-button>
       <el-button type="danger" plain @click="stopCamera" v-if="stopCameraStatus">断开摄像头连接</el-button>
     </div>
@@ -55,7 +55,7 @@ export default {
           lowLatencyMode: true,    // 低延迟模式（可选）
           liveSyncDuration: 3,     // 与直播点的同步延迟（单位：秒，可选）
           maxLiveSyncPlaybackRate: 1.5, // 当直播滞后时，加速追赶（可选）
-        }); 
+        });
         hls.loadSource(url);
         hls.attachMedia(videoElement);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {

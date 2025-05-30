@@ -102,13 +102,13 @@
         </el-table-column>
 
         <el-table-column prop="t" label="实时温度" width="100px" align="center"></el-table-column>
-        <!-- <el-table-column label="温度系数" width="100px" align="center">
+        <el-table-column label="温度系数" width="100px" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.coefficient" size="mini" @input="updateTemperature(scope.row)" />
           </template>
-        </el-table-column> -->
+        </el-table-column>
 
-        <el-table-column prop="coefficient" label="温度系数" width="100px" align="center"></el-table-column>
+        <!-- <el-table-column prop="coefficient" label="温度系数" width="100px" align="center"></el-table-column> -->
         <el-table-column label="换算后的温度" width="120px" align="center">
           <template slot-scope="scope">
             {{ scope.row.t ? (scope.row.t * scope.row.coefficient).toFixed(2) : '' }}
@@ -118,13 +118,13 @@
 
         <el-table-column prop="h" label="实时湿度" width="100px" align="center"></el-table-column>
 
-        <!-- <el-table-column label="湿度系数" width="100px" align="center">
+        <el-table-column label="湿度系数" width="100px" align="center">
           <template slot-scope="scope">
             <el-input v-model="scope.row.coefficientH" size="mini" @input="updateHumidity(scope.row)" />
           </template>
-        </el-table-column> -->
+        </el-table-column>
 
-        <el-table-column prop="coefficientH" label="温度系数" width="100px" align="center"></el-table-column>
+        <!-- <el-table-column prop="coefficientH" label="温度系数" width="100px" align="center"></el-table-column> -->
         <el-table-column label="换算后的温度" width="120px" align="center">
           <template slot-scope="scope">
             {{ scope.row.h ? (scope.row.h * scope.row.coefficientH).toFixed(2) : '' }}
@@ -145,13 +145,18 @@
         <el-row>
           <el-col :span="6">
             <el-form-item label="温区实时温度" v-if="tableData.length != 0">
-              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageTemperature() }}C° </el-tag>
+              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageTemperature }}C° </el-tag>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="温区实时湿度" v-if="tableData.length != 0">
-              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageHumidity() }}%</el-tag>
+              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageHumidity }}%</el-tag>
             </el-form-item>
+
+            <el-form-item label="温区实时温度" v-if="tableData.length != 0" v-show="false">
+              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageTemperature }}C°</el-tag>
+            </el-form-item>
+
           </el-col>
           <el-col :span="6">
             <el-form-item label="气象温度" v-if="tableData.length != 0">
@@ -331,6 +336,44 @@ export default {
     };
   },
 
+
+  computed: {
+
+    calculateAverageHumidity() {
+      const totalHumidity = this.tableData.reduce((acc, row) => {
+        // 确保 row.h 是有效的数字字符串
+        if (row.h && !isNaN(Number(row.h))) {
+          acc += Number(row.h * row.coefficientH);  // 将 row.h 转换为数字后累加
+        } else {
+          console.warn("Invalid row.h value:", row.h);  // 输出无效的值
+        }
+        return acc;
+      }, 0);
+      // const count = this.tableData.length;
+      const count = this.tableData.filter(row => row.h && row.h != 0).length;
+      console.info("calculateAverageHumidity", count > 0 ? (totalHumidity / count).toFixed(2) : '')
+      return count > 0 ? (totalHumidity / count).toFixed(2) : '';
+    },
+
+
+    calculateAverageTemperature() {
+      const totalConvertedTemperature = this.tableData.reduce((acc, row) => {
+        if (row.t && !isNaN(Number(row.t))) {
+          acc += Number(row.t * row.coefficient);  // 将 row.h 转换为数字后累加
+        } else {
+          console.warn("Invalid row.h value:", row.t);  // 输出无效的值
+        }
+        return acc;
+      }, 0);
+
+      // const count = this.tableData.length;
+      const count = this.tableData.filter(row => row.t && row.t != 0).length;
+      console.info("calculateAverageTemperature", count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '')
+      return count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '';
+    },
+
+
+  },
   watch: {
 
     "calendarSbu"(n, o) {
@@ -385,7 +428,7 @@ export default {
         }).href;
       } else if (type == 'airtemp') {
         url = 'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + 'airtemp';
-      }else{
+      } else {
         url = 'http://10.97.245.114/sbu2/th-record/TH-dashboard-Report.php?ID=' + this.form.groupName;
 
       }
@@ -594,37 +637,7 @@ export default {
     workCalendar() {
       this.workCalendarDigStatus = true;
     },
-    calculateAverageTemperature() {
-      const totalConvertedTemperature = this.tableData.reduce((acc, row) => {
-        if (row.t && !isNaN(Number(row.t))) {
-          acc += Number(row.t * row.coefficient);  // 将 row.h 转换为数字后累加
-        } else {
-          console.warn("Invalid row.h value:", row.t);  // 输出无效的值
-        }
-        return acc;
-      }, 0);
 
-      // const count = this.tableData.length;
-      const count = this.tableData.filter(row => row.t && row.t != 0).length;
-
-      return count > 0 ? (totalConvertedTemperature / count).toFixed(2) : '';
-    },
-
-    calculateAverageHumidity() {
-      const totalHumidity = this.tableData.reduce((acc, row) => {
-        // 确保 row.h 是有效的数字字符串
-        if (row.h && !isNaN(Number(row.h))) {
-          acc += Number(row.h * row.coefficientH);  // 将 row.h 转换为数字后累加
-        } else {
-          console.warn("Invalid row.h value:", row.h);  // 输出无效的值
-        }
-        return acc;
-      }, 0);
-      // const count = this.tableData.length;
-      const count = this.tableData.filter(row => row.h && row.h != 0).length;
-      return count > 0 ? (totalHumidity / count).toFixed(2) : '';
-    }
-    ,
 
 
     validateNumber(field) {
@@ -658,7 +671,7 @@ export default {
     },
     onSubmitTable() {
       if (this.tableData.length == 0 && this.groupId == '') {
-        this.$message.wa('请添加数据');
+        this.$message.warning('请添加数据');
         return;
       }
       if (this.form.groupName == '') {
@@ -881,7 +894,7 @@ export default {
                 "设备：" + element.eqid + "<br>" +
                 "最后一次上线时间：" + element.lastTime
               ,
-              duration: 15000,
+              duration: 5000,
               onClose: () => {
                 this.offlineDevice = this.offlineDevice.filter(device => device.eqid !== element.eqid);
               }
@@ -901,7 +914,7 @@ export default {
 <style scoped>
 .logo-container {
   text-align: center;
-  margin-top: 50px;
+  margin-top: 30px;
   margin-bottom: 20px;
 }
 
@@ -921,7 +934,7 @@ export default {
 }
 
 .table-container {
-  max-width: 60%;
+  max-width: 70%;
   margin: 20px auto;
 }
 
