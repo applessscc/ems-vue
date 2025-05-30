@@ -1,6 +1,6 @@
 <template>
   <div id="data-view">
-    
+
     <div class="main-header">
 
       <el-form :inline="true" :model="searchForm" class="search-form">
@@ -8,7 +8,8 @@
           <el-switch v-model="pageTimerSwitch" active-color="#13ce66" inactive-color="#cccccc" />
         </el-form-item>
         <el-form-item label="日期">
-          <el-date-picker v-model="searchForm.dateRange" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss">
+          <el-date-picker v-model="searchForm.dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
+            end-placeholder="结束日期" value-format="yyyy-MM-dd HH:mm:ss">
           </el-date-picker>
         </el-form-item>
         <!-- <el-form-item label="所属SUB">
@@ -34,7 +35,7 @@
 
     <!-- 顶部容器 -->
     <div class="echart-div">
-        <div ref="echart" class="echartContaion"></div>
+      <div ref="echart" class="echartContaion"></div>
       <!-- <div class="warmContaion">
       </div> -->
     </div>
@@ -48,72 +49,67 @@
 
 
 
-        <template slot="header">
-          <el-row type="flex" justify="space-between" align="middle">
-            <div class="title" style="font-weight: bold;">温度异常列表</div>
-          </el-row>
-          <!-- <div class="title">温度异常列表</div> -->
-        </template>
+      <template slot="header">
+        <el-row type="flex" justify="space-between" align="middle">
+          <div class="title" style="font-weight: bold;">温度异常列表</div>
+        </el-row>
+        <!-- <div class="title">温度异常列表</div> -->
+      </template>
 
-        <el-table :data="tableData2" border style="width: 90% ;" :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }" height="180" 
-         :row-class-name="rowClassName" size="mini"  empty-text="暂无数据">
-          <el-table-column prop="aiName" label="AI名称" width="200px">
-          </el-table-column>
-          <el-table-column prop="currentRealTimeValue" label="实时温度" width="115" :formatter="(row, column, cellValue) => `${cellValue}℃`">
-          </el-table-column>
-          <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数" ></el-table-column>
-        </el-table>
+      <el-table :data="tableData2" border style="width: 90% ;" :cell-style="{ textAlign: 'center' }"
+        :header-cell-style="{ textAlign: 'center' }" height="180" :row-class-name="rowClassName" size="mini"
+        empty-text="暂无数据">
+        <el-table-column prop="aiName" label="AI名称" width="200px">
+        </el-table-column>
+        <el-table-column prop="currentRealTimeValue" label="实时温度" width="115"
+          :formatter="(row, column, cellValue) => `${cellValue}℃`">
+        </el-table-column>
+        <el-table-column prop="dayUnqualifiedMinutes" label="日不合格分钟数"></el-table-column>
+      </el-table>
       <!-- </el-card> -->
     </div>
 
     <div class="table-head">
       <!-- 表头不滚动 -->
-      <el-table :data="[]" style="width: 100%;" :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' } ">
-        <!-- <el-table-column fixed label="序号" width="50">
-          <template slot-scope="scope">
-            {{ (scope.$index + 1) }}
-          </template>
-        </el-table-column> -->
-        <!-- <el-table-column prop="aiSeqNo" label="AI序号" width="180"></el-table-column> -->
-                <el-table-column prop="aiName" label="AI名称" width="250"></el-table-column>
+          <!-- <el-table :data="tableData" style="width: 100%" v-loading="loading" :show-header="true"  :default-sort="{prop: 'currentRealTimeValue', order: 'descending'}"
+            :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }">
+            <el-table-column prop="aiName" label="AI名称" width="250" sortable></el-table-column>
+            <el-table-column prop="day" label="日" width="150" sortable></el-table-column>
+            <el-table-column prop="currentRealTimeValue" label="实时温度" width="200"
+              :formatter="(row, column, cellValue) => `${cellValue}℃`" sortable></el-table-column>
 
-        <el-table-column prop="day" label="日" width="150"></el-table-column>
-        <el-table-column prop="currentRealTimeValue" label="实时温度" width="200"></el-table-column>
-
-        <el-table-column prop="dayMaxTime" label="日最大时间" width="220"></el-table-column>
-        <el-table-column prop="dayMaxValue" label="日最大值" width="220">
-        </el-table-column>
-        <el-table-column prop="dayMinTime" label="日最小时间" width="220"></el-table-column>
-        <el-table-column prop="dayMinValue" label="日最小值" width="220"></el-table-column>
-        <el-table-column prop="avg" label="日平均值" width="220"></el-table-column>
-      </el-table>
+            <el-table-column prop="dayMaxTime" label="日最大时间" width="220" sortable></el-table-column>
+            <el-table-column prop="dayMaxValue" label="日最大值" width="220"
+              :formatter="(row, column, cellValue) => `${cellValue}℃`" sortable>
+            </el-table-column>
+            <el-table-column prop="dayMinTime" label="日最小时间" width="220" sortable></el-table-column>
+            <el-table-column prop="dayMinValue" label="日最小值" width="220"
+              :formatter="(row, column, cellValue) => `${cellValue}℃`" sortable></el-table-column>
+            <el-table-column prop="avg" label="日平均值" width="220"
+              :formatter="(row, column, cellValue) => `${(cellValue).toFixed(2)}℃`" sortable></el-table-column>
+          </el-table> -->
     </div>
     <!-- 底部容器 -->
     <div class="bottom-main-container">
 
       <div class="listContaion">
         <!-- 滚动列表 -->
-        <div class="scroll-container">
-          <el-table :data="tableData" style="width: 100%" v-loading="loading" :show-header="false" :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }">
-            <!-- <el-table-column fixed label="序号" width="50" v-if="true">
-              <template slot-scope="scope">
-                {{ (scope.$index + 1) }}
-              </template>
-            </el-table-column> -->
-            <!-- <el-table-column prop="aiSeqNo" label="AI序号" width="180" v-if="true"></el-table-column> -->
-                        <el-table-column prop="aiName" label="AI名称" width="250"></el-table-column>
-
-            <el-table-column prop="day" label="日" width="150"></el-table-column>
-            <el-table-column prop="currentRealTimeValue" label="实时温度" width="200" :formatter="(row, column, cellValue) => `${cellValue}℃`"></el-table-column>
-
-            <el-table-column prop="dayMaxTime" label="日最大时间" width="220"></el-table-column>
-            <el-table-column prop="dayMaxValue" label="日最大值" width="220" :formatter="(row, column, cellValue) => `${cellValue}℃`">
+         <el-table :data="tableData" style="width: 100%" v-loading="loading"  :default-sort="{prop: 'currentRealTimeValue', order: 'descending'}"
+            :cell-style="{ textAlign: 'center' }" :header-cell-style="{ textAlign: 'center' }"   height="400">
+            <el-table-column prop="aiName" label="AI名称" width="250" sortable></el-table-column>
+            <el-table-column prop="day" label="日" width="150" sortable></el-table-column>
+            <el-table-column prop="currentRealTimeValue" label="实时温度" width="200"
+              :formatter="(row, column, cellValue) => `${cellValue}℃`" sortable></el-table-column>
+            <el-table-column prop="dayMaxTime" label="日最大时间" width="220" sortable></el-table-column>
+            <el-table-column prop="dayMaxValue" label="日最大值" width="220"
+              :formatter="(row, column, cellValue) => `${cellValue}℃`" sortable>
             </el-table-column>
-            <el-table-column prop="dayMinTime" label="日最小时间" width="220"></el-table-column>
-            <el-table-column prop="dayMinValue" label="日最小值" width="220" :formatter="(row, column, cellValue) => `${cellValue}℃`"></el-table-column>
-            <el-table-column prop="avg" label="日平均值" width="220" :formatter="(row, column, cellValue) => `${(cellValue).toFixed(2)}℃`"></el-table-column>
+            <el-table-column prop="dayMinTime" label="日最小时间" width="220" sortable></el-table-column>
+            <el-table-column prop="dayMinValue" label="日最小值" width="220"
+              :formatter="(row, column, cellValue) => `${cellValue}℃`" sortable></el-table-column>
+            <el-table-column prop="avg" label="日平均值" width="220"
+              :formatter="(row, column, cellValue) => `${(cellValue).toFixed(2)}℃`" sortable></el-table-column>
           </el-table>
-        </div>
 
       </div>
     </div>
@@ -130,12 +126,12 @@ import { saveVisitLog } from '@/utils/commonUtils.js'
 
 export default {
   created() {
-        saveVisitLog('CMS 实时温度详情-访问');
+    saveVisitLog('CMS 实时温度详情-访问');
   },
   data() {
     return {
 
-      tableData2:[],
+      tableData2: [],
 
 
 
@@ -225,9 +221,9 @@ export default {
   },
 
   methods: {
- rowClassName() {
-    return 'error-row' ;
-  },
+    rowClassName() {
+      return 'error-row';
+    },
 
     reflashData() {
       this.fetchData()
@@ -238,15 +234,17 @@ export default {
     // 滚动表格
     startAutoScroll() {
 
-      const scrollContainer = document.querySelector('.scroll-container');
-      let scrollStep = 1; // 每次滚动的像素数
-      setInterval(() => {
-        scrollContainer.scrollTop += scrollStep;
-        // 如果滚动到底部，回到顶部继续滚动
-        if (scrollContainer.scrollTop + scrollContainer.clientHeight + 5 >= scrollContainer.scrollHeight) {
-          scrollContainer.scrollTop = 0;
-        }
-      }, 50); // 滚动间隔，单位为毫秒，可以调整以控制滚动速度
+      // 不滚动了 滚不动了
+
+      // const scrollContainer = document.querySelector('.scroll-container');
+      // let scrollStep = 1; // 每次滚动的像素数
+      // setInterval(() => {
+      //   scrollContainer.scrollTop += scrollStep;
+      //   // 如果滚动到底部，回到顶部继续滚动
+      //   if (scrollContainer.scrollTop + scrollContainer.clientHeight + 5 >= scrollContainer.scrollHeight) {
+      //     scrollContainer.scrollTop = 0;
+      //   }
+      // }, 50); // 滚动间隔，单位为毫秒，可以调整以控制滚动速度
     },
     // 表单搜索功能
     search(isExport) {
@@ -391,15 +389,15 @@ export default {
 
           this.tableData2 = [];
 
-        this.tableData2 = data.forEach(element => {
-          // console.log(element.dayUnqualifiedMinutes)
-          // console.log(element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0)
-          if (element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0) {
-            this.tableData2.push(element);
-          }
-        });
+          this.tableData2 = data.forEach(element => {
+            // console.log(element.dayUnqualifiedMinutes)
+            // console.log(element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0)
+            if (element.dayUnqualifiedMinutes != null && element.dayUnqualifiedMinutes != 0) {
+              this.tableData2.push(element);
+            }
+          });
 
-          
+
         }
 
 
@@ -418,7 +416,7 @@ export default {
 }
 </script>
 
-<style lang="scss"  >
+<style lang="scss">
 .el-table__empty-block {
   display: none;
 }
@@ -476,50 +474,64 @@ export default {
 
 /* 让搜索栏固定 */
 .main-header {
-  position: fixed; /* 固定定位 */
-  top: 20px; /* 距离顶部 0px */
+  position: fixed;
+  /* 固定定位 */
+  top: 20px;
+  /* 距离顶部 0px */
   // left: 130px;
   width: 100%;
   height: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 10; /* 确保位于其他元素之上 */
+  z-index: 10;
+  /* 确保位于其他元素之上 */
   padding-left: 20px;
 }
 
 /* 让图表固定 */
 .echart-div {
-  position: fixed; /* 固定定位 */
-  top: 85px; /* 距离搜索栏下方 80px */
+  position: fixed;
+  /* 固定定位 */
+  top: 85px;
+  /* 距离搜索栏下方 80px */
   left: 0;
   width: 100%;
   height: 395px;
-  z-index: 400; /* 保证图表在搜索栏下方，但在内容表格之上 */
-  background-color: white; /* 可根据需要修改背景色 */
+  z-index: 400;
+  /* 保证图表在搜索栏下方，但在内容表格之上 */
+  background-color: white;
+  /* 可根据需要修改背景色 */
 }
 
 /* 让内容区域有足够的空间放下固定元素 */
 .bottom-main-container {
-  margin-top: 500px; /* 给底部容器预留足够的空间（80px + 300px） */
+  margin-top: 500px;
+  /* 给底部容器预留足够的空间（80px + 300px） */
   padding: 20px;
 }
 
 /* 滚动容器 */
 .scroll-container {
   overflow-y: auto;
-  max-height: calc(100vh - 580px); /* 根据搜索栏和图表的总高度，设置最大高度 */
+  max-height: calc(100vh - 580px);
+  /* 根据搜索栏和图表的总高度，设置最大高度 */
 }
+
 .table-head {
-  position: fixed; /* 固定定位 */
+  position: fixed;
+  /* 固定定位 */
   top: 480px;
   left: 20px;
-  z-index: 10; /* 确保位于其他元素之上 */
+  z-index: 10;
+  /* 确保位于其他元素之上 */
 }
+
 //
 .el-select .el-input__inner {
   width: 300px;
 }
+
 .echart-list-div {
   position: fixed;
   left: 1400px;
@@ -532,6 +544,7 @@ export default {
 
 .el-table .error-row {
   background: #ebabab;
-}/* 隐藏表格的提示信息 */
+}
 
+/* 隐藏表格的提示信息 */
 </style>
