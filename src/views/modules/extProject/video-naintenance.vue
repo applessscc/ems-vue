@@ -12,39 +12,35 @@
             </el-form-item>
         </el-form>
         <el-table :data="videoInfoList" style="width: 100%" border>
-            <el-table-column label="videoId" prop="videoId" width="150">
-                <template slot-scope="scope">
-                    {{ scope.row.ip == "" && scope.row.address == "" ? "" : scope.row.ip + "+" + scope.row.address }}
-                </template>
-            </el-table-column>
+            <el-table-column label="id" prop="id" width="180"></el-table-column>
 
-            <el-table-column label="name" prop="name" width="150">
+
+            <el-table-column label="name" prop="name" width="180">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.name" size="small" placeholder="请输入名称"></el-input>
                 </template>
             </el-table-column>
-            <el-table-column label="SAP" prop="sap" width="150">
-                <template slot-scope="scope">
-                    <el-input v-model="scope.row.sap" size="small" placeholder="请输入SAP"></el-input>
-                </template>
-            </el-table-column>
-            <el-table-column label="ip" prop="ip" width="150">
+            <el-table-column label="ip" prop="ip" width="180">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.ip" size="small" placeholder="请输入IP地址"></el-input>
                 </template>
             </el-table-column>
-            <el-table-column label="address" prop="address" width="150">
+
+            <el-table-column label="password" prop="password" width="180">
                 <template slot-scope="scope">
-                    <el-input v-model="scope.row.address" size="small" placeholder="请输入地址"></el-input>
+                    <el-input v-model="scope.row.password" size="small" placeholder="请输入密码"></el-input>
                 </template>
             </el-table-column>
-            <el-table-column label="operator" prop="operator" width="150"></el-table-column>
+
+            <el-table-column label="operator" prop="operator" width="180"></el-table-column>
             <el-table-column label="createTime" prop="createTime" width="180"></el-table-column>
             <el-table-column label="updateTime" prop="updateTime" width="180"></el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
-                    <el-button type="warning" plain @click="handleUpdate(scope.row)" v-if="scope.row.id != null">修改</el-button>
-                    <el-button type="success" plain @click="handleUpdate(scope.row)" v-if="scope.row.id == null">新增</el-button>
+                    <el-button type="warning" plain @click="handleUpdate(scope.row)"
+                        v-if="scope.row.id != null">修改</el-button>
+                    <el-button type="success" plain @click="handleUpdate(scope.row)"
+                        v-if="scope.row.id == null">新增</el-button>
                     <el-button type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>

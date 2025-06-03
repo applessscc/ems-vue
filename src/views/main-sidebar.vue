@@ -55,9 +55,15 @@
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
             <span>视频</span>
-          </template> <el-menu-item index="demo-echarts" @click="openNew('modules/extProject/video')">
+          </template>
+          <el-menu-item index="demo-echarts" @click="openNew('modules/extProject/video')">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
-            video
+            视频
+          </el-menu-item>
+
+          <el-menu-item index="demo-echarts"  @click="$router.push({ name: 'video-naintenance' })">
+            <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
+            视频设备维护
           </el-menu-item>
         </el-submenu>
 

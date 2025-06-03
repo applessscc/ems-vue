@@ -27,7 +27,9 @@
             <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
           </el-form-item>
           <el-form-item style="width: 250px;">
-            <el-button type="success" plain @click="startCamera">连接摄像头</el-button>
+            <el-button type="success" plain :loading="loading" :disabled="loading" @click="startCamera">
+              连接摄像头
+            </el-button>
           </el-form-item>
         </el-form>
 
@@ -44,12 +46,12 @@
 
 <script>
 import Hls from 'hls.js';
-import { watch } from 'less';
 
 export default {
   name: 'LiveVideo',
   data() {
     return {
+      loading: false, // ← 新增
       videoInfo: {},
       form: {
         name: '',
@@ -82,6 +84,15 @@ export default {
     }, 15000);  // 10秒
     this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
     this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
+
+    if ((this.$route.query.ip && this.$route.query.password)) {
+      this.form.ip = this.$route.query.ip;
+      this.form.password = this.$route.query.password;
+      this.startCamera();
+    } else if (this.$route.query.name) {
+      this.startCamera();
+    }
+
   },
 
   watch: {
@@ -89,13 +100,65 @@ export default {
       this.form.ip = newVal.ip || '';
       this.form.password = newVal.password || '';
       this.form.name = newVal.name || '';
-    }
+    },
+
+    '$route.query.ip'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.form.ip !== newVal) {
+        this.form.ip = newVal;
+      }
+    },
+
+    'form.ip'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.$route.query.ip !== newVal) {
+        this.$router.replace({
+          query: {
+            ...this.$route.query,
+            ip: newVal
+          }
+        });
+      }
+    },
+
+    '$route.query.password'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.form.password !== newVal) {
+        this.form.password = newVal;
+      }
+    },
+
+    'form.password'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.$route.query.password !== newVal) {
+        this.$router.replace({
+          query: {
+            ...this.$route.query,
+            password: newVal
+          }
+        });
+      }
+    },
+
+    'form.name'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.$route.query.name !== newVal) {
+        this.$router.replace({
+          query: {
+            ...this.$route.query,
+            name: newVal
+          }
+        });
+      }
+    },
+
+
   },
 
   methods: {
-
+    pauseAndClearVideo(videoElement) {
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.removeAttribute('src');  // 移除src
+        videoElement.load();                  // 重新加载，清除已加载的数据
+      }
+    },
     initPlayer(videoElement, url) {
-
       if (Hls.isSupported()) {
         const hls = new Hls({
           startPosition: -1,        // 默认直播行为，从最新位置开始播放
@@ -118,57 +181,74 @@ export default {
       }
     },
     startCamera() {
+      this.loading = true; // 开始加载
       this.$http({
         url: this.$http.adornUrl(`/extProject/startVideo`),
         method: 'get',
         params: {
           ip: this.form.ip,
           password: this.form.password,
+          name: this.$route.query.name
         }
       }).then((response) => {
         if (response.data.code === 200) {
+          this.startCameraStatus = false;
+          this.stopCameraStatus = true;
           this.$message({
             message: '摄像头已连接',
             type: 'success',
-            duration: 800
+            duration: 1500
           });
+          this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
+          this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
         } else {
           this.$message({
-            message: '摄像头连接失败！',
+            message: response.data.msg || '连接摄像头失败!',
             type: 'error',
-            duration: 1000
+            duration: 1500
           });
         }
-        this.getActiveStreams();
-
       }).catch(() => {
         this.$message({
-          message: '连接摄像头失败',
+          message: response.data.msg || '连接摄像头失败!',
           type: 'error',
-          duration: 800
+          duration: 1500
         });
         this.getActiveStreams();
+      }).finally(() => {
+        this.loading = false; // 无论成功失败都关闭 loading
       });
     },
+
     stopCamera() {
       this.$http({
         url: this.$http.adornUrl(`/extProject/stopVideo`),
         method: 'get'
-      }).then(() => {
-        this.$message({
-          message: '摄像头已断开',
-          type: 'warning',
-          duration: 800
-        });
+      }).then((response) => {
+        if (response.data.code === 200) {
+          this.$message({
+            message: '摄像头已断开',
+            type: 'success',
+            duration: 1500
+          });
+        } else {
+          this.$message({
+            message: response.data.msg || '断开摄像头失败!',
+            type: 'error',
+            duration: 1500
+          });
+        }
         this.getActiveStreams();
       }).catch(() => {
         this.$message({
-          message: '断开摄像头失败',
+          message: response.data.msg || '断开摄像头失败!',
           type: 'error',
-          duration: 800
+          duration: 1500
         });
         this.getActiveStreams();
       });
+
+
     },
 
     getActiveStreams() {
@@ -181,11 +261,9 @@ export default {
         if (!streams) {
           this.startCameraStatus = false;
           this.stopCameraStatus = true;
-          console.info('streams', streams);
         } else {
           this.startCameraStatus = true;
           this.stopCameraStatus = false;
-          console.info('streams2', streams);
         }
       }).catch((error) => {
         console.error('getActiveStreams', error);

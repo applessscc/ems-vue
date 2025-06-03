@@ -153,10 +153,6 @@
               <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageHumidity }}%</el-tag>
             </el-form-item>
 
-            <el-form-item label="温区实时温度" v-if="tableData.length != 0" v-show="false">
-              <el-tag type="success" @click.stop="openNewWindow()">{{ calculateAverageTemperature }}C°</el-tag>
-            </el-form-item>
-
           </el-col>
           <el-col :span="6">
             <el-form-item label="气象温度" v-if="tableData.length != 0">

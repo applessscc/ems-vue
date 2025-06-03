@@ -67,7 +67,9 @@ const mainRoutes = {
     { path: '/cookerJob', component: _import('cookerJob/cookerJob'), name: 'cookerJob' , meta: { title: '炒房机任务'}}, 
 
     { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply' , meta: { title: '报修表单'}}, 
+    { path: '/video-naintenance', component: _import('modules/extProject/video-naintenance'), name: 'video-naintenance' , meta: { title: '视频设备维护'}}, 
     { path: '/repair-jobDetail', component: _import('repair/repair-jobDetail'), name: 'repair-jobDetail' , meta: { title: '任务详情'}}, 
+
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
