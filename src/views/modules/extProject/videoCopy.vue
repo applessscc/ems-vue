@@ -2,15 +2,15 @@
   <div>
     <div class="container">
       <div class="video-section" v-show="stream1Show">
-        <!-- <h2>实时视频播放</h2> -->
+        <h2>实时视频播放</h2>
         <video ref="videoPlayer" autoplay muted playsinline></video>
       </div>
       <div class="video-section" v-show="stream1channel2Show">
-        <!-- <h2>热成像</h2> -->
+        <h2>热成像</h2>
         <video ref="thermalPlayer" autoplay muted playsinline></video>
       </div>
       <div class="video-section" v-show="stepShow">
-        <!-- <h2>楼梯口</h2> -->
+        <h2>楼梯口</h2>
         <video ref="stepPlayer" autoplay muted playsinline></video>
       </div>
     </div>
@@ -84,6 +84,7 @@ export default {
   },
   mounted() {
     this.fetchVideoInfo();
+    this.getActiveStreams();
     this.intervalId = setInterval(() => {
       this.getActiveStreams();
       this.fetchVideoInfo();
@@ -104,7 +105,6 @@ export default {
       this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
       this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
     }
-    this.getActiveStreams();
 
   },
 
@@ -165,16 +165,19 @@ export default {
 
   methods: {
     startPlay() {
+      this.stream1Show = false;
+      this.stream1channel2Show = false;
+      this.stepShow = false;
       this.videoInfoList = this.videoInfoList.filter(item => item.ip === this.form.ip);
       this.videoInfoList.forEach(item => {
         console.log('videoInfoListitem', item.videoUrl);
         const urls = (typeof item.videoUrl === 'string' ? item.videoUrl.split(',') : []);
         urls.forEach(url => {
-          if (url === 'stream1') {
+          if (url.includes('stream1')) {
             console.log('stream1True');
             this.stream1Show = true;
             this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
-          } else if (url === 'stream1&channel=2') {
+          } else if (url.includes('stream1&channel=2')) {
             console.log('stream1&channel=2True');
             this.stream1channel2Show = true;
             this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
@@ -340,16 +343,12 @@ export default {
 }
 
 .container {
-  margin-top: 30px;
   display: flex;
-  justify-content: center;
-  /* 水平居中 */
-  align-items: center;
-  /* 垂直居中 */
+  align-items: flex-start;
+  margin: 20px;
 }
 
 .video-section {
-  max-width: 900px;
   flex: 1;
   margin: 0;
   padding: 0;
