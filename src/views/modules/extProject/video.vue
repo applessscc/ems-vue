@@ -55,20 +55,31 @@ export default {
   name: 'LiveVideo',
   data() {
     return {
+
+      // 控制视频流的显示
       stream1channel2Show: false,
       stream1Show: false,
       stepShow: false,
-      loading: false, // ← 新增
+
+
+
       videoInfo: {},
       form: {
         name: '',
         ip: '',
         password: ''
       },
+
+
       videoInfoList: [],
       searchForm: '',
+
+      // 摄像头连接状态
+      loading: false, // ← 新增
       startCameraStatus: false,
       stopCameraStatus: false,
+
+      // 视频流的URL
       m3u8Url: this.$http.adornUrl(`/videos/stream1.m3u8`),
       thermalUrl: this.$http.adornUrl(`/videos/stream1&channel=2.m3u8`),
       stepUrl: this.$http.adornUrl(`/videos/stream2.m3u8`),
@@ -149,6 +160,14 @@ export default {
       }
     },
 
+    '$route.query.name'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.form.name !== newVal) {
+        this.form.name = newVal;
+        this.videoInfo = this.videoInfoList.find(item => item.name === this.$route.query.name) || {};
+        this.form.ip = this.videoInfo.ip || '';
+        this.form.password = this.videoInfo.password || '';
+      }
+    },
     'form.name'(newVal, oldVal) {
       if (newVal && newVal !== oldVal && this.$route.query.name !== newVal) {
         this.$router.replace({
@@ -165,7 +184,7 @@ export default {
 
   methods: {
     startPlay() {
-      this.videoInfoList = this.videoInfoList.filter(item => item.ip === this.form.ip);
+      this.videoInfoList = this.videoInfoList.filter(item => item.ip === this.form.ip || item.name === this.$route.query.name);
       this.videoInfoList.forEach(item => {
         console.log('videoInfoListitem', item.videoUrl);
         const urls = (typeof item.videoUrl === 'string' ? item.videoUrl.split(',') : []);
@@ -259,7 +278,11 @@ export default {
     stopCamera() {
       this.$http({
         url: this.$http.adornUrl(`/extProject/stopVideo`),
-        method: 'get'
+        method: 'get',
+        params: {
+          ip: this.form.ip,
+          name: this.$route.query.name
+        }
       }).then((response) => {
         if (response.data.code === 200) {
           this.$message({
@@ -267,6 +290,7 @@ export default {
             type: 'success',
             duration: 1500
           });
+          this.getActiveStreams();
         } else {
           this.$message({
             message: response.data.msg || '断开摄像头失败!',
@@ -290,7 +314,11 @@ export default {
     getActiveStreams() {
       this.$http({
         url: this.$http.adornUrl(`/extProject/getActiveStreams`),
-        method: 'get'
+        method: 'get',
+        params: {
+          ip: this.form.ip,
+          name: this.$route.query.name
+        }
       }).then((response) => {
         const streams = response.data.data;
         console.log('当前活跃的流', streams);

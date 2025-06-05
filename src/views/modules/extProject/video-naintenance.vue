@@ -12,29 +12,35 @@
             </el-form-item>
         </el-form>
         <el-table :data="videoInfoList" style="width: 100%" border>
-            <el-table-column label="id" prop="id" width="180"></el-table-column>
+            <el-table-column label="id" prop="id" width="100"></el-table-column>
 
 
-            <el-table-column label="name" prop="name" width="180">
+            <el-table-column label="name" prop="name" width="150">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.name" size="small" placeholder="请输入名称"></el-input>
                 </template>
             </el-table-column>
-            <el-table-column label="ip" prop="ip" width="180">
+            <el-table-column label="ip" prop="ip" width="150">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.ip" size="small" placeholder="请输入IP地址"></el-input>
                 </template>
             </el-table-column>
 
-            <el-table-column label="password" prop="password" width="180">
+            <el-table-column label="password" prop="password" width="150">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.password" size="small" placeholder="请输入密码"></el-input>
                 </template>
             </el-table-column>
 
-            <el-table-column label="operator" prop="operator" width="180"></el-table-column>
-            <el-table-column label="createTime" prop="createTime" width="180"></el-table-column>
-            <el-table-column label="updateTime" prop="updateTime" width="180"></el-table-column>
+                <el-table-column label="videoUrl" prop="videoUrl" width="260">
+                <template slot-scope="scope">
+                    <el-input v-model="scope.row.videoUrl" size="small" placeholder="访问路径（多个流逗号隔开）"></el-input>
+                </template>
+            </el-table-column>
+
+            <el-table-column label="operator" prop="operator" width="100"></el-table-column>
+            <el-table-column label="createTime" prop="createTime" width="154"></el-table-column>
+            <el-table-column label="updateTime" prop="updateTime" width="154"></el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button type="warning" plain @click="handleUpdate(scope.row)"
@@ -80,6 +86,7 @@ export default {
                 ip: this.newVideo.ip,
                 address: this.newVideo.address,
                 operator: this.$store.state.user.name,
+                password: this.newVideo.password,
                 createTime: this.formatDate(new Date()),
                 updateTime: this.formatDate(new Date())
             });
@@ -97,6 +104,8 @@ export default {
                     ip: row.ip,
                     address: row.address,
                     operator: row.operator,
+                    password: row.password,
+
                     createTime: row.createTime,
                     updateTime: row.updateTime
                 }
