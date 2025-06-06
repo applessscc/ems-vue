@@ -2,15 +2,15 @@
   <div>
     <div class="container">
       <div class="video-section" v-show="stream1Show">
-        <h2>实时视频播放</h2>
+        <!-- <h2>实时视频播放</h2> -->
         <video ref="videoPlayer" autoplay muted playsinline></video>
       </div>
       <div class="video-section" v-show="stream1channel2Show">
-        <h2>热成像</h2>
+        <!-- <h2>热成像</h2> -->
         <video ref="thermalPlayer" autoplay muted playsinline></video>
       </div>
       <div class="video-section" v-show="stepShow">
-        <h2>楼梯口</h2>
+        <!-- <h2>楼梯口</h2> -->
         <video ref="stepPlayer" autoplay muted playsinline></video>
       </div>
     </div>
@@ -55,20 +55,31 @@ export default {
   name: 'LiveVideo',
   data() {
     return {
+
+      // 控制视频流的显示
       stream1channel2Show: false,
       stream1Show: false,
       stepShow: false,
-      loading: false, // ← 新增
+
+
+
       videoInfo: {},
       form: {
         name: '',
         ip: '',
         password: ''
       },
+
+
       videoInfoList: [],
       searchForm: '',
+
+      // 摄像头连接状态
+      loading: false, // ← 新增
       startCameraStatus: false,
       stopCameraStatus: false,
+
+      // 视频流的URL
       m3u8Url: this.$http.adornUrl(`/videos/stream1.m3u8`),
       thermalUrl: this.$http.adornUrl(`/videos/stream1&channel=2.m3u8`),
       stepUrl: this.$http.adornUrl(`/videos/stream2.m3u8`),
@@ -84,7 +95,6 @@ export default {
   },
   mounted() {
     this.fetchVideoInfo();
-    this.getActiveStreams();
     this.intervalId = setInterval(() => {
       this.getActiveStreams();
       this.fetchVideoInfo();
@@ -105,6 +115,7 @@ export default {
       this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
       this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
     }
+    this.getActiveStreams();
 
   },
 
@@ -149,6 +160,14 @@ export default {
       }
     },
 
+    '$route.query.name'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.form.name !== newVal) {
+        this.form.name = newVal;
+        this.videoInfo = this.videoInfoList.find(item => item.name === this.$route.query.name) || {};
+        this.form.ip = this.videoInfo.ip || '';
+        this.form.password = this.videoInfo.password || '';
+      }
+    },
     'form.name'(newVal, oldVal) {
       if (newVal && newVal !== oldVal && this.$route.query.name !== newVal) {
         this.$router.replace({
@@ -165,19 +184,16 @@ export default {
 
   methods: {
     startPlay() {
-      this.stream1Show = false;
-      this.stream1channel2Show = false;
-      this.stepShow = false;
-      this.videoInfoList = this.videoInfoList.filter(item => item.ip === this.form.ip);
+      this.videoInfoList = this.videoInfoList.filter(item => item.ip === this.form.ip || item.name === this.$route.query.name);
       this.videoInfoList.forEach(item => {
         console.log('videoInfoListitem', item.videoUrl);
         const urls = (typeof item.videoUrl === 'string' ? item.videoUrl.split(',') : []);
         urls.forEach(url => {
-          if (url.includes('stream1')) {
+          if (url === 'stream1') {
             console.log('stream1True');
             this.stream1Show = true;
             this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
-          } else if (url.includes('stream1&channel=2')) {
+          } else if (url === 'stream1&channel=2') {
             console.log('stream1&channel=2True');
             this.stream1channel2Show = true;
             this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
@@ -262,7 +278,11 @@ export default {
     stopCamera() {
       this.$http({
         url: this.$http.adornUrl(`/extProject/stopVideo`),
-        method: 'get'
+        method: 'get',
+        params: {
+          ip: this.form.ip,
+          name: this.$route.query.name
+        }
       }).then((response) => {
         if (response.data.code === 200) {
           this.$message({
@@ -270,6 +290,7 @@ export default {
             type: 'success',
             duration: 1500
           });
+          this.getActiveStreams();
         } else {
           this.$message({
             message: response.data.msg || '断开摄像头失败!',
@@ -293,7 +314,11 @@ export default {
     getActiveStreams() {
       this.$http({
         url: this.$http.adornUrl(`/extProject/getActiveStreams`),
-        method: 'get'
+        method: 'get',
+        params: {
+          ip: this.form.ip,
+          name: this.$route.query.name
+        }
       }).then((response) => {
         const streams = response.data.data;
         console.log('当前活跃的流', streams);
@@ -343,12 +368,16 @@ export default {
 }
 
 .container {
+  margin-top: 30px;
   display: flex;
-  align-items: flex-start;
-  margin: 20px;
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
 }
 
 .video-section {
+  max-width: 900px;
   flex: 1;
   margin: 0;
   padding: 0;

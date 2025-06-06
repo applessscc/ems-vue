@@ -1,34 +1,33 @@
 <template>
   <div>
     <div class="container">
-      <div class="video-section" v-show="stream1Show">
+      <div class="video-section">
         <!-- <h2>实时视频播放</h2> -->
         <video ref="videoPlayer" autoplay muted playsinline></video>
       </div>
-      <div class="video-section" v-show="stream1channel2Show">
+      <div class="video-section" v-show="form.videoNum == 2">
         <!-- <h2>热成像</h2> -->
-        <video ref="thermalPlayer" autoplay muted playsinline></video>
-      </div>
-      <div class="video-section" v-show="stepShow">
-        <!-- <h2>楼梯口</h2> -->
-        <video ref="stepPlayer" autoplay muted playsinline></video>
+        <video ref="videoPlayer2" autoplay muted playsinline></video>
       </div>
     </div>
 
     <div class="button-group">
       <div v-if="startCameraStatus" class="form-wrapper">
         <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="name" style="width: 250px;">
+          <el-form-item label="name" style="width: 250px;" v-show="false">
             <el-select v-model="videoInfo" placeholder="请选择摄像头名称" :clearable="true">
               <el-option v-for="item in videoInfoList" :key="item.name" :label="item.name" :value="item">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="ip" style="width: 250px;">
+          <el-form-item label="ip" style="width: 250px;" v-show="false">
             <el-input v-model="form.ip" placeholder="请输入摄像头IP地址"></el-input>
           </el-form-item>
-          <el-form-item label="password" style="width: 250px;">
+          <el-form-item label="password" style="width: 250px;" v-show="false">
             <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
+          </el-form-item>
+          <el-form-item label="videoNum" style="width: 250px;" v-show="false">
+            <el-input v-model="form.videoNum" placeholder="请输入摄像头数量"></el-input>
           </el-form-item>
           <el-form-item style="width: 250px;">
             <el-button type="success" plain :loading="loading" :disabled="loading" @click="startCamera">
@@ -67,7 +66,8 @@ export default {
       form: {
         name: '',
         ip: '',
-        password: ''
+        password: '',
+        videoNum: '', // 默认视频流数量
       },
 
 
@@ -80,9 +80,8 @@ export default {
       stopCameraStatus: false,
 
       // 视频流的URL
-      m3u8Url: this.$http.adornUrl(`/videos/stream1.m3u8`),
-      thermalUrl: this.$http.adornUrl(`/videos/stream1&channel=2.m3u8`),
-      stepUrl: this.$http.adornUrl(`/videos/stream2.m3u8`),
+      m3u8Url: this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
+      thermalUrl: this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1&channel=2.m3u8`),
     };
   },
 
@@ -112,8 +111,10 @@ export default {
         this.stream1Show = true,
         this.form.ip = '10.9.42.13'
       this.form.password = 'hugo@test'
+      this.form.videoNum = 2
+      this.form.name = 'IR_CAM'
       this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
-      this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
+      this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
     }
     this.getActiveStreams();
 
@@ -127,6 +128,7 @@ export default {
     },
 
     '$route.query.ip'(newVal, oldVal) {
+      console.log('watchIp', newVal, oldVal);
       if (newVal && newVal !== oldVal && this.form.ip !== newVal) {
         this.form.ip = newVal;
       }
@@ -144,6 +146,7 @@ export default {
     },
 
     '$route.query.password'(newVal, oldVal) {
+      console.log('watchPassword', newVal, oldVal);
       if (newVal && newVal !== oldVal && this.form.password !== newVal) {
         this.form.password = newVal;
       }
@@ -157,6 +160,14 @@ export default {
             password: newVal
           }
         });
+      }
+    },
+    'videoInfoList'(newVal, oldVal) {
+      if (newVal && newVal.length > 0 && this.$route.query.name) {
+        this.videoInfo = newVal.find(item => item.name === this.$route.query.name) || {};
+        this.form.ip = this.videoInfo.ip || '';
+        this.form.password = this.videoInfo.password || '';
+        this.form.videoNum = this.videoInfo.videoNum || '';
       }
     },
 
@@ -180,31 +191,33 @@ export default {
     },
 
 
+    '$route.query.videoNum'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.form.videoNum !== newVal) {
+        this.form.videoNum = newVal;
+      }
+    },
+    'form.videoNum'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.$route.query.videoNum !== newVal) {
+        this.$router.replace({
+          query: {
+            ...this.$route.query,
+            videoNum: newVal
+          }
+        });
+      }
+    },
+
+
   },
 
   methods: {
     startPlay() {
-      this.videoInfoList = this.videoInfoList.filter(item => item.ip === this.form.ip || item.name === this.$route.query.name);
-      this.videoInfoList.forEach(item => {
-        console.log('videoInfoListitem', item.videoUrl);
-        const urls = (typeof item.videoUrl === 'string' ? item.videoUrl.split(',') : []);
-        urls.forEach(url => {
-          if (url === 'stream1') {
-            console.log('stream1True');
-            this.stream1Show = true;
-            this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
-          } else if (url === 'stream1&channel=2') {
-            console.log('stream1&channel=2True');
-            this.stream1channel2Show = true;
-            this.initPlayer(this.$refs.thermalPlayer, this.thermalUrl);
-          } else if (url.includes('stream2')) {
-            console.log('stream2True');
-            this.stepShow = true;
-            this.initPlayer(this.$refs.stepPlayer, this.stepUrl);
-          }
-        });
-      });
-
+      this.m3u8Url = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
+        this.thermalUrl = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1&channel=2.m3u8`),
+        this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
+      if (this.$route.query.videoNum == 2) {
+        this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
+      }
 
     },
     pauseAndClearVideo(videoElement) {
@@ -244,7 +257,8 @@ export default {
         params: {
           ip: this.form.ip,
           password: this.form.password,
-          name: this.$route.query.name
+          name: this.$route.query.name,
+          videoNum: this.$route.query.videoNum,
         }
       }).then((response) => {
         if (response.data.code === 200) {
@@ -281,7 +295,9 @@ export default {
         method: 'get',
         params: {
           ip: this.form.ip,
-          name: this.$route.query.name
+          password: this.form.password,
+          name: this.$route.query.name,
+          videoNum: this.$route.query.videoNum,
         }
       }).then((response) => {
         if (response.data.code === 200) {
@@ -321,7 +337,6 @@ export default {
         }
       }).then((response) => {
         const streams = response.data.data;
-        console.log('当前活跃的流', streams);
         if (!streams) {
           this.startCameraStatus = false;
           this.stopCameraStatus = true;
