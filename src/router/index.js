@@ -23,9 +23,9 @@ const globalRoutes = [
   { path: '/equipment/electricity-his', component: _import('equipment/electricity-his'), name: 'electricity-his', meta: { title: 'CMS 能耗历史查询' } },
   { path: '/equipment/ai-temp-borad', component: _import('equipment/ai-temp-borad'), name: 'ai-temp-borad', meta: { title: 'CMS 实时温度' } },
   { path: '/equipment/ai-temp-board-detail', component: _import('equipment/ai-temp-board-detail'), name: 'ai-temp-board-detail', meta: { title: 'CMS 实时温度详情' } },
-  { path: '/cookerJob/cookerJob-b8', component: _import('cookerJob/cookerJob-b8'), name: 'cookerJob-b8' , meta: { title: '炒房机任务-b8'}}, 
-  { path: '/air-condition/kangban', component: _import('air-condition/kangban'), name: 'air-condition' , meta: { title: '温区看板'}}, 
-  { path: '/air-condition/addKV', component: _import('air-condition/addKV'), name: 'addKV' , meta: { title: '添加空调比值键值对'}}, 
+  { path: '/cookerJob/cookerJob-b8', component: _import('cookerJob/cookerJob-b8'), name: 'cookerJob-b8', meta: { title: '炒房机任务-b8' } },
+  { path: '/air-condition/kangban', component: _import('air-condition/kangban'), name: 'air-condition', meta: { title: '温区看板' } },
+  { path: '/air-condition/addKV', component: _import('air-condition/addKV'), name: 'addKV', meta: { title: '添加空调比值键值对' } },
 
 
   { path: '/repair/repair-kanban', component: _import('repair/repair-kanban'), name: 'repair-kanban', meta: { title: '维修任务看板' } },
@@ -60,18 +60,18 @@ const mainRoutes = {
     { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
     { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } },
     { path: '/formdetail', component: _import('modules/site/formdetail'), name: 'formdetail', meta: { title: '问题单详情', isTab: true } },
-    { path: '/repair-index', component: _import('repair/repair-index'), name: 'repair-index' , meta: { title: '报修表单'}}, 
-    { path: '/device-maintenance', component: _import('extProject/device-maintenance'), name: 'device-maintenance' , meta: { title: '设备维护'}}, 
-    { path: '/instruct-task', component: _import('repair/instruct-task'), name: 'instruct-task' , meta: { title: '自动化任务'}}, 
-    { path: '/sendEmail', component: _import('modules/email/sendEmail'), name: 'sendEmail' , meta: { title: '发送邮箱'}}, 
-    { path: '/cookerJob', component: _import('cookerJob/cookerJob'), name: 'cookerJob' , meta: { title: '炒房机任务'}}, 
+    { path: '/repair-index', component: _import('repair/repair-index'), name: 'repair-index', meta: { title: '报修表单' } },
+    { path: '/device-maintenance', component: _import('extProject/device-maintenance'), name: 'device-maintenance', meta: { title: '设备维护' } },
+    { path: '/instruct-task', component: _import('repair/instruct-task'), name: 'instruct-task', meta: { title: '自动化任务' } },
+    { path: '/sendEmail', component: _import('modules/email/sendEmail'), name: 'sendEmail', meta: { title: '发送邮箱' } },
+    { path: '/cookerJob', component: _import('cookerJob/cookerJob'), name: 'cookerJob', meta: { title: '炒房机任务' } },
 
-    { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply' , meta: { title: '报修表单'}}, 
-    { path: '/video-naintenance', component: _import('modules/extProject/video-naintenance'), name: 'video-naintenance' , meta: { title: '视频设备维护'}}, 
-    { path: '/repair-jobDetail', component: _import('repair/repair-jobDetail'), name: 'repair-jobDetail' , meta: { title: '任务详情'}}, 
+    { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply', meta: { title: '报修表单' } },
+    { path: '/video-naintenance', component: _import('modules/extProject/video-naintenance'), name: 'video-naintenance', meta: { title: '视频设备维护' } },
+    { path: '/repair-jobDetail', component: _import('repair/repair-jobDetail'), name: 'repair-jobDetail', meta: { title: '任务详情' } },
 
   ],
-  beforeEnter (to, from, next) {
+  beforeEnter(to, from, next) {
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
@@ -101,7 +101,7 @@ router.beforeEach((to, from, next) => {
       url: http.adornUrl('/sys/menu/nav'),
       method: 'get',
       params: http.adornParams()
-    }).then(({data}) => {
+    }).then(({ data }) => {
       if (data && data.code === 0) {
         fnAddDynamicMenuRoutes(data.menuList)
         router.options.isAddDynamicMenuRoutes = true
@@ -124,7 +124,7 @@ router.beforeEach((to, from, next) => {
  * 判断当前路由类型, global: 全局路由, main: 主入口路由
  * @param {*} route 当前路由
  */
-function fnCurrentRouteType (route, globalRoutes = []) {
+function fnCurrentRouteType(route, globalRoutes = []) {
   var temp = []
   for (var i = 0; i < globalRoutes.length; i++) {
     if (route.path === globalRoutes[i].path) {
@@ -141,7 +141,7 @@ function fnCurrentRouteType (route, globalRoutes = []) {
  * @param {*} menuList 菜单列表
  * @param {*} routes 递归创建的动态(菜单)路由
  */
-function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
+function fnAddDynamicMenuRoutes(menuList = [], routes = []) {
   var temp = []
   for (var i = 0; i < menuList.length; i++) {
     if (menuList[i].list && menuList[i].list.length >= 1) {
@@ -157,6 +157,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
           title: menuList[i].name,
           isDynamic: true,
           isTab: true,
+          openInNewWindow: true,
           iframeUrl: ''
         }
       }
@@ -168,7 +169,7 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       } else {
         try {
           route['component'] = _import(`modules/${menuList[i].url}`) || null
-        } catch (e) {}
+        } catch (e) { }
       }
       routes.push(route)
     }

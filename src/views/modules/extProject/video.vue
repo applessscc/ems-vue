@@ -5,7 +5,7 @@
         <!-- <h2>实时视频播放</h2> -->
         <video ref="videoPlayer" autoplay muted playsinline></video>
       </div>
-      <div class="video-section" v-show="form.videoNum == 2">
+      <div class="video-section" v-show="this.$route.query.videoUrl? this.$route.query.videoUrl.split(',').length > 1 : false">
         <!-- <h2>热成像</h2> -->
         <video ref="videoPlayer2" autoplay muted playsinline></video>
       </div>
@@ -26,8 +26,8 @@
           <el-form-item label="password" style="width: 250px;" v-show="false">
             <el-input v-model="form.password" placeholder="请输入密码" show-password></el-input>
           </el-form-item>
-          <el-form-item label="videoNum" style="width: 250px;" v-show="false">
-            <el-input v-model="form.videoNum" placeholder="请输入摄像头数量"></el-input>
+          <el-form-item label="videoUrl" style="width: 250px;" v-show="false">
+            <el-input v-model="form.videoUrl" placeholder="请输入摄像头Url"></el-input>
           </el-form-item>
           <el-form-item style="width: 250px;">
             <el-button type="success" plain :loading="loading" :disabled="loading" @click="startCamera">
@@ -49,6 +49,7 @@
 
 <script>
 import Hls from 'hls.js';
+import { saveVisitLog } from '@/utils/commonUtils.js'
 
 export default {
   name: 'LiveVideo',
@@ -67,7 +68,7 @@ export default {
         name: '',
         ip: '',
         password: '',
-        videoNum: '', // 默认视频流数量
+        videoUrl: '', // 视频流URL
       },
 
 
@@ -80,8 +81,23 @@ export default {
       stopCameraStatus: false,
 
       // 视频流的URL
-      m3u8Url: this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
-      thermalUrl: this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1&channel=2.m3u8`),
+      // m3u8Url: this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
+      m3u8Url: this.m3u8Url = this.$http.adornUrl(
+        `/videos/` + this.$route.query.ip +
+        ((this.$route.query.videoUrl && this.$route.query.videoUrl.length > 1)
+          ? this.$route.query.videoUrl.split(',')[0] + '.m3u8'
+          : 'stream1.m3u8')
+      ),
+
+      // thermalUrl: this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1&channel=2.m3u8`),
+
+      thermalUrl: this.thermalUrl = this.$http.adornUrl(
+        `/videos/` + this.$route.query.ip +
+        ((this.$route.query.videoUrl && this.$route.query.videoUrl.length > 2)
+          ? this.$route.query.videoUrl.split(',')[1] + '.m3u8'
+          : 'stream1&channel=2.m3u8')
+      )
+
     };
   },
 
@@ -91,6 +107,9 @@ export default {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
+  },
+    created() {
+     saveVisitLog('CMS 视频监控-访问');
   },
   mounted() {
     this.fetchVideoInfo();
@@ -108,10 +127,9 @@ export default {
       this.startCamera();
     } else {
       this.stream1channel2Show = true,
-        this.stream1Show = true,
-        this.form.ip = '10.9.42.13'
+      this.stream1Show = true,
+      this.form.ip = '10.9.42.13'
       this.form.password = 'hugo@test'
-      this.form.videoNum = 2
       this.form.name = 'IR_CAM'
       this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
       this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
@@ -121,10 +139,12 @@ export default {
   },
 
   watch: {
-    videoInfo(newVal) {
+    'videoInfo'(newVal) {
+      console.log('watchVideoInfo', newVal);
       this.form.ip = newVal.ip || '';
       this.form.password = newVal.password || '';
       this.form.name = newVal.name || '';
+      this.form.videoUrl = newVal.videoUrl || '';
     },
 
     '$route.query.ip'(newVal, oldVal) {
@@ -167,7 +187,6 @@ export default {
         this.videoInfo = newVal.find(item => item.name === this.$route.query.name) || {};
         this.form.ip = this.videoInfo.ip || '';
         this.form.password = this.videoInfo.password || '';
-        this.form.videoNum = this.videoInfo.videoNum || '';
       }
     },
 
@@ -191,17 +210,18 @@ export default {
     },
 
 
-    '$route.query.videoNum'(newVal, oldVal) {
-      if (newVal && newVal !== oldVal && this.form.videoNum !== newVal) {
-        this.form.videoNum = newVal;
+
+    '$route.query.videoUrl'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.form.videoUrl !== newVal) {
+        this.form.videoUrl = newVal;
       }
     },
-    'form.videoNum'(newVal, oldVal) {
-      if (newVal && newVal !== oldVal && this.$route.query.videoNum !== newVal) {
+    'form.videoUrl'(newVal, oldVal) {
+      if (newVal && newVal !== oldVal && this.$route.query.videoUrl !== newVal) {
         this.$router.replace({
           query: {
             ...this.$route.query,
-            videoNum: newVal
+            videoUrl: newVal
           }
         });
       }
@@ -211,11 +231,30 @@ export default {
   },
 
   methods: {
+
+    //     this.m3u8Url = this.$http.adornUrl(`/videos/` + this.$route.query.ip + videoUrl ? this.$route.query.videoUrl.split(',')[0] +'.m3u8': 'stream1.m3u8'),
+    // this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
+    // if (this.$route.query.videoNum == 2) {
+    //   this.thermalUrl = this.$http.adornUrl(`/videos/` + this.$route.query.ip + videoUrl ? this.$route.query.videoUrl.split(',')[1] +'.m3u8': 'stream1&channel=2.m3u8'),
+    //   this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
+    // }
     startPlay() {
-      this.m3u8Url = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
-        this.thermalUrl = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1&channel=2.m3u8`),
-        this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
-      if (this.$route.query.videoNum == 2) {
+      // this.m3u8Url = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
+      this.m3u8Url = this.$http.adornUrl(
+        `/videos/` + this.$route.query.ip +
+        ((this.$route.query.videoUrl && this.$route.query.videoUrl.length > 1)
+          ? this.$route.query.videoUrl.split(',')[0] + '.m3u8'
+          : 'stream1.m3u8')
+      )
+      // this.thermalUrl = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1&channel=2.m3u8`),
+      this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
+      if (this.$route.query.videoUrl? this.$route.query.videoUrl.split(',').length > 1 : false) {
+        this.thermalUrl = this.$http.adornUrl(
+          `/videos/` + this.$route.query.ip +
+          ((this.$route.query.videoUrl && this.$route.query.videoUrl.length > 2)
+            ? this.$route.query.videoUrl.split(',')[1] + '.m3u8'
+            : 'stream1&channel=2.m3u8')
+        )
         this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
       }
 
@@ -258,7 +297,7 @@ export default {
           ip: this.form.ip,
           password: this.form.password,
           name: this.$route.query.name,
-          videoNum: this.$route.query.videoNum,
+          videoUrl: this.$route.query.videoUrl
         }
       }).then((response) => {
         if (response.data.code === 200) {
@@ -297,7 +336,6 @@ export default {
           ip: this.form.ip,
           password: this.form.password,
           name: this.$route.query.name,
-          videoNum: this.$route.query.videoNum,
         }
       }).then((response) => {
         if (response.data.code === 200) {

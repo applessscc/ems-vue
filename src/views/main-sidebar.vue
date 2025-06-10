@@ -61,7 +61,7 @@
             视频
           </el-menu-item>
 
-          <el-menu-item index="demo-echarts"  @click="$router.push({ name: 'video-naintenance' })">
+          <el-menu-item index="demo-echarts" @click="$router.push({ name: 'video-naintenance' })">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             视频设备维护
           </el-menu-item>
@@ -172,6 +172,13 @@ export default {
     },
     // 路由操作
     routeHandle(route) {
+      // 如果标记为新窗口打开
+      // if (route.meta.openInNewWindow) {
+      //   const url = route.meta.iframeUrl ||  this.$http.adornUrl(route.path)
+      //   console.log('新窗口打开:', "http://localhost:8001/#/sys-user")
+      //   window.open("http://localhost:8001/#/sys-user", '_blank')
+      //   return
+      // }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加
         var tab = this.mainTabs.filter(item => item.name === route.name)[0]

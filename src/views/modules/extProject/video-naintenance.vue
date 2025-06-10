@@ -67,7 +67,8 @@ export default {
                 name: '',
                 sap: '',
                 ip: '',
-                address: ''
+                address: '',
+                videoUrl:''
             }
         };
     },
@@ -87,6 +88,7 @@ export default {
                 address: this.newVideo.address,
                 operator: this.$store.state.user.name,
                 password: this.newVideo.password,
+                videoUrl: this.newVideo.videoUrl,
                 createTime: this.formatDate(new Date()),
                 updateTime: this.formatDate(new Date())
             });
@@ -105,7 +107,7 @@ export default {
                     address: row.address,
                     operator: row.operator,
                     password: row.password,
-
+                    videoUrl: row.videoUrl,
                     createTime: row.createTime,
                     updateTime: row.updateTime
                 }
