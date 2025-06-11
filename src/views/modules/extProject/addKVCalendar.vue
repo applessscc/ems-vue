@@ -311,7 +311,6 @@ export default {
             }
         },
         isWorkDate(date, group) {
-            console.log('Checking work date:', date, group);
             if (group === undefined) {
                 console.error('Group is undefined, cannot check work date.');
                 return false;

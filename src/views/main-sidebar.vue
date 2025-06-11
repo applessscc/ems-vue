@@ -172,6 +172,7 @@ export default {
     },
     // 路由操作
     routeHandle(route) {
+      console.log('route changed:', route.fullPath);
       // 如果标记为新窗口打开
       // if (route.meta.openInNewWindow) {
       //   const url = route.meta.iframeUrl ||  this.$http.adornUrl(route.path)
