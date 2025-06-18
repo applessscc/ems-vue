@@ -21,7 +21,7 @@
   <span slot="title">ueditor</span>
 </el-menu-item>
 </el-submenu> -->
-        <el-submenu index="能耗分析">
+        <!-- <el-submenu index="能耗分析">
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
             <span>能耗分析</span>
@@ -40,8 +40,8 @@
             <span slot="title">CMS 实时温度</span>
           </el-menu-item>
 
-        </el-submenu>
-
+        </el-submenu> -->
+        <!-- 
         <el-submenu index="炒饭机任务">
           <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
@@ -50,9 +50,9 @@
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             炒菜机-b8
           </el-menu-item>
-        </el-submenu>
-        <el-submenu index="视频">
-          <template slot="title">
+        </el-submenu> -->
+        <!-- <el-submenu index="视频"> -->
+        <!-- <template slot="title">
             <icon-svg name="shoucang" class="site-sidebar__menu-icon"></icon-svg>
             <span>视频</span>
           </template>
@@ -64,8 +64,8 @@
           <el-menu-item index="demo-echarts" @click="$router.push({ name: 'video-naintenance' })">
             <icon-svg name="tubiao" class="site-sidebar__menu-icon"></icon-svg>
             视频设备维护
-          </el-menu-item>
-        </el-submenu>
+          </el-menu-item> -->
+        <!-- </el-submenu> -->
 
         <!-- <el-submenu index="任务管理">
           <template slot="title">
@@ -180,6 +180,35 @@ export default {
       //   window.open("http://localhost:8001/#/sys-user", '_blank')
       //   return
       // }
+      // if (route.meta.openInNewWindow) {
+      // console.log('新窗口打开:', route.path)
+      // this.openNew(route.path)
+      // return
+      // }
+
+      const routePath = route.path;
+      console.log('routePath:', routePath);
+      if (routePath === '/extProject-video') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/video')
+        return
+      } else if (routePath === '/cookerJob-cookerJob-b8') {
+        this.$router.push('/home')
+        this.openNew('cookerJob/cookerJob-b8')
+        return
+      } else if (routePath === '/equipment-electricity') {
+        this.$router.push('/home')
+        this.openNew('equipment/electricity')
+        return
+      } else if (routePath === '/equipment-electricity-his') {
+        this.$router.push('/home')
+        this.openNew('equipment/electricity-his')
+        return
+      } else if (routePath === '/equipment-ai-temp-borad') {
+        this.$router.push('/home')
+        this.openNew('equipment/ai-temp-borad')
+        return
+      }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加
         var tab = this.mainTabs.filter(item => item.name === route.name)[0]

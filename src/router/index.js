@@ -91,6 +91,14 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+
+  //   if (to.meta.openInNewWindow) {
+  //   const fullUrl = window.location.origin + to.fullPath
+  //   window.open(fullUrl, '_blank')
+  //   next(false) // ❗️阻止当前导航，防止死循环
+  //   return
+  // }
+  
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
@@ -157,7 +165,7 @@ function fnAddDynamicMenuRoutes(menuList = [], routes = []) {
           title: menuList[i].name,
           isDynamic: true,
           isTab: true,
-          openInNewWindow: true,
+          // openInNewWindow: true,
           iframeUrl: ''
         }
       }

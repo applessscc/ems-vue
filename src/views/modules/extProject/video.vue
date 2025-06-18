@@ -131,8 +131,9 @@ export default {
       this.form.ip = '10.9.42.13'
       this.form.password = 'hugo@test'
       this.form.name = 'IR_CAM'
-      this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
-      this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
+      this.startCamera();
+      // this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
+      // this.initPlayer(this.$refs.videoPlayer2, this.thermalUrl);
     }
     this.getActiveStreams();
 

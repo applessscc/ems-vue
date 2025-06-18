@@ -15,7 +15,7 @@
             <el-form-item prop="password">
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
-            <el-form-item prop="captcha" v-if="!dataForm.isGuest">
+            <!-- <el-form-item prop="captcha"  v-if="false">
               <el-row :gutter="20" v-show="false">
                 <el-col :span="14" >
                   <el-input v-model="dataForm.captcha" placeholder="验证码">
@@ -25,12 +25,12 @@
                   <img :src="captchaPath" @click="getCaptcha()" alt="">
                 </el-col>
               </el-row>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item>
               <el-button class="login-btn-submit" type="primary" @click="dataFormSubmit()">登录</el-button>
             </el-form-item>
              <el-form-item>
-              <el-button class="guest-login-btn" type="default" @click="guestLogin" v-show="false">游客登录</el-button> <!-- 新增: 游客登录按钮 -->
+              <el-button class="guest-login-btn" type="default" @click="guestLogin" v-if="false">游客登录</el-button> <!-- 新增: 游客登录按钮 -->
             </el-form-item>
 
           </el-form>
