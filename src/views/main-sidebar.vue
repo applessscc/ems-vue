@@ -208,6 +208,14 @@ export default {
         this.$router.push('/home')
         this.openNew('equipment/ai-temp-borad')
         return
+      }else if (routePath === '/extProject-kangban') {
+        this.$router.push('/home')
+        this.openNew('/air-condition/kangban')
+        return
+      }else if (routePath === '/extProject-cookerJobKanban') {
+        this.$router.push('/home')
+        this.openNew('/cookerJob/cookerJobKanban')
+        return
       }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加

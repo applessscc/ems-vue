@@ -51,7 +51,7 @@ export default {
         source: []
       },
       dayYAxis: [
-        { name: 'KW/H', type: 'value' }
+        { name: 'KW/HA', type: 'value' }
       ],
       daySeries: [
         // { type: 'bar', label: { show: false, position: 'top', color: '#fff' }},
@@ -65,7 +65,7 @@ export default {
         source: []
       },
       monthYAxis: [
-        { name: 'KW/H', type: 'value' }
+        { name: 'KW/HA', type: 'value' }
       ],
       monthSeries: [
         // { type: 'bar', label: { show: true, position: 'top', color: '#fff' }, stack: 'bu',},

@@ -53,7 +53,7 @@ export default {
       optionData.title.text = params.title;
 
       //设置Y轴单位
-      var unit = (params.query_type == '1') ? 'KW/H' : 'T';
+      var unit = (params.query_type == '1') ? '' : 'T';
       optionData.yAxis[0].axisLabel.formatter = '{value} ' + unit;
 
       //柱状条数据组装

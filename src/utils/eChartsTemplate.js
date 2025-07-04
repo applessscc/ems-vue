@@ -62,7 +62,7 @@ export function getElectricityEChartsTemplate() {
             ],
         },
         yAxis: [{
-            name: '消耗量',
+            name: '消耗量（KW/H）',
             type: 'value',
             axisLabel: {
                 formatter: '{value} KW/H'
