@@ -37,7 +37,7 @@
                                 <template v-if="isWorkDate(date, group)">
                                     <el-button size="mini" round @click.stop="handleDateClick(date, group)"
                                         type="danger" plain style="margin-left: 8px;">
-                                        删除
+                                        取消
                                     </el-button>
                                 </template>
                                 <template v-else>
@@ -93,8 +93,20 @@ export default {
             const [start] = this.getWeekRange();
             const [year, month, day] = start.split('-').map(Number);
             const date = new Date(year, month - 1, day);
-            const weekNumber = this.getWeekOfMonth(date);
-            return `${year}年${month}月 第${weekNumber}周 `;
+
+            // 计算ISO 8601周数的函数
+            function getISOWeekNumber(d) {
+                const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                // 周四所在的周才是当前周，调整到周四
+                const dayNum = date.getUTCDay() || 7;
+                date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+                const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+                const weekNo = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
+                return weekNo;
+            }
+
+            const isoWeekNumber = getISOWeekNumber(date);
+            return `${year}年${month}月 第${isoWeekNumber}周`;
         },
 
     },

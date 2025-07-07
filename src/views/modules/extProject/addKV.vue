@@ -7,7 +7,7 @@
 
     <div>
       <div class="workCalendarButton">
-        <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button>
+        <!-- <el-button @click="workCalendar()"><i class="el-icon-date"></i> 工作日历</el-button> -->
         <!-- <el-button @click="openNewWindow()"><i class="el-icon-date"></i> 温区看板</el-button> -->
 
       </div>

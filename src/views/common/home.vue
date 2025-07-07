@@ -8,8 +8,8 @@
       <el-table-column prop="groupId" label="温区ID" width="180"></el-table-column>
       <el-table-column prop="groupName" label="温区名称" width="180"></el-table-column>
       <el-table-column prop="isOnline" label="是否在线" width="180"></el-table-column>
-      <el-table-column prop="lastTime" label="最后一次上线时间" width="180"></el-table-column>
-
+      <el-table-column prop="lastTime" label="最后一次上线时间" width="180" :formatter="(row) => row.lastTime || '超过一天'">
+      </el-table-column>
     </el-table>
   </div>
 </template>
