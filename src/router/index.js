@@ -39,6 +39,8 @@ const globalRoutes = [
   { path: '/kanban/machine-state-item', component: _import('kanban/machine-state-item'), name: 'machine-state-item', meta: { title: 'SN 查询' } },
   { path: '/kanban/machine-state-rep', component: _import('kanban/machine-state-rep'), name: 'machine-state-rep', meta: { title: '测试报表 查询' } },
   { path: '/modules/extProject/video', component: _import('modules/extProject/video'), name: 'video', meta: { title: 'video' } },
+  { path: '/modules/extProject/sensorStatus', component: _import('modules/extProject/sensorStatus'), name: 'sensorStatus', meta: { title: 'sensorStatus' } },
+
   { path: '/demo/test', component: _import('demo/test'), name: 'test', meta: { title: '看板测试' } }
 
 ]

@@ -216,6 +216,10 @@ export default {
         this.$router.push('/home')
         this.openNew('/cookerJob/cookerJobKanban')
         return
+      }else if (routePath === '/extProject-sensorStatus') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/sensorStatus')
+        return
       }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加
