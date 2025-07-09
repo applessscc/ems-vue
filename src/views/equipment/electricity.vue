@@ -131,6 +131,7 @@ export default {
         year: '',
         month: '',
         date: '',
+        cacheKey: ''
       },
       pieTopTitle: '1600KVA',
       pieBottomTitle: '1000KVA',
@@ -249,6 +250,32 @@ export default {
         }
         this.monthParams.date_type = "month";
         this.monthParams.title = this.getChartTitle('日') + '(' + this.monthParams.month + ')';
+
+
+        const now = new Date();
+        const currentMonth = now.getFullYear().toString() +
+          String(now.getMonth() + 1).padStart(2, '0'); // 当前年月，格式"YYYYMM"
+
+        // if (this.monthParams.month === currentMonth) {
+        //   // 当月，赋值为具体日期
+        //   const currentDate = currentMonth + String(now.getDate()).padStart(2, '0'); // "YYYYMMDD"
+        //   this.monthParams.cacheKey = this.monthParams.month.query_type + currentDate + this.monthParams.month.bu_name;
+        // } else {
+        //   // 不是当月，直接赋值month
+        //   this.monthParams.cacheKey = this.monthParams.month.query_type + this.monthParams.month + this.monthParams.month.bu_name;
+
+        // }
+
+
+        const { month, query_type, bu_name } = this.monthParams;
+        if (month === currentMonth) {
+          const currentDate = currentMonth + String(now.getDate()).padStart(2, '0'); // 20250709
+          this.monthParams.cacheKey = query_type + ':' + currentDate + ':' + bu_name;
+        } else {
+          this.monthParams.cacheKey = query_type + ':' + month + ':' + bu_name;
+        }
+
+
         this.$refs.chartLineBar2.getDataList(this.monthParams, '/report/electricitybu/queryElectricityConsumptionByDay');
       }
 

@@ -60,8 +60,8 @@
 
 
               <div class="custom-card"
-                :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item.deviceName).color }"
-                :class="['marquee-border', getBorderColor(item.deviceName).animationClass]">
+                :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
+                :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
                   <!-- 标题 -->
                   <div class="item-desc">{{ item.deviceName }}</div>
@@ -75,23 +75,24 @@
                       <div class="info-item">
                         <i class="el-icon-sunny" style="color: #f39c12; margin-right: 4px;"></i>
                         <span class="label">温度:</span>
-                        <span class="value">{{ item.tempValue }}°C</span>
+                        <span class="value" style="color: #f39c12;">{{ item.tempValue }}°C</span>
                       </div>
                       <div class="info-item">
                         <i class="el-icon-water-cup" style="color: #3498db; margin-right: 4px;"></i>
                         <span class="label">湿度:</span>
-                        <span class="value">{{ item.dampValue }}%</span>
+                        <span class="value" style="color: #3498db;">{{ item.dampValue }}%</span>
                       </div>
                       <div class="info-item">
                         <i class="el-icon-lightning" style="color: #e74c3c; margin-right: 4px;"></i>
                         <span class="label">powerValue:</span>
-                        <span class="value">{{ item.powerValue }}</span>
+                        <span class="value" style="color: #e74c3c;">{{ item.powerValue }}</span>
                       </div>
+
                     </div>
                     <!-- 右边：状态标签-->
                     <div class="info-tag">
-                      <el-tag :type="getStatusType(item.deviceName)" class="status-tag">
-                        {{ getStatusText(item.deviceName) }}
+                      <el-tag :type="getStatusType(item)" class="status-tag">
+                        {{ getStatusText(item) }}
                       </el-tag>
                     </div>
                   </div>
@@ -112,7 +113,12 @@
 </template>
 
 <script>
+import ClockGauge from '@/components/ClockGauge.vue';
+
 export default {
+  components: {
+    ClockGauge
+  },
   mounted() {
     this.getSensorStatus();
     this.timer = setInterval(() => {
@@ -145,38 +151,39 @@ export default {
         label: "label",
       },
       loading: false,
-      tableData: [
-        { deviceName: "设备1", tempValue: "29.3°C", statusCode: "正常", dampValue: "67.8", powerValue: "42" },
-        { deviceName: "设备2", tempValue: "24.7°C", statusCode: "正常", dampValue: "74.1", powerValue: "87" },
-        { deviceName: "设备3", tempValue: "32.1°C", statusCode: "异常", dampValue: "58.3", powerValue: "13" },
-        { deviceName: "设备4", tempValue: "21.9°C", statusCode: "正常", dampValue: "33.2", powerValue: "76" },
-        { deviceName: "设备5", tempValue: "27.4°C", statusCode: "正常", dampValue: "49.9", powerValue: "22" },
-        { deviceName: "设备6", tempValue: "30.6°C", statusCode: "正常", dampValue: "66.4", powerValue: "59" },
-        { deviceName: "设备7", tempValue: "25.0°C", statusCode: "正常", dampValue: "70.5", powerValue: "7" },
-        { deviceName: "设备8", tempValue: "28.8°C", statusCode: "正常", dampValue: "62.0", powerValue: "91" },
-        { deviceName: "设备9", tempValue: "23.5°C", statusCode: "异常", dampValue: "40.3", powerValue: "33" },
-        { deviceName: "设备10", tempValue: "26.2°C", statusCode: "正常", dampValue: "52.7", powerValue: "14" },
-        { deviceName: "设备11", tempValue: "31.7°C", statusCode: "正常", dampValue: "60.2", powerValue: "80" },
-        { deviceName: "设备12", tempValue: "22.1°C", statusCode: "正常", dampValue: "45.6", powerValue: "50" },
-        { deviceName: "设备13", tempValue: "29.9°C", statusCode: "异常", dampValue: "53.1", powerValue: "19" },
-        { deviceName: "设备14", tempValue: "24.3°C", statusCode: "正常", dampValue: "38.7", powerValue: "43" },
-        { deviceName: "设备15", tempValue: "27.8°C", statusCode: "正常", dampValue: "69.4", powerValue: "88" },
-        { deviceName: "设备16", tempValue: "30.1°C", statusCode: "正常", dampValue: "55.9", powerValue: "65" },
-        { deviceName: "设备17", tempValue: "23.8°C", statusCode: "正常", dampValue: "48.0", powerValue: "26" },
-        { deviceName: "设备18", tempValue: "26.5°C", statusCode: "正常", dampValue: "64.3", powerValue: "72" },
-        { deviceName: "设备19", tempValue: "28.2°C", statusCode: "异常", dampValue: "57.5", powerValue: "39" },
-        { deviceName: "设备20", tempValue: "25.7°C", statusCode: "正常", dampValue: "61.6", powerValue: "54" },
-        { deviceName: "设备21", tempValue: "27.1°C", statusCode: "正常", dampValue: "59.2", powerValue: "47" },
-        { deviceName: "设备22", tempValue: "29.4°C", statusCode: "异常", dampValue: "50.9", powerValue: "31" },
-        { deviceName: "设备23", tempValue: "24.9°C", statusCode: "正常", dampValue: "68.7", powerValue: "83" },
-        { deviceName: "设备24", tempValue: "31.2°C", statusCode: "正常", dampValue: "44.5", powerValue: "28" },
-        { deviceName: "设备25", tempValue: "26.8°C", statusCode: "正常", dampValue: "53.4", powerValue: "65" },
-        { deviceName: "设备26", tempValue: "30.0°C", statusCode: "异常", dampValue: "61.1", powerValue: "12" },
-        { deviceName: "设备27", tempValue: "23.3°C", statusCode: "正常", dampValue: "56.7", powerValue: "74" },
-        { deviceName: "设备28", tempValue: "28.5°C", statusCode: "正常", dampValue: "47.9", powerValue: "58" },
-        { deviceName: "设备29", tempValue: "25.1°C", statusCode: "正常", dampValue: "62.8", powerValue: "41" },
-        { deviceName: "设备30", tempValue: "27.6°C", statusCode: "异常", dampValue: "55.3", powerValue: "36" }
-      ]
+      tableData: [],
+      // tableData: [
+      //   { deviceName: "设备1", tempValue: "29.3°C", statusCode: "正常", dampValue: "67.8", powerValue: "42" },
+      //   { deviceName: "设备2", tempValue: "24.7°C", statusCode: "正常", dampValue: "74.1", powerValue: "87" },
+      //   { deviceName: "设备3", tempValue: "32.1°C", statusCode: "异常", dampValue: "58.3", powerValue: "13" },
+      //   { deviceName: "设备4", tempValue: "21.9°C", statusCode: "正常", dampValue: "33.2", powerValue: "76" },
+      //   { deviceName: "设备5", tempValue: "27.4°C", statusCode: "正常", dampValue: "49.9", powerValue: "22" },
+      //   { deviceName: "设备6", tempValue: "30.6°C", statusCode: "正常", dampValue: "66.4", powerValue: "59" },
+      //   { deviceName: "设备7", tempValue: "25.0°C", statusCode: "正常", dampValue: "70.5", powerValue: "7" },
+      //   { deviceName: "设备8", tempValue: "28.8°C", statusCode: "正常", dampValue: "62.0", powerValue: "91" },
+      //   { deviceName: "设备9", tempValue: "23.5°C", statusCode: "异常", dampValue: "40.3", powerValue: "33" },
+      //   { deviceName: "设备10", tempValue: "26.2°C", statusCode: "正常", dampValue: "52.7", powerValue: "14" },
+      //   { deviceName: "设备11", tempValue: "31.7°C", statusCode: "正常", dampValue: "60.2", powerValue: "80" },
+      //   { deviceName: "设备12", tempValue: "22.1°C", statusCode: "正常", dampValue: "45.6", powerValue: "50" },
+      //   { deviceName: "设备13", tempValue: "29.9°C", statusCode: "异常", dampValue: "53.1", powerValue: "19" },
+      //   { deviceName: "设备14", tempValue: "24.3°C", statusCode: "正常", dampValue: "38.7", powerValue: "43" },
+      //   { deviceName: "设备15", tempValue: "27.8°C", statusCode: "正常", dampValue: "69.4", powerValue: "88" },
+      //   { deviceName: "设备16", tempValue: "30.1°C", statusCode: "正常", dampValue: "55.9", powerValue: "65" },
+      //   { deviceName: "设备17", tempValue: "23.8°C", statusCode: "正常", dampValue: "48.0", powerValue: "26" },
+      //   { deviceName: "设备18", tempValue: "26.5°C", statusCode: "正常", dampValue: "64.3", powerValue: "72" },
+      //   { deviceName: "设备19", tempValue: "28.2°C", statusCode: "异常", dampValue: "57.5", powerValue: "39" },
+      //   { deviceName: "设备20", tempValue: "25.7°C", statusCode: "正常", dampValue: "61.6", powerValue: "54" },
+      //   { deviceName: "设备21", tempValue: "27.1°C", statusCode: "正常", dampValue: "59.2", powerValue: "47" },
+      //   { deviceName: "设备22", tempValue: "29.4°C", statusCode: "异常", dampValue: "50.9", powerValue: "31" },
+      //   { deviceName: "设备23", tempValue: "24.9°C", statusCode: "正常", dampValue: "68.7", powerValue: "83" },
+      //   { deviceName: "设备24", tempValue: "31.2°C", statusCode: "正常", dampValue: "44.5", powerValue: "28" },
+      //   { deviceName: "设备25", tempValue: "26.8°C", statusCode: "正常", dampValue: "53.4", powerValue: "65" },
+      //   { deviceName: "设备26", tempValue: "30.0°C", statusCode: "异常", dampValue: "61.1", powerValue: "12" },
+      //   { deviceName: "设备27", tempValue: "23.3°C", statusCode: "正常", dampValue: "56.7", powerValue: "74" },
+      //   { deviceName: "设备28", tempValue: "28.5°C", statusCode: "正常", dampValue: "47.9", powerValue: "58" },
+      //   { deviceName: "设备29", tempValue: "25.1°C", statusCode: "正常", dampValue: "62.8", powerValue: "41" },
+      //   { deviceName: "设备30", tempValue: "27.6°C", statusCode: "异常", dampValue: "55.3", powerValue: "36" }
+      // ]
 
     };
   },
@@ -226,17 +233,24 @@ export default {
         window.open(url, '_blank');
       }
     },
-    getBorderColor(deviceName) {
+    getBorderColor(item) {
+      if (item && item.status === 2) {
+        return {
+          color: '#F56C6C', // 红色边框
+          animationClass: 'alarm-border-animation',
+        };
+      }
       return {
         color: '#67C23A',
         animationClass: 'marquee-border-testing',
       };
+
     },
-    getStatusType(deviceName) {
-      return 'success';
+    getStatusType(item) {
+      return item && item.status === 2 ? 'danger' : 'success';
     },
-    getStatusText(deviceName) {
-      return '正常';
+    getStatusText(item) {
+      return item && item.status === 2 ? '异常' : '正常';
     },
   },
 };
@@ -248,18 +262,24 @@ export default {
   color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-size: 24px;
-  margin: 5px;
+  margin: 7px;
   text-align: center;
   line-height: 60px;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .aside {
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   background-image: url('~@/assets/img/side.jpg');
   background-repeat: repeat;
   background-size: auto;
   color: white;
   padding: 10px;
-  margin: 5px;
+  margin: 7px;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   overflow: auto;
@@ -275,11 +295,14 @@ export default {
   background-repeat: repeat;
   color: #333;
   padding: 30px;
-  margin: 5px;
+  margin: 7px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: 850px;
   overflow: auto;
   text-align: center;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .show-item {
@@ -341,19 +364,35 @@ export default {
 
 /* 卡片模拟样式 */
 .custom-card {
-  border-width: 8px;
-  border-style: solid;
+  background: rgba(255, 255, 255, 0.15);
+  /* 透明白 */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* 半透明边框 */
   border-radius: 20px;
-  background-color: white;
-  transition: box-shadow 0.3s;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  /* 高斯模糊，核心效果 */
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    /* 柔和阴影 */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  /* 内阴影，高光效果 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   box-sizing: border-box;
 }
 
 .custom-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
+
+
+
+
+
 
 /* 动画样式 */
 .marquee-border {
@@ -363,6 +402,14 @@ export default {
 .marquee-border-testing {
   animation-name: testing-marquee-border;
 }
+
+.alarm-border-animation {
+  animation-name: alarm-flash-border;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
 
 .tooltip-label {
   color: #409EFF;
@@ -374,7 +421,24 @@ export default {
 @keyframes testing-marquee-border {
   0% {
     border-color: #91e991;
-    background-color: #d7e2d7;
+    background-color: #ebffeb;
+  }
+
+  50% {
+    border-color: #91e991;
+    background-color: #ebffeb;
+  }
+
+  100% {
+    border-color: #91e991;
+    background-color: #ebffeb;
+  }
+}
+
+@keyframes alarm-flash-border {
+  0% {
+    border-color: #F56C6C;
+    background-color: #ffeaea;
   }
 
   50% {
@@ -383,10 +447,8 @@ export default {
   }
 
   100% {
-    border-color: #91e991;
-    background-color: #d7e2d7;
+    border-color: #F56C6C;
+    background-color: #ffeaea;
   }
 }
-
-
 </style>

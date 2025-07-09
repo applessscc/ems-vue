@@ -75,18 +75,19 @@
                       <div class="info-item">
                         <i class="el-icon-sunny" style="color: #f39c12; margin-right: 4px;"></i>
                         <span class="label">温度:</span>
-                        <span class="value">{{ item.tempValue }}°C</span>
+                        <span class="value" style="color: #f39c12;">{{ item.tempValue }}°C</span>
                       </div>
                       <div class="info-item">
                         <i class="el-icon-water-cup" style="color: #3498db; margin-right: 4px;"></i>
                         <span class="label">湿度:</span>
-                        <span class="value">{{ item.dampValue }}%</span>
+                        <span class="value" style="color: #3498db;">{{ item.dampValue }}%</span>
                       </div>
                       <div class="info-item">
                         <i class="el-icon-lightning" style="color: #e74c3c; margin-right: 4px;"></i>
                         <span class="label">powerValue:</span>
-                        <span class="value">{{ item.powerValue }}</span>
+                        <span class="value" style="color: #e74c3c;">{{ item.powerValue }}</span>
                       </div>
+
                     </div>
                     <!-- 右边：状态标签-->
                     <div class="info-tag">
@@ -112,7 +113,12 @@
 </template>
 
 <script>
+import ClockGauge from '@/components/ClockGauge.vue';
+
 export default {
+  components: {
+    ClockGauge
+  },
   mounted() {
     this.getSensorStatus();
     this.timer = setInterval(() => {
@@ -256,18 +262,24 @@ export default {
   color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-size: 24px;
-  margin: 5px;
+  margin: 7px;
   text-align: center;
   line-height: 60px;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .aside {
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   background-image: url('~@/assets/img/side.jpg');
   background-repeat: repeat;
   background-size: auto;
   color: white;
   padding: 10px;
-  margin: 5px;
+  margin: 7px;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   overflow: auto;
@@ -278,16 +290,21 @@ export default {
 
 
 .main {
+    border-radius: 20px;
+
   background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
   background-image: url('~@/assets/img/main.jpg');
   background-repeat: repeat;
   color: #333;
   padding: 30px;
-  margin: 5px;
+  margin: 7px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   height: 850px;
   overflow: auto;
   text-align: center;
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .show-item {
@@ -349,19 +366,35 @@ export default {
 
 /* 卡片模拟样式 */
 .custom-card {
-  border-width: 8px;
-  border-style: solid;
+  background: rgba(255, 255, 255, 0.15);
+  /* 透明白 */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* 半透明边框 */
   border-radius: 20px;
-  background-color: white;
-  transition: box-shadow 0.3s;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  /* 高斯模糊，核心效果 */
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    /* 柔和阴影 */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  /* 内阴影，高光效果 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   box-sizing: border-box;
 }
 
 .custom-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
+
+
+
+
+
 
 /* 动画样式 */
 .marquee-border {
@@ -390,17 +423,17 @@ export default {
 @keyframes testing-marquee-border {
   0% {
     border-color: #91e991;
-    background-color: #d7e2d7;
+    background-color: #ebffeb;
   }
 
   50% {
-    border-color: transparent;
-    background-color: transparent;
+    border-color: #91e991;
+    background-color: #ebffeb;
   }
 
   100% {
     border-color: #91e991;
-    background-color: #d7e2d7;
+    background-color: #ebffeb;
   }
 }
 
@@ -409,10 +442,12 @@ export default {
     border-color: #F56C6C;
     background-color: #ffeaea;
   }
+
   50% {
     border-color: transparent;
     background-color: transparent;
   }
+
   100% {
     border-color: #F56C6C;
     background-color: #ffeaea;
