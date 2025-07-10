@@ -1,9 +1,17 @@
 <template>
   <el-container>
-    <el-header class="header">温度传感器看板</el-header>
+    <el-header class="header" style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
+         text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
+         letter-spacing: 2px;">
+      温度传感器看板
+      <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
+        <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
+      </span>
+    </el-header>
     <el-container>
       <el-aside width="200px" class="aside">
-        <el-tree :data="data" :props="defaultProps" @node-click="handleNodeClick" highlight-current />
+        <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
+          show-checkbox ref="tree"  node-key="nodeKey"/>
       </el-aside>
       <el-main class="main">
         <el-row :gutter="24" justify="center">
@@ -119,75 +127,74 @@ export default {
   components: {
     ClockGauge
   },
+
+  watch: {
+    // 监听树节点的勾选变化
+    secondLevelChecked(n, o) {
+      if (n !== o) {
+        this.getSensorStatus();
+      }
+    }
+  },
   mounted() {
+this.getSensorTreeData(); // 先调用方法
+
+this.$nextTick(() => {
+  // 等 DOM 更新完之后执行
+  this.$refs.tree.setCheckedKeys(['parent-0']);
+
+});
+
     this.getSensorStatus();
     this.timer = setInterval(() => {
       this.getSensorStatus();
     }, 15000); // 每5秒调用一次
+
   },
   data() {
     return {
-      data: [
-        {
-          label: "一级 1",
-          children: [
-            {
-              label: "二级 1-1",
-              children: [{ label: "三级 1-1-1" }, { label: "三级 1-1-2" }],
-            },
-          ],
-        },
-        {
-          label: "一级 2",
-          children: [{ label: "二级 2-1" }, { label: "二级 2-2" }],
-        },
-        {
-          label: "一级 3",
-          children: [{ label: "二级 3-1" }, { label: "二级 3-2" }],
-        },
-      ],
+      checkedNodes: [],
+      secondLevelChecked: [],
+      treeData: [],
       defaultProps: {
         children: "children",
         label: "label",
       },
       loading: false,
       tableData: [],
-      // tableData: [
-      //   { deviceName: "设备1", tempValue: "29.3°C", statusCode: "正常", dampValue: "67.8", powerValue: "42" },
-      //   { deviceName: "设备2", tempValue: "24.7°C", statusCode: "正常", dampValue: "74.1", powerValue: "87" },
-      //   { deviceName: "设备3", tempValue: "32.1°C", statusCode: "异常", dampValue: "58.3", powerValue: "13" },
-      //   { deviceName: "设备4", tempValue: "21.9°C", statusCode: "正常", dampValue: "33.2", powerValue: "76" },
-      //   { deviceName: "设备5", tempValue: "27.4°C", statusCode: "正常", dampValue: "49.9", powerValue: "22" },
-      //   { deviceName: "设备6", tempValue: "30.6°C", statusCode: "正常", dampValue: "66.4", powerValue: "59" },
-      //   { deviceName: "设备7", tempValue: "25.0°C", statusCode: "正常", dampValue: "70.5", powerValue: "7" },
-      //   { deviceName: "设备8", tempValue: "28.8°C", statusCode: "正常", dampValue: "62.0", powerValue: "91" },
-      //   { deviceName: "设备9", tempValue: "23.5°C", statusCode: "异常", dampValue: "40.3", powerValue: "33" },
-      //   { deviceName: "设备10", tempValue: "26.2°C", statusCode: "正常", dampValue: "52.7", powerValue: "14" },
-      //   { deviceName: "设备11", tempValue: "31.7°C", statusCode: "正常", dampValue: "60.2", powerValue: "80" },
-      //   { deviceName: "设备12", tempValue: "22.1°C", statusCode: "正常", dampValue: "45.6", powerValue: "50" },
-      //   { deviceName: "设备13", tempValue: "29.9°C", statusCode: "异常", dampValue: "53.1", powerValue: "19" },
-      //   { deviceName: "设备14", tempValue: "24.3°C", statusCode: "正常", dampValue: "38.7", powerValue: "43" },
-      //   { deviceName: "设备15", tempValue: "27.8°C", statusCode: "正常", dampValue: "69.4", powerValue: "88" },
-      //   { deviceName: "设备16", tempValue: "30.1°C", statusCode: "正常", dampValue: "55.9", powerValue: "65" },
-      //   { deviceName: "设备17", tempValue: "23.8°C", statusCode: "正常", dampValue: "48.0", powerValue: "26" },
-      //   { deviceName: "设备18", tempValue: "26.5°C", statusCode: "正常", dampValue: "64.3", powerValue: "72" },
-      //   { deviceName: "设备19", tempValue: "28.2°C", statusCode: "异常", dampValue: "57.5", powerValue: "39" },
-      //   { deviceName: "设备20", tempValue: "25.7°C", statusCode: "正常", dampValue: "61.6", powerValue: "54" },
-      //   { deviceName: "设备21", tempValue: "27.1°C", statusCode: "正常", dampValue: "59.2", powerValue: "47" },
-      //   { deviceName: "设备22", tempValue: "29.4°C", statusCode: "异常", dampValue: "50.9", powerValue: "31" },
-      //   { deviceName: "设备23", tempValue: "24.9°C", statusCode: "正常", dampValue: "68.7", powerValue: "83" },
-      //   { deviceName: "设备24", tempValue: "31.2°C", statusCode: "正常", dampValue: "44.5", powerValue: "28" },
-      //   { deviceName: "设备25", tempValue: "26.8°C", statusCode: "正常", dampValue: "53.4", powerValue: "65" },
-      //   { deviceName: "设备26", tempValue: "30.0°C", statusCode: "异常", dampValue: "61.1", powerValue: "12" },
-      //   { deviceName: "设备27", tempValue: "23.3°C", statusCode: "正常", dampValue: "56.7", powerValue: "74" },
-      //   { deviceName: "设备28", tempValue: "28.5°C", statusCode: "正常", dampValue: "47.9", powerValue: "58" },
-      //   { deviceName: "设备29", tempValue: "25.1°C", statusCode: "正常", dampValue: "62.8", powerValue: "41" },
-      //   { deviceName: "设备30", tempValue: "27.6°C", statusCode: "异常", dampValue: "55.3", powerValue: "36" }
-      // ]
 
     };
   },
   methods: {
+getSensorTreeData() {
+  this.$http({
+    url: this.$http.adornUrl("/extProject/getSensorStatusTreeValue"),
+    method: "get",
+  })
+    .then((res) => {
+      const rawData = res.data.data;
+      const tree = Object.keys(rawData).map((parentLabel, parentIndex) => {
+        return {
+          label: parentLabel,
+          nodeKey: `parent-${parentIndex}`,
+          children: rawData[parentLabel].map((childLabel, childIndex) => ({
+            label: childLabel,
+            nodeKey: `parent-${parentIndex}-child-${childIndex}`,
+          })),
+        };
+      });
+      this.treeData = tree;
+    })
+    .then(() => {
+      // 下一轮 DOM 更新后，手动同步勾选状态
+      this.$nextTick(() => {
+        this.handleCheckChange();
+      });
+    })
+    .catch((err) => {
+      console.error("获取树结构失败：", err);
+    });
+},
 
 
     getDetailInfo(item) {
@@ -207,14 +214,33 @@ export default {
     },
     getSensorStatus() {
       this.loading = true;
+      const searchParams = {
+        searchParams: this.secondLevelChecked.map(node => node.label)
+      };
+      console.log("请求参数:", searchParams)
       this.$http({
         url: this.$http.adornUrl("/extProject/getSensorStatus"),
         method: "get",
+        params: {
+          // 写法改为直接传数组
+          searchParams: this.secondLevelChecked.map(node => node.label)
+        },
+        paramsSerializer: params => {
+          // 强制避免 axios 默认加上 [] 的行为
+          return Object.entries(params)
+            .map(([key, val]) => {
+              if (Array.isArray(val)) {
+                return val.map(v => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`).join("&");
+              }
+              return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
+            })
+            .join("&");
+        }
       })
         .then((response) => {
           const data = response.data.data;
           this.tableData = data;
-          console.log("传感器状态数据:", data);
+          // console.log("传感器状态数据:", data);
         })
         .catch((error) => {
           console.error("请求出错:", error);
@@ -224,10 +250,28 @@ export default {
           this.loading = false;
         });
     },
-    handleNodeClick(data) {
-      console.log("点击了节点：", data);
+
+
+    handleCheckChange() {
+      const checkedNodes = this.$refs.tree.getCheckedNodes();
+      this.secondLevelChecked = checkedNodes.filter(node => {
+        return this.isSecondLevel(node);
+      });
+      console.log('勾选的二级节点：', this.secondLevelChecked);
     },
+    isSecondLevel(node) {
+      // 判断当前 node 是否为二级节点（父节点是 treeData 的子项）
+      for (let root of this.treeData) {
+        if (root.children && root.children.includes(node)) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+
     openNewWindow(deviceName) {
+      fv
       if (deviceName) {
         const url = this.$router.resolve({ name: 'deviceDetail', query: { device: deviceName } }).href;
         window.open(url, '_blank');
@@ -290,6 +334,8 @@ export default {
 
 
 .main {
+  border-radius: 20px;
+
   background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
   background-image: url('~@/assets/img/main.jpg');
   background-repeat: repeat;
