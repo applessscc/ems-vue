@@ -8,15 +8,16 @@
         <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
       </span>
     </el-header>
+
     <el-container>
       <el-aside width="200px" class="aside">
         <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
-          show-checkbox ref="tree"  node-key="nodeKey"/>
+          show-checkbox ref="tree" node-key="nodeKey" />
       </el-aside>
-      <el-main class="main">
-        <el-row :gutter="24" justify="center">
 
-          <el-col v-for="(item, index) in tableData" :key="index" :span="4" class="show-item">
+      <el-main class="main">
+        <div class="card-container">
+          <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
             <el-tooltip effect="light" placement="bottom-end">
               <div slot="content" style="max-width: 300px;">
                 <div>
@@ -65,20 +66,12 @@
                 </div>
               </div>
 
-
-
               <div class="custom-card"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
-                  <!-- 标题 -->
                   <div class="item-desc">{{ item.deviceName }}</div>
-
-                  <!-- 下方显示栏 -->
                   <div style="margin-top: 5px; display: flex; justify-content: center; align-items: flex-start;">
-
-
-                    <!-- 左边：温湿度 垂直排列 -->
                     <div style="display: flex; flex-direction: column; text-align: left;">
                       <div class="info-item">
                         <i class="el-icon-sunny" style="color: #f39c12; margin-right: 4px;"></i>
@@ -91,30 +84,23 @@
                         <span class="value" style="color: #3498db;">{{ item.dampValue }}%</span>
                       </div>
                       <div class="info-item">
-                        <i class="el-icon-lightning" style="color: #e74c3c; margin-right: 4px;"></i>
+                        <i class="el-icon-lightning" style="color: #9b59b6; margin-right: 4px;"></i>
                         <span class="label">powerValue:</span>
-                        <span class="value" style="color: #e74c3c;">{{ item.powerValue }}</span>
+                        <span class="value" style="color: #9b59b6;">{{ item.powerValue }}</span>
                       </div>
 
                     </div>
-                    <!-- 右边：状态标签-->
                     <div class="info-tag">
                       <el-tag :type="getStatusType(item)" class="status-tag">
                         {{ getStatusText(item) }}
                       </el-tag>
                     </div>
                   </div>
-
-
-
                 </div>
               </div>
-
-
             </el-tooltip>
-          </el-col>
-
-        </el-row>
+          </div>
+        </div>
       </el-main>
     </el-container>
   </el-container>
@@ -125,7 +111,7 @@ import ClockGauge from '@/components/ClockGauge.vue';
 
 export default {
   components: {
-    ClockGauge
+    ClockGauge,
   },
 
   watch: {
@@ -134,22 +120,21 @@ export default {
       if (n !== o) {
         this.getSensorStatus();
       }
-    }
+    },
   },
   mounted() {
-this.getSensorTreeData(); // 先调用方法
+    this.getSensorTreeData(); // 先调用方法
 
-this.$nextTick(() => {
-  // 等 DOM 更新完之后执行
-  this.$refs.tree.setCheckedKeys(['parent-0']);
-
-});
+    this.$nextTick(() => {
+      // 等 DOM 更新完之后执行默认勾选第一个父节点
+      this.$refs.tree.setCheckedKeys(['parent-0']);
+    });
 
     this.getSensorStatus();
+
     this.timer = setInterval(() => {
       this.getSensorStatus();
-    }, 15000); // 每5秒调用一次
-
+    }, 15000); // 每15秒调用一次
   },
   data() {
     return {
@@ -157,45 +142,43 @@ this.$nextTick(() => {
       secondLevelChecked: [],
       treeData: [],
       defaultProps: {
-        children: "children",
-        label: "label",
+        children: 'children',
+        label: 'label',
       },
       loading: false,
       tableData: [],
-
     };
   },
   methods: {
-getSensorTreeData() {
-  this.$http({
-    url: this.$http.adornUrl("/extProject/getSensorStatusTreeValue"),
-    method: "get",
-  })
-    .then((res) => {
-      const rawData = res.data.data;
-      const tree = Object.keys(rawData).map((parentLabel, parentIndex) => {
-        return {
-          label: parentLabel,
-          nodeKey: `parent-${parentIndex}`,
-          children: rawData[parentLabel].map((childLabel, childIndex) => ({
-            label: childLabel,
-            nodeKey: `parent-${parentIndex}-child-${childIndex}`,
-          })),
-        };
-      });
-      this.treeData = tree;
-    })
-    .then(() => {
-      // 下一轮 DOM 更新后，手动同步勾选状态
-      this.$nextTick(() => {
-        this.handleCheckChange();
-      });
-    })
-    .catch((err) => {
-      console.error("获取树结构失败：", err);
-    });
-},
-
+    getSensorTreeData() {
+      this.$http({
+        url: this.$http.adornUrl('/extProject/getSensorStatusTreeValue'),
+        method: 'get',
+      })
+        .then((res) => {
+          const rawData = res.data.data;
+          const tree = Object.keys(rawData).map((parentLabel, parentIndex) => {
+            return {
+              label: parentLabel,
+              nodeKey: `parent-${parentIndex}`,
+              children: rawData[parentLabel].map((childLabel, childIndex) => ({
+                label: childLabel,
+                nodeKey: `parent-${parentIndex}-child-${childIndex}`,
+              })),
+            };
+          });
+          this.treeData = tree;
+        })
+        .then(() => {
+          // 下一轮 DOM 更新后，手动同步勾选状态
+          this.$nextTick(() => {
+            this.handleCheckChange();
+          });
+        })
+        .catch((err) => {
+          console.error('获取树结构失败：', err);
+        });
+    },
 
     getDetailInfo(item) {
       return `
@@ -212,53 +195,57 @@ getSensorTreeData() {
 备注: ${item.remark}
       `.trim();
     },
+
     getSensorStatus() {
       this.loading = true;
       const searchParams = {
-        searchParams: this.secondLevelChecked.map(node => node.label)
+        searchParams: this.secondLevelChecked.map((node) => node.label),
       };
-      console.log("请求参数:", searchParams)
+      console.log('请求参数:', searchParams);
       this.$http({
-        url: this.$http.adornUrl("/extProject/getSensorStatus"),
-        method: "get",
+        url: this.$http.adornUrl('/extProject/getSensorStatus'),
+        method: 'get',
         params: {
-          // 写法改为直接传数组
-          searchParams: this.secondLevelChecked.map(node => node.label)
+          searchParams: this.secondLevelChecked.map((node) => node.label),
         },
-        paramsSerializer: params => {
+        paramsSerializer: (params) => {
           // 强制避免 axios 默认加上 [] 的行为
           return Object.entries(params)
             .map(([key, val]) => {
               if (Array.isArray(val)) {
-                return val.map(v => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`).join("&");
+                return val
+                  .map(
+                    (v) =>
+                      `${encodeURIComponent(key)}=${encodeURIComponent(v)}`
+                  )
+                  .join('&');
               }
               return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`;
             })
-            .join("&");
-        }
+            .join('&');
+        },
       })
         .then((response) => {
           const data = response.data.data;
           this.tableData = data;
-          // console.log("传感器状态数据:", data);
         })
         .catch((error) => {
-          console.error("请求出错:", error);
-          this.$message.error("请求传感器状态出错");
+          console.error('请求出错:', error);
+          this.$message.error('请求传感器状态出错');
         })
         .finally(() => {
           this.loading = false;
         });
     },
 
-
     handleCheckChange() {
       const checkedNodes = this.$refs.tree.getCheckedNodes();
-      this.secondLevelChecked = checkedNodes.filter(node => {
+      this.secondLevelChecked = checkedNodes.filter((node) => {
         return this.isSecondLevel(node);
       });
       console.log('勾选的二级节点：', this.secondLevelChecked);
     },
+
     isSecondLevel(node) {
       // 判断当前 node 是否为二级节点（父节点是 treeData 的子项）
       for (let root of this.treeData) {
@@ -269,14 +256,16 @@ getSensorTreeData() {
       return false;
     },
 
-
     openNewWindow(deviceName) {
-      fv
       if (deviceName) {
-        const url = this.$router.resolve({ name: 'deviceDetail', query: { device: deviceName } }).href;
+        const url = this.$router.resolve({
+          name: 'deviceDetail',
+          query: { device: deviceName },
+        }).href;
         window.open(url, '_blank');
       }
     },
+
     getBorderColor(item) {
       if (item && item.status === 2) {
         return {
@@ -288,14 +277,21 @@ getSensorTreeData() {
         color: '#67C23A',
         animationClass: 'marquee-border-testing',
       };
-
     },
+
     getStatusType(item) {
       return item && item.status === 2 ? 'danger' : 'success';
     },
+
     getStatusText(item) {
       return item && item.status === 2 ? '异常' : '正常';
     },
+  },
+
+  beforeDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
   },
 };
 </script>
@@ -309,14 +305,12 @@ getSensorTreeData() {
   margin: 7px;
   text-align: center;
   line-height: 60px;
-  box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.15),
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
 .aside {
-  box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.15),
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   background-image: url('~@/assets/img/side.jpg');
   background-repeat: repeat;
@@ -330,12 +324,8 @@ getSensorTreeData() {
   height: 850px;
 }
 
-
-
-
 .main {
   border-radius: 20px;
-
   background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
   background-image: url('~@/assets/img/main.jpg');
   background-repeat: repeat;
@@ -346,8 +336,7 @@ getSensorTreeData() {
   height: 850px;
   overflow: auto;
   text-align: center;
-  box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.15),
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
@@ -377,14 +366,10 @@ getSensorTreeData() {
   justify-content: space-between;
 }
 
-
-
 .status-tag {
   font-size: 12px;
   border-radius: 10px;
-  /* 设置圆角 */
   padding: 0 8px;
-  /* 可选：让 tag 更紧凑 */
 }
 
 .info-tag {
@@ -392,9 +377,7 @@ getSensorTreeData() {
   align-items: center;
   justify-content: center;
   margin-left: 15px;
-  /* 可选，根据视觉需要添加 */
 }
-
 
 .info-item {
   margin-bottom: 2px;
@@ -411,18 +394,12 @@ getSensorTreeData() {
 /* 卡片模拟样式 */
 .custom-card {
   background: rgba(255, 255, 255, 0.15);
-  /* 透明白 */
   border: 1px solid rgba(255, 255, 255, 0.3);
-  /* 半透明边框 */
   border-radius: 20px;
   backdrop-filter: blur(10px);
-  /* 高斯模糊，核心效果 */
   -webkit-backdrop-filter: blur(10px);
-  box-shadow:
-    0 4px 30px rgba(0, 0, 0, 0.1),
-    /* 柔和阴影 */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1),
     inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-  /* 内阴影，高光效果 */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
   box-sizing: border-box;
@@ -430,15 +407,9 @@ getSensorTreeData() {
 
 .custom-card:hover {
   transform: translateY(-8px);
-  box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.15),
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15),
     inset 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
-
-
-
-
-
 
 /* 动画样式 */
 .marquee-border {
@@ -456,10 +427,8 @@ getSensorTreeData() {
   animation-timing-function: ease-in-out;
 }
 
-
 .tooltip-label {
   color: #409EFF;
-  /* 蓝色，Element UI 主色调 */
   font-weight: 500;
   margin-right: 4px;
 }
@@ -496,5 +465,18 @@ getSensorTreeData() {
     border-color: #F56C6C;
     background-color: #ffeaea;
   }
+}
+
+/* 新增：卡片容器，支持自动换行 */
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 240px);
+  grid-gap: 50px;
+  justify-content: center;
+  /* 整体居中排列，最后一行默认靠左 */
+}
+
+.card-wrapper {
+  width: 240px;
 }
 </style>
