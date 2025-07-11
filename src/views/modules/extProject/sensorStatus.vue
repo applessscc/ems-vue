@@ -3,18 +3,18 @@
     <el-header class="header" style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
          text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
          letter-spacing: 2px;">
-       CMS 温湿度集中监控管理系统
+      CMS 温湿度集中监控管理系统
       <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
         <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
       </span>
     </el-header>
 
     <el-container>
-      <el-aside width="200px" class="aside">
+      <el-aside width="210px" class="aside">
         <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
-          show-checkbox ref="tree" node-key="nodeKey" />
+          show-checkbox ref="tree" node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys" />
       </el-aside>
-  
+
       <el-main class="main">
         <div class="card-container">
           <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
@@ -85,11 +85,11 @@
                         <span class="label">湿度:</span>
                         <span class="value" style="color: #3498db;">{{ item.dampValue }}%</span>
                       </div>
-                      <div class="info-item">
+                      <!-- <div class="info-item">
                         <i class="el-icon-lightning" style="color: #9b59b6; margin-right: 4px;"></i>
                         <span class="label">powerValue:</span>
                         <span class="value" style="color: #9b59b6;">{{ item.powerValue }}</span>
-                      </div>
+                      </div> -->
 
                     </div>
                     <div class="info-tag">
@@ -126,10 +126,10 @@ export default {
   },
   mounted() {
     this.getSensorTreeData(); // 先调用方法
-
     this.$nextTick(() => {
       // 等 DOM 更新完之后执行默认勾选第一个父节点
-      this.$refs.tree.setCheckedKeys(['parent-0']);
+      this.$refs.tree.setCheckedKeys(['cms-root']);
+
     });
 
     this.getSensorStatus();
@@ -140,6 +140,7 @@ export default {
   },
   data() {
     return {
+      defaultExpandedKeys: ['cms-root'], // 默认展开 CMS 节点
       checkedNodes: [],
       secondLevelChecked: [],
       treeData: [],
@@ -159,7 +160,7 @@ export default {
       })
         .then((res) => {
           const rawData = res.data.data;
-          const tree = Object.keys(rawData).map((parentLabel, parentIndex) => {
+          const children = Object.keys(rawData).map((parentLabel, parentIndex) => {
             return {
               label: parentLabel,
               nodeKey: `parent-${parentIndex}`,
@@ -169,10 +170,31 @@ export default {
               })),
             };
           });
-          this.treeData = tree;
+          // 包装最外层 CMS 节点
+          this.treeData = [
+            {
+              label: 'CMS',
+              nodeKey: 'cms-root',
+              children,
+            },
+          ];
         })
         .then(() => {
-          // 下一轮 DOM 更新后，手动同步勾选状态
+          // 展开tree
+          const expandedKeys = ['cms-root'];
+          if (this.treeData.length > 0 && this.treeData[0].children) {
+            this.treeData[0].children.forEach(parent => {
+              expandedKeys.push(parent.nodeKey);
+              if (parent.children && parent.children.length > 0) {
+                parent.children.forEach(child => {
+                  expandedKeys.push(child.nodeKey);
+                });
+              }
+            });
+          }
+          this.defaultExpandedKeys = expandedKeys;
+
+
           this.$nextTick(() => {
             this.handleCheckChange();
           });
@@ -181,6 +203,7 @@ export default {
           console.error('获取树结构失败：', err);
         });
     },
+
 
     getDetailInfo(item) {
       return `
@@ -248,9 +271,11 @@ export default {
     },
 
     isSecondLevel(node) {
-      // 判断当前 node 是否为二级节点（父节点是 treeData 的子项）
-      for (let root of this.treeData) {
-        if (root.children && root.children.includes(node)) {
+      // 多了一层 CMS
+      if (this.treeData.length === 0) return false;
+      const cmsNode = this.treeData[0];
+      for (let group of cmsNode.children || []) {
+        if (group.children && group.children.includes(node)) {
           return true;
         }
       }
@@ -402,11 +427,13 @@ export default {
 }
 
 .custom-card:hover {
-transform: scale(1.15); /* 稍强烈但不突兀 */
-box-shadow: 0 8px 30px rgba(74, 144, 226, 0.3); /* 更深更远的阴影 */
+  transform: scale(1.15);
+  /* 稍强烈但不突兀 */
+  box-shadow: 0 8px 30px rgba(74, 144, 226, 0.3);
+  /* 更深更远的阴影 */
 
 
- 
+
 }
 
 /* 动画样式 */
@@ -483,7 +510,7 @@ box-shadow: 0 8px 30px rgba(74, 144, 226, 0.3); /* 更深更远的阴影 */
   border-radius: 20px;
   margin-top: 5px;
   margin-left: 5px;
-    margin-right: 5px;
+  margin-right: 5px;
 
   margin-bottom: 15px;
   text-align: center;
@@ -505,11 +532,12 @@ box-shadow: 0 8px 30px rgba(74, 144, 226, 0.3); /* 更深更远的阴影 */
   padding: 4px 12px;
 }
 
-.item-desc:hover {
-transform: scale(1.025); /* 比原来 1.01 稍微放大一点点 */
-box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2); /* 阴影略微加深 */
+/* .item-desc:hover {
+  transform: scale(1.025);
+  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);
 
-}
+} */
+
 .info-content {
   margin: 5px;
   display: flex;
@@ -528,10 +556,11 @@ box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2); /* 阴影略微加深 */
 }
 
 .info-content:hover {
-transform: scale(1.025); /* 比原来 1.01 稍微放大一点点 */
-/* box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);  */
-box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2); /* 阴影略微加深 */
+  transform: scale(1.025);
+  /* 比原来 1.01 稍微放大一点点 */
+  /* box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);  */
+  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);
+  /* 阴影略微加深 */
 
 }
-
 </style>
