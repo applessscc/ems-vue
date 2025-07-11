@@ -3,7 +3,7 @@
     <el-header class="header" style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
          text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
          letter-spacing: 2px;">
-      温度传感器看板
+       CMS 温湿度集中监控管理系统
       <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
         <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
       </span>
@@ -14,14 +14,14 @@
         <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
           show-checkbox ref="tree" node-key="nodeKey" />
       </el-aside>
-
+  
       <el-main class="main">
         <div class="card-container">
           <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
             <el-tooltip effect="light" placement="bottom-end">
               <div slot="content" style="max-width: 300px;">
                 <div>
-                  <span style="font-weight: bold; color: #409EFF;">设备日志ID</span>
+                  <span style="font-weight: bold; color: #409EFF; ">设备日志ID</span>
                   <span style="color:#409EFF;">: {{ item.deviceLogId }}</span>
                 </div>
                 <div>
@@ -71,7 +71,9 @@
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
                   <div class="item-desc">{{ item.deviceName }}</div>
-                  <div style="margin-top: 5px; display: flex; justify-content: center; align-items: flex-start;">
+
+                  <div class="info-content">
+
                     <div style="display: flex; flex-direction: column; text-align: left;">
                       <div class="info-item">
                         <i class="el-icon-sunny" style="color: #f39c12; margin-right: 4px;"></i>
@@ -209,7 +211,6 @@ export default {
           searchParams: this.secondLevelChecked.map((node) => node.label),
         },
         paramsSerializer: (params) => {
-          // 强制避免 axios 默认加上 [] 的行为
           return Object.entries(params)
             .map(([key, val]) => {
               if (Array.isArray(val)) {
@@ -351,14 +352,9 @@ export default {
   margin: 8px;
 }
 
-.item-desc {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 16px;
-  color: #000;
-}
+
+
+
 
 .bottom {
   display: flex;
@@ -406,9 +402,11 @@ export default {
 }
 
 .custom-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+transform: scale(1.15); /* 稍强烈但不突兀 */
+box-shadow: 0 8px 30px rgba(74, 144, 226, 0.3); /* 更深更远的阴影 */
+
+
+ 
 }
 
 /* 动画样式 */
@@ -471,7 +469,7 @@ export default {
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 240px);
-  grid-gap: 50px;
+  grid-gap: 60px;
   justify-content: center;
   /* 整体居中排列，最后一行默认靠左 */
 }
@@ -479,4 +477,61 @@ export default {
 .card-wrapper {
   width: 240px;
 }
+
+
+.item-desc {
+  border-radius: 20px;
+  margin-top: 5px;
+  margin-left: 5px;
+    margin-right: 5px;
+
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 550;
+  /* 更加粗 */
+  font-size: 15px;
+  color: #000000;
+  /* 黑色字体 */
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: default;
+  user-select: none;
+
+  /* 轻微阴影给容器增加浮感 */
+  /* box-shadow: 0 2px 5px rgba(74, 144, 226, 0.2); */
+
+  /* 圆角和内边距增加可读性 */
+  padding: 4px 12px;
+}
+
+.item-desc:hover {
+transform: scale(1.025); /* 比原来 1.01 稍微放大一点点 */
+box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2); /* 阴影略微加深 */
+
+}
+.info-content {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  /* 柔和一点的阴影和边框 */
+  /* box-shadow: 0 1px 3px rgba(74, 144, 226, 0.1); */
+  border-radius: 20px;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-content:hover {
+transform: scale(1.025); /* 比原来 1.01 稍微放大一点点 */
+/* box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);  */
+box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2); /* 阴影略微加深 */
+
+}
+
 </style>
