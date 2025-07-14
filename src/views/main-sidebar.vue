@@ -221,6 +221,11 @@ export default {
         this.openNew('modules/extProject/sensorStatus')
         return
       }
+      else if (routePath === '/extProject-sensorKanban') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/sensorKanban')
+        return
+      }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加
         var tab = this.mainTabs.filter(item => item.name === route.name)[0]

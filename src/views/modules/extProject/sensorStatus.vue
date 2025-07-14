@@ -10,15 +10,15 @@
     </el-header>
 
     <el-container>
-      <el-aside width="210px" class="aside">
+      <el-aside width="250px" class="aside">
         <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
-          show-checkbox ref="tree" node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys" />
+          show-checkbox ref="tree" node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys"/>
       </el-aside>
 
       <el-main class="main">
         <div class="card-container">
           <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
-            <el-tooltip effect="light" placement="bottom-end">
+            <el-tooltip effect="light" pacement="bottom-end">
               <div slot="content" style="max-width: 300px;">
                 <div>
                   <span style="font-weight: bold; color: #409EFF; ">设备日志ID</span>
@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="custom-card"
+              <div class="custom-card" @click="openNewWindow()"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
@@ -183,6 +183,7 @@ export default {
                   children: deviceList.map((device, devIndex) => ({
                     label: device,
                     nodeKey: `vtc-${vtcIndex}-lb-${lbIndex}-sub-${subIndex}-dev-${devIndex}`,
+
                   }))
                 };
               });
@@ -211,13 +212,15 @@ export default {
           ];
         })
         .then(() => {
-          // 自动展开所有层级
+          // 自动展开到第二级（CMS -> VTC -> LB），不展开 SUB 和设备
           const expandedKeys = ['cms-root'];
 
-          const walk = (nodes) => {
+          const walk = (nodes, level = 0) => {
             nodes.forEach((node) => {
-              expandedKeys.push(node.nodeKey);
-              if (node.children) walk(node.children);
+              if (level <= 2) { // 只展开到第二层（0: CMS, 1: VTC, 2: LB）
+                expandedKeys.push(node.nodeKey);
+                if (node.children) walk(node.children, level + 1);
+              }
             });
           };
 
@@ -229,6 +232,7 @@ export default {
             this.handleCheckChange();
           });
         })
+
         .catch((err) => {
           console.error('获取树结构失败：', err);
         });
@@ -299,7 +303,7 @@ export default {
       this.secondLevelChecked = checkedNodes.filter((node) => {
         return this.isSecondLevel(node);
       });
-      console.log('勾选的二级节点：', this.secondLevelChecked);
+      console.log('勾选的设备节点：', this.secondLevelChecked);
     },
     isSecondLevel(node) {
       // 判断是否是设备节点（第四级）
@@ -309,14 +313,12 @@ export default {
 
 
 
-    openNewWindow(deviceName) {
-      if (deviceName) {
-        const url = this.$router.resolve({
-          name: 'deviceDetail',
-          query: { device: deviceName },
-        }).href;
+
+  openNewWindow() {
+        const url = this.$router.resolve({ name: 'sensorKanban'}).href;
+        console.log('打开新窗口的URL:', url);
         window.open(url, '_blank');
-      }
+      
     },
 
     getBorderColor(item) {
@@ -349,7 +351,7 @@ export default {
 };
 </script>
 
-<style >
+<style>
 .header {
   background: linear-gradient(90deg, #3a8ee6, #1f3c88);
   color: white;

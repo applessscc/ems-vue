@@ -207,7 +207,7 @@
 
 
           <el-col :span="6">
-            <el-form-item label="空调设备">
+            <el-form-item label="空调">
               <el-select v-model="form.appGroup.appId" placeholder="请选择设备" clearable filterable style="width: 170px">
                 <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
                   :value="airDevice.appId">
@@ -216,6 +216,20 @@
               <!-- <el-input  v-model="form.appGroup.appId" style="width: 200px" placeholder="空调设备ID"></el-input> -->
             </el-form-item>
           </el-col>
+
+          <el-col :span="6">
+            <el-form-item v-if="form.appGroup != null && form.appGroup.appId != ''">
+
+              <el-switch style="display: block" v-model="form.appGroup.mode" active-color="#13ce66"
+                inactive-color="#409EFF" :active-value="'1'" :inactive-value="'2'" active-text="自动"
+                inactive-text="手动" />
+
+            </el-form-item>
+
+          </el-col>
+
+
+
         </el-row>
 
         <!-- 早上 -->
@@ -685,6 +699,7 @@ export default {
         groupName: this.form.groupName,
         groupSbu: this.form.groupSbu,
         appId: this.form.appGroup.appId,
+        mode: this.form.appGroup.mode,
         mStartTime: this.form.mStartTime,
         mEndTime: this.form.mEndTime,
         aStartTime: this.form.aStartTime,
@@ -942,8 +957,8 @@ export default {
 
 .form-buttom-container {
   text-align: center;
-  width: 50%;
-  margin: 20px auto;
+  width: 70%;
+  margin: 10px auto;
   margin-top: 40px;
 
 
