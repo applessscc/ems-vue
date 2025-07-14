@@ -153,6 +153,7 @@ export default {
     };
   },
   methods: {
+
     getSensorTreeData() {
       this.$http({
         url: this.$http.adornUrl('/extProject/getSensorStatusTreeValue'),
@@ -160,40 +161,69 @@ export default {
       })
         .then((res) => {
           const rawData = res.data.data;
-          const children = Object.keys(rawData).map((parentLabel, parentIndex) => {
+
+          // 用于分组构建结构：{ VTC -> LB -> SUB -> [设备列表] }
+          const treeMap = {};
+
+          Object.keys(rawData).forEach((key) => {
+            const [vtc, lb, sub] = key.split('-');
+            if (!treeMap[vtc]) treeMap[vtc] = {};
+            if (!treeMap[vtc][lb]) treeMap[vtc][lb] = {};
+            treeMap[vtc][lb][sub] = rawData[key]; // 对应设备数组
+          });
+
+          // 构建最终树状结构
+          const cmsChildren = Object.keys(treeMap).map((vtcLabel, vtcIndex) => {
+            const lbNodes = Object.keys(treeMap[vtcLabel]).map((lbLabel, lbIndex) => {
+              const subNodes = Object.keys(treeMap[vtcLabel][lbLabel]).map((subLabel, subIndex) => {
+                const deviceList = treeMap[vtcLabel][lbLabel][subLabel];
+                return {
+                  label: subLabel,
+                  nodeKey: `vtc-${vtcIndex}-lb-${lbIndex}-sub-${subIndex}`,
+                  children: deviceList.map((device, devIndex) => ({
+                    label: device,
+                    nodeKey: `vtc-${vtcIndex}-lb-${lbIndex}-sub-${subIndex}-dev-${devIndex}`,
+                  }))
+                };
+              });
+
+              return {
+                label: lbLabel,
+                nodeKey: `vtc-${vtcIndex}-lb-${lbIndex}`,
+                children: subNodes
+              };
+            });
+
             return {
-              label: parentLabel,
-              nodeKey: `parent-${parentIndex}`,
-              children: rawData[parentLabel].map((childLabel, childIndex) => ({
-                label: childLabel,
-                nodeKey: `parent-${parentIndex}-child-${childIndex}`,
-              })),
+              label: vtcLabel,
+              nodeKey: `vtc-${vtcIndex}`,
+              children: lbNodes
             };
           });
-          // 包装最外层 CMS 节点
+
+          // 包装为 CMS 根节点
           this.treeData = [
             {
               label: 'CMS',
               nodeKey: 'cms-root',
-              children,
-            },
+              children: cmsChildren
+            }
           ];
         })
         .then(() => {
-          // 展开tree
+          // 自动展开所有层级
           const expandedKeys = ['cms-root'];
-          if (this.treeData.length > 0 && this.treeData[0].children) {
-            this.treeData[0].children.forEach(parent => {
-              expandedKeys.push(parent.nodeKey);
-              if (parent.children && parent.children.length > 0) {
-                parent.children.forEach(child => {
-                  expandedKeys.push(child.nodeKey);
-                });
-              }
-            });
-          }
-          this.defaultExpandedKeys = expandedKeys;
 
+          const walk = (nodes) => {
+            nodes.forEach((node) => {
+              expandedKeys.push(node.nodeKey);
+              if (node.children) walk(node.children);
+            });
+          };
+
+          walk(this.treeData);
+
+          this.defaultExpandedKeys = expandedKeys;
 
           this.$nextTick(() => {
             this.handleCheckChange();
@@ -203,6 +233,8 @@ export default {
           console.error('获取树结构失败：', err);
         });
     },
+
+
 
 
     getDetailInfo(item) {
@@ -269,18 +301,13 @@ export default {
       });
       console.log('勾选的二级节点：', this.secondLevelChecked);
     },
-
     isSecondLevel(node) {
-      // 多了一层 CMS
-      if (this.treeData.length === 0) return false;
-      const cmsNode = this.treeData[0];
-      for (let group of cmsNode.children || []) {
-        if (group.children && group.children.includes(node)) {
-          return true;
-        }
-      }
-      return false;
+      // 判断是否是设备节点（第四级）
+      return !node.children;
     },
+
+
+
 
     openNewWindow(deviceName) {
       if (deviceName) {
@@ -322,7 +349,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 .header {
   background: linear-gradient(90deg, #3a8ee6, #1f3c88);
   color: white;

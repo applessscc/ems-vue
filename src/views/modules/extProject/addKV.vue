@@ -188,7 +188,7 @@
         </el-row>
 
         <el-row>
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item label="温区sbu">
 
               <el-select v-model="form.groupSbu" placeholder="温区sbu" filterable style="width: 120px">
@@ -199,14 +199,14 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item label="温区名称">
               <el-input v-model="form.groupName" style="width: 170px" placeholder="groupName"></el-input>
             </el-form-item>
           </el-col>
 
 
-          <el-col :span="8">
+          <el-col :span="6">
             <el-form-item label="空调设备">
               <el-select v-model="form.appGroup.appId" placeholder="请选择设备" clearable filterable style="width: 170px">
                 <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
