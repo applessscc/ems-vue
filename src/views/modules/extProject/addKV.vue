@@ -238,12 +238,12 @@
             <el-form-item label="早班">
               <el-time-select placeholder="起始时间" v-model="form.mStartTime" :picker-options="{
                 start: '00:00',
-                step: '00:15',
+                step: '00:05',
                 end: '24:00'
               }" style="width: 120px;"></el-time-select>
               <el-time-select placeholder="结束时间" v-model="form.mEndTime" :picker-options="{
                 start: '00:00',
-                step: '00:15',
+                step: '00:05',
                 end: '24:00',
                 minTime: form.mStartTime
               }" style="width: 120px;"></el-time-select>
@@ -254,12 +254,12 @@
             <el-form-item label="午班">
               <el-time-select placeholder="起始时间" v-model="form.aStartTime" :picker-options="{
                 start: '00:00',
-                step: '00:15',
+                step: '00:05',
                 end: '24:00'
               }" style="width: 120px;"></el-time-select>
               <el-time-select placeholder="结束时间" v-model="form.aEndTime" :picker-options="{
                 start: '00:00',
-                step: '00:15',
+                step: '00:05',
                 end: '24:00',
                 minTime: form.aStartTime
               }" style="width: 120px;"></el-time-select>
@@ -270,12 +270,12 @@
             <el-form-item label="晚班">
               <el-time-select placeholder="起始时间" v-model="form.eStartTime" :picker-options="{
                 start: '18:00',
-                step: '00:15',
+                step: '00:05',
                 end: '24:00'
               }" style="width: 120px;"></el-time-select>
               <el-time-select placeholder="结束时间" v-model="form.eEndTime" :picker-options="{
                 start: '18:00',
-                step: '00:15',
+                step: '00:05',
                 end: '24:00',
                 minTime: form.eStartTime
               }" style="width: 120px;"></el-time-select>
