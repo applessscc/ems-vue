@@ -36,12 +36,12 @@
     </el-header>
 
     <el-main style="padding: 10px;">
-      <div ref="chart" style="width: 100%; height: 400px;"></div>
+      <div ref="chart" style="width: 100%; height: 600px;"></div>
     </el-main>
 
-    <el-footer style="text-align: center; line-height: 40px; background: #f2f2f2;">
+    <!-- <el-footer style="text-align: center; line-height: 40px; background: #f2f2f2;">
       Footer
-    </el-footer>
+    </el-footer> -->
   </el-container>
 </template>
 
@@ -274,9 +274,31 @@ export default {
       const tempSeries = data.map(item => parseFloat(item.tempValue));
       const dampSeries = data.map(item => parseFloat(item.dampValue));
 
+
       const option = {
         tooltip: { trigger: 'axis' },
-        legend: { data: ['温度', '湿度'] },
+        legend: {
+          data: ['湿度', '温度'],
+          textStyle: { color: '#333' }
+        },
+        grid: {
+          left: 100,
+          right: 100,
+          top: 100,
+          bottom: 110  // 给底部元素留足够空间
+        },
+        dataZoom: [
+          {
+            type: 'inside', // 鼠标滚轮缩放
+            xAxisIndex: 0
+          },
+          {
+            type: 'slider', // 底部滑动条
+            xAxisIndex: 0,
+            height: 20,
+            bottom: 10
+          }
+        ],
         xAxis: {
           type: 'category',
           data: xAxisData,
@@ -291,37 +313,91 @@ export default {
         yAxis: [
           {
             type: 'value',
-            name: '温度 (℃)',
-            position: 'left',
-            axisLabel: { formatter: '{value} ℃' },
+            name: '湿度 (%)',
+            position: 'right',
+            min: 15,
+            max: 90,
+            interval: 15,
+            axisLabel: { formatter: '{value} %' },
+            axisLine: {
+              lineStyle: {
+                // color: '#3498db'
+              }
+            }
           },
           {
             type: 'value',
-            name: '湿度 (%)',
-            position: 'right',
-            axisLabel: { formatter: '{value} %' }
-          }
+            name: '温度 (℃)',
+            position: 'left',
+            min: 0,
+            max: 40,
+            interval: 8,
+            axisLabel: { formatter: '{value} ℃' },
+            axisLine: {
+              lineStyle: {
+                // color: '#e74c3c'
+              }
+            }
+          },
+
         ],
         series: [
           {
-            name: '温度',
+            name: '湿度',
             type: 'line',
             yAxisIndex: 0,
             smooth: true,
-            data: tempSeries
+            data: dampSeries,
+            lineStyle: {
+              // color: '#3498db'
+            },
+            // markLine: {
+            //   symbol: 'none',
+            //   label: {
+            //     formatter: '警戒线：80%',
+            //     position: 'end',
+            //     color: '#3498db',
+            //   },
+            //   lineStyle: {
+            //     type: 'dashed',
+            //     color: '#3498db'
+            //   },
+            //   data: [{ yAxis: 80 }]
+            // }
           },
           {
-            name: '湿度',
+            name: '温度',
             type: 'line',
             yAxisIndex: 1,
             smooth: true,
-            data: dampSeries
+            data: tempSeries,
+            itemStyle: {
+              // color: '#e74c3c'
+            },
+            // markLine: {
+            //   symbol: 'none',
+            //   label: {
+            //     formatter: '警戒线：35℃',
+            //     position: 'end',
+            //     color: '#e74c3c'
+            //   },
+            //   lineStyle: {
+            //     type: 'dashed',
+            //     color: '#e74c3c'
+            //   },
+            //   data: [{ yAxis: 35 }]
+            // }
           }
         ]
+
       };
 
       this.chart.setOption(option);
     }
+
+
+
+
   },
   beforeDestroy() {
     if (this.chart) {
