@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="custom-card" @click="openNew('sensorKanban')"
+              <div class="custom-card"  @click="openNew('sensorKanban', item.groupName, item.deviceName)"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
@@ -311,11 +311,22 @@ export default {
 
 
 
+openNew(path, groupName, deviceName) {
+  const newUrl = this.$router.resolve({
+    path: path,
+    query: {
+      groupName: groupName,
+      deviceName: deviceName
+    }
+  });
+  console.log('打开新页面的URL:', newUrl.href);
+  window.open(newUrl.href, '_blank');
+},
 
-    openNew(path) {
-      let newUrl = this.$router.resolve({ path: path });
-      window.open(newUrl.href, '_blank');
-    },
+    // openNew(path) {
+    //   let newUrl = this.$router.resolve({ path: path });
+    //   window.open(newUrl.href, '_blank');
+    // },
   
 
     getBorderColor(item) {

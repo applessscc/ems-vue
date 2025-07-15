@@ -10,7 +10,7 @@
     </el-header>
 
     <el-container>
-      <el-aside width="210px" class="aside">
+      <el-aside width="250px" class="aside">
         <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
           show-checkbox ref="tree" node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys" />
       </el-aside>
@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="custom-card"
+              <div class="custom-card"  @click="openNew('sensorKanban', item.groupName, item.deviceName)"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
@@ -311,16 +311,23 @@ export default {
 
 
 
+openNew(path, groupName, deviceName) {
+  const newUrl = this.$router.resolve({
+    path: path,
+    query: {
+      groupName: groupName,
+      deviceName: deviceName
+    }
+  });
+  console.log('打开新页面的URL:', newUrl.href);
+  window.open(newUrl.href, '_blank');
+},
 
-    openNewWindow(deviceName) {
-      if (deviceName) {
-        const url = this.$router.resolve({
-          name: 'deviceDetail',
-          query: { device: deviceName },
-        }).href;
-        window.open(url, '_blank');
-      }
-    },
+    // openNew(path) {
+    //   let newUrl = this.$router.resolve({ path: path });
+    //   window.open(newUrl.href, '_blank');
+    // },
+  
 
     getBorderColor(item) {
       if (item && item.status === 2) {
@@ -340,13 +347,20 @@ export default {
       };
     },
 
-    getStatusType(item) {
-      return item && item.status === 2 ? 'danger' : 'success';
-    },
+getStatusType(item) {
+  if (!item) return '';
+  if (item.status === 2) return 'danger';     // 异常 - 红色
+  if (item.status === 3) return 'info';       // 离线 - 灰色（Element UI 中 'info' 是灰色）
+  return 'success';                           // 正常 - 绿色
+},
 
-    getStatusText(item) {
-      return item && item.status === 2 ? '异常' : '正常';
-    },
+getStatusText(item) {
+  if (!item) return '';
+  if (item.status === 2) return '异常';
+  if (item.status === 3) return '离线';
+  return '正常';
+},
+
   },
 
   beforeDestroy() {
