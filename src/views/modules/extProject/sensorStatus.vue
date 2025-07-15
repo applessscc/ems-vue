@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="custom-card"  @click="openNew('sensorKanban', item.groupName, item.deviceName)"
+              <div class="custom-card" @click="openNew('sensorKanban', item.groupName, item.deviceName)"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
@@ -78,12 +78,12 @@
                       <div class="info-item">
                         <i class="el-icon-sunny" style="color: #f39c12; margin-right: 4px;"></i>
                         <span class="label">温度:</span>
-                        <span class="value" style="color: #f39c12;">{{ item.tempValue }}°C</span>
+                        <span class="value" :style="{ color: getTempColor(item) }">{{ item.tempValue }}°C</span>
                       </div>
                       <div class="info-item">
                         <i class="el-icon-water-cup" style="color: #3498db; margin-right: 4px;"></i>
                         <span class="label">湿度:</span>
-                        <span class="value" style="color: #3498db;">{{ item.dampValue }}%</span>
+                        <span class="value" :style="{ color: getDampColor(item) }">{{ item.dampValue }}%</span>
                       </div>
                       <!-- <div class="info-item">
                         <i class="el-icon-lightning" style="color: #9b59b6; margin-right: 4px;"></i>
@@ -153,6 +153,19 @@ export default {
     };
   },
   methods: {
+    getTempColor(item) {
+      if (!item) return '#f39c12'; // 默认温度颜色（橙色）
+      if (item.status === 3) return '#909399'; // 离线时灰色
+      if (item.status === 2) return '#F56C6C'; // 异常时红色
+      return '#f39c12'; // 正常时橙色
+    },
+    getDampColor(item) {
+  if (!item) return '#3498db';       // 默认蓝色
+  if (item.status === 3) return '#909399'; // 离线灰色
+  if (item.status === 2) return '#F56C6C'; // 异常红色
+  return '#3498db';                  // 正常蓝色
+},
+
     getSensorTreeData() {
       this.$http({
         url: this.$http.adornUrl('/extProject/getSensorStatusTreeValue'),
@@ -311,33 +324,33 @@ export default {
 
 
 
-openNew(path, groupName, deviceName) {
-  const newUrl = this.$router.resolve({
-    path: path,
-    query: {
-      groupName: groupName,
-      deviceName: deviceName
-    }
-  });
-  console.log('打开新页面的URL:', newUrl.href);
-  window.open(newUrl.href, '_blank');
-},
+    openNew(path, groupName, deviceName) {
+      const newUrl = this.$router.resolve({
+        path: path,
+        query: {
+          groupName: groupName,
+          deviceName: deviceName
+        }
+      });
+      console.log('打开新页面的URL:', newUrl.href);
+      window.open(newUrl.href, '_blank');
+    },
 
     // openNew(path) {
     //   let newUrl = this.$router.resolve({ path: path });
     //   window.open(newUrl.href, '_blank');
     // },
-  
+
 
     getBorderColor(item) {
       if (item && item.status === 2) {
         return {
-          color: '#F56C6C', 
+          color: '#F56C6C',
           animationClass: 'alarm-border-animation',
         };
-      }else if (item && item.status === 3) {
+      } else if (item && item.status === 3) {
         return {
-          color: '#909399', 
+          color: '#909399',
           animationClass: 'leave-border-animation',
         };
       }
@@ -347,19 +360,19 @@ openNew(path, groupName, deviceName) {
       };
     },
 
-getStatusType(item) {
-  if (!item) return '';
-  if (item.status === 2) return 'danger';     // 异常 - 红色
-  if (item.status === 3) return 'info';       // 离线 - 灰色（Element UI 中 'info' 是灰色）
-  return 'success';                           // 正常 - 绿色
-},
+    getStatusType(item) {
+      if (!item) return '';
+      if (item.status === 2) return 'danger';     // 异常 - 红色
+      if (item.status === 3) return 'info';       // 离线 - 灰色（Element UI 中 'info' 是灰色）
+      return 'success';                           // 正常 - 绿色
+    },
 
-getStatusText(item) {
-  if (!item) return '';
-  if (item.status === 2) return '异常';
-  if (item.status === 3) return '离线';
-  return '正常';
-},
+    getStatusText(item) {
+      if (!item) return '';
+      if (item.status === 2) return '异常';
+      if (item.status === 3) return '离线';
+      return '正常';
+    },
 
   },
 
@@ -508,6 +521,7 @@ getStatusText(item) {
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
+
 .tooltip-label {
   color: #409EFF;
   font-weight: 500;
@@ -551,8 +565,10 @@ getStatusText(item) {
 
 @keyframes leave-flash-border {
   0% {
-    border-color: #c0c4cc;        /* 初始边框：Element UI 中性灰 */
-    background-color: #f0f2f5;    /* 初始背景：Element UI 背景灰 */
+    border-color: #c0c4cc;
+    /* 初始边框：Element UI 中性灰 */
+    background-color: #f0f2f5;
+    /* 初始背景：Element UI 背景灰 */
   }
 
   50% {
@@ -561,8 +577,10 @@ getStatusText(item) {
   }
 
   100% {
-    border-color: #c0c4cc;        /* 回到初始灰色边框 */
-    background-color: #f0f2f5;    /* 回到初始背景 */
+    border-color: #c0c4cc;
+    /* 回到初始灰色边框 */
+    background-color: #f0f2f5;
+    /* 回到初始背景 */
   }
 }
 

@@ -23,9 +23,18 @@
           </el-select>
         </el-form-item>
         <el-form-item label="日期范围">
-          <el-date-picker v-model="form.dateRange" type="daterange" align="right" unlink-panels range-separator="至"
-            start-placeholder="开始日期" end-placeholder="结束日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
-            :picker-options="pickerOptions">
+          <el-date-picker
+            v-model="form.dateRange"
+            type="daterange"
+            align="right"
+            unlink-panels
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            format="yyyy-MM-dd"
+            value-format="yyyy-MM-dd"
+            :picker-options="pickerOptions"
+          >
           </el-date-picker>
         </el-form-item>
 
@@ -57,19 +66,17 @@ export default {
     return {
       form: {
         deviceName: '',
-        dateRange: [todayStr, todayStr]
+        dateRange: [todayStr, todayStr],
       },
 
       pickerOptions: {
         shortcuts: [
-
           {
             text: '今天',
             onClick(picker) {
               const today = new Date();
-              // 只选今天这一天，开始和结束都设为今天
               picker.$emit('pick', [today, today]);
-            }
+            },
           },
           {
             text: '最近一周',
@@ -78,7 +85,7 @@ export default {
               const start = new Date();
               start.setDate(start.getDate() - 7);
               picker.$emit('pick', [start, end]);
-            }
+            },
           },
           {
             text: '最近一个月',
@@ -87,7 +94,7 @@ export default {
               const start = new Date();
               start.setMonth(start.getMonth() - 1);
               picker.$emit('pick', [start, end]);
-            }
+            },
           },
           {
             text: '最近三个月',
@@ -96,16 +103,14 @@ export default {
               const start = new Date();
               start.setMonth(start.getMonth() - 3);
               picker.$emit('pick', [start, end]);
-            }
-          }
+            },
+          },
         ],
         disabledDate(time) {
-          // 禁止选择今天之后的日期
           return time.getTime() > Date.now();
-        }
+        },
       },
 
-      // 其他数据...
       selectedLevel1: '',
       selectedLevel2: '',
       selectedLevel3: '',
@@ -116,7 +121,8 @@ export default {
       fullDataMap: {},
       chart: null,
       level2Map: {},
-      level3Map: {}
+      level3Map: {},
+      refreshTimer: null, // 定时器ID
     };
   },
 
@@ -143,15 +149,20 @@ export default {
               this.$nextTick(() => {
                 this.form.deviceName = deviceName;
                 this.getSensorKanban();
+
+                this.startAutoRefresh();
               });
             });
           });
         }
       } else {
-        this.getSensorKanban(); // 默认加载
+        this.getSensorKanban();
+
+        this.startAutoRefresh();
       }
     });
   },
+
   methods: {
     initChart() {
       this.chart = echarts.init(this.$refs.chart);
@@ -161,7 +172,7 @@ export default {
       const self = this;
       return this.$http({
         url: this.$http.adornUrl('/extProject/getSensorStatusTreeValue'),
-        method: 'get'
+        method: 'get',
       }).then(function (res) {
         const rawData = res.data.data;
         self.fullDataMap = rawData;
@@ -251,53 +262,54 @@ export default {
       const requestData = {
         startTime,
         endTime,
-        deviceName
+        deviceName,
       };
 
       this.$http({
         url: this.$http.adornUrl('/extProject/getSensorKanban'),
         method: 'post',
-        data: requestData
-      }).then(response => {
-        const data = response.data.data;
-        this.setChartOption(data);
-      }).catch(error => {
-        console.error('请求出错:', error);
-        this.$message.error('传感器看板数据请求失败，请稍后重试。');
-      });
+        data: requestData,
+      })
+        .then((response) => {
+          const data = response.data.data;
+          this.setChartOption(data);
+        })
+        .catch((error) => {
+          console.error('请求出错:', error);
+          this.$message.error('传感器看板数据请求失败，请稍后重试。');
+        });
     },
 
     setChartOption(data) {
       if (!this.chart || !Array.isArray(data)) return;
 
-      const xAxisData = data.map(item => item.saveTime);
-      const tempSeries = data.map(item => parseFloat(item.tempValue));
-      const dampSeries = data.map(item => parseFloat(item.dampValue));
-
+      const xAxisData = data.map((item) => item.saveTime);
+      const tempSeries = data.map((item) => parseFloat(item.tempValue));
+      const dampSeries = data.map((item) => parseFloat(item.dampValue));
 
       const option = {
         tooltip: { trigger: 'axis' },
         legend: {
           data: ['湿度', '温度'],
-          textStyle: { color: '#333' }
+          textStyle: { color: '#333' },
         },
         grid: {
           left: 100,
           right: 100,
           top: 100,
-          bottom: 110  // 给底部元素留足够空间
+          bottom: 110,
         },
         dataZoom: [
           {
-            type: 'inside', // 鼠标滚轮缩放
-            xAxisIndex: 0
+            type: 'inside',
+            xAxisIndex: 0,
           },
           {
-            type: 'slider', // 底部滑动条
+            type: 'slider',
             xAxisIndex: 0,
             height: 20,
-            bottom: 10
-          }
+            bottom: 10,
+          },
         ],
         xAxis: {
           type: 'category',
@@ -307,8 +319,8 @@ export default {
               return value.length >= 16 ? value.substring(0, 16) : value;
             },
             rotate: 45,
-            fontSize: 10
-          }
+            fontSize: 10,
+          },
         },
         yAxis: [
           {
@@ -319,11 +331,6 @@ export default {
             max: 90,
             interval: 15,
             axisLabel: { formatter: '{value} %' },
-            axisLine: {
-              lineStyle: {
-                // color: '#3498db'
-              }
-            }
           },
           {
             type: 'value',
@@ -333,13 +340,7 @@ export default {
             max: 40,
             interval: 8,
             axisLabel: { formatter: '{value} ℃' },
-            axisLine: {
-              lineStyle: {
-                // color: '#e74c3c'
-              }
-            }
           },
-
         ],
         series: [
           {
@@ -348,22 +349,6 @@ export default {
             yAxisIndex: 0,
             smooth: true,
             data: dampSeries,
-            lineStyle: {
-              // color: '#3498db'
-            },
-            // markLine: {
-            //   symbol: 'none',
-            //   label: {
-            //     formatter: '警戒线：80%',
-            //     position: 'end',
-            //     color: '#3498db',
-            //   },
-            //   lineStyle: {
-            //     type: 'dashed',
-            //     color: '#3498db'
-            //   },
-            //   data: [{ yAxis: 80 }]
-            // }
           },
           {
             name: '温度',
@@ -371,39 +356,32 @@ export default {
             yAxisIndex: 1,
             smooth: true,
             data: tempSeries,
-            itemStyle: {
-              // color: '#e74c3c'
-            },
-            // markLine: {
-            //   symbol: 'none',
-            //   label: {
-            //     formatter: '警戒线：35℃',
-            //     position: 'end',
-            //     color: '#e74c3c'
-            //   },
-            //   lineStyle: {
-            //     type: 'dashed',
-            //     color: '#e74c3c'
-            //   },
-            //   data: [{ yAxis: 35 }]
-            // }
-          }
-        ]
-
+          },
+        ],
       };
 
       this.chart.setOption(option);
-    }
+    },
 
-
-
-
+    startAutoRefresh() {
+      if (this.refreshTimer) {
+        clearInterval(this.refreshTimer);
+      }
+      this.refreshTimer = setInterval(() => {
+        this.getSensorKanban();
+      }, 15000); // 15秒调用一次
+    },
   },
+
   beforeDestroy() {
     if (this.chart) {
       this.chart.dispose();
     }
-  }
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
+    }
+  },
 };
 </script>
 
@@ -412,6 +390,5 @@ export default {
   margin: 25px;
   margin-bottom: 50px;
   text-align: center;
-
 }
 </style>
