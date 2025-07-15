@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="custom-card"
+              <div class="custom-card" @click="openNew('sensorKanban')"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
@@ -312,15 +312,11 @@ export default {
 
 
 
-    openNewWindow(deviceName) {
-      if (deviceName) {
-        const url = this.$router.resolve({
-          name: 'deviceDetail',
-          query: { device: deviceName },
-        }).href;
-        window.open(url, '_blank');
-      }
+    openNew(path) {
+      let newUrl = this.$router.resolve({ path: path });
+      window.open(newUrl.href, '_blank');
     },
+  
 
     getBorderColor(item) {
       if (item && item.status === 2) {
