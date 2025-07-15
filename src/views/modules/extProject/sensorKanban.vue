@@ -1,6 +1,6 @@
 <template>
   <el-container style="height: 100vh;">
-    <el-header>
+    <el-header class="head">
       <el-form :inline="true" :model="form" size="small" @submit.native.prevent>
         <el-form-item label="区域">
           <el-select v-model="selectedLevel1" placeholder="请选择" @change="onLevel1Change">
@@ -242,7 +242,7 @@ export default {
             type: 'value',
             name: '温度 (℃)',
             position: 'left',
-            axisLabel: { formatter: '{value} ℃' }
+            axisLabel: { formatter: '{value} ℃' },
           },
           {
             type: 'value',
@@ -281,5 +281,7 @@ export default {
 </script>
 
 <style scoped>
-/* 样式可以根据需要自定义 */
+.head {
+  margin: 25px;
+}
 </style>
