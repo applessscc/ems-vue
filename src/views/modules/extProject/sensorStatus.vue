@@ -12,13 +12,13 @@
     <el-container>
       <el-aside width="250px" class="aside">
         <el-tree :data="treeData" :props="defaultProps" @check-change="handleCheckChange" highlight-current
-          show-checkbox ref="tree" node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys"/>
+          show-checkbox ref="tree" node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys" />
       </el-aside>
 
       <el-main class="main">
         <div class="card-container">
           <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
-            <el-tooltip effect="light" pacement="bottom-end">
+            <el-tooltip effect="light" placement="bottom-end">
               <div slot="content" style="max-width: 300px;">
                 <div>
                   <span style="font-weight: bold; color: #409EFF; ">设备日志ID</span>
@@ -66,7 +66,7 @@
                 </div>
               </div>
 
-              <div class="custom-card" @click="openNewWindow()"
+              <div class="custom-card"
                 :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
                 :class="['marquee-border', getBorderColor(item).animationClass]">
                 <div class="right-status-container" style="margin-top: 8px;">
@@ -153,7 +153,6 @@ export default {
     };
   },
   methods: {
-
     getSensorTreeData() {
       this.$http({
         url: this.$http.adornUrl('/extProject/getSensorStatusTreeValue'),
@@ -313,19 +312,26 @@ export default {
 
 
 
-
-  openNewWindow() {
-        const url = this.$router.resolve({ name: 'sensorKanban'}).href;
-        console.log('打开新窗口的URL:', url);
+    openNewWindow(deviceName) {
+      if (deviceName) {
+        const url = this.$router.resolve({
+          name: 'deviceDetail',
+          query: { device: deviceName },
+        }).href;
         window.open(url, '_blank');
-      
+      }
     },
 
     getBorderColor(item) {
       if (item && item.status === 2) {
         return {
-          color: '#F56C6C', // 红色边框
+          color: '#F56C6C', 
           animationClass: 'alarm-border-animation',
+        };
+      }else if (item && item.status === 3) {
+        return {
+          color: '#909399', 
+          animationClass: 'leave-border-animation',
         };
       }
       return {
@@ -334,13 +340,20 @@ export default {
       };
     },
 
-    getStatusType(item) {
-      return item && item.status === 2 ? 'danger' : 'success';
-    },
+getStatusType(item) {
+  if (!item) return '';
+  if (item.status === 2) return 'danger';     // 异常 - 红色
+  if (item.status === 3) return 'info';       // 离线 - 灰色（Element UI 中 'info' 是灰色）
+  return 'success';                           // 正常 - 绿色
+},
 
-    getStatusText(item) {
-      return item && item.status === 2 ? '异常' : '正常';
-    },
+getStatusText(item) {
+  if (!item) return '';
+  if (item.status === 2) return '异常';
+  if (item.status === 3) return '离线';
+  return '正常';
+},
+
   },
 
   beforeDestroy() {
@@ -481,6 +494,13 @@ export default {
   animation-timing-function: ease-in-out;
 }
 
+
+.leave-border-animation {
+  animation-name: leave-flash-border;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
 .tooltip-label {
   color: #409EFF;
   font-weight: 500;
@@ -520,6 +540,25 @@ export default {
     background-color: #ffeaea;
   }
 }
+
+
+@keyframes leave-flash-border {
+  0% {
+    border-color: #c0c4cc;        /* 初始边框：Element UI 中性灰 */
+    background-color: #f0f2f5;    /* 初始背景：Element UI 背景灰 */
+  }
+
+  50% {
+    border-color: transparent;
+    background-color: transparent;
+  }
+
+  100% {
+    border-color: #c0c4cc;        /* 回到初始灰色边框 */
+    background-color: #f0f2f5;    /* 回到初始背景 */
+  }
+}
+
 
 /* 新增：卡片容器，支持自动换行 */
 .card-container {

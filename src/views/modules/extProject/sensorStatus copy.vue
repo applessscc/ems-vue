@@ -325,8 +325,13 @@ export default {
     getBorderColor(item) {
       if (item && item.status === 2) {
         return {
-          color: '#F56C6C', // 红色边框
+          color: '#F56C6C', 
           animationClass: 'alarm-border-animation',
+        };
+      }else if (item && item.status === 3) {
+        return {
+          color: '#909399', 
+          animationClass: 'leave-border-animation',
         };
       }
       return {
@@ -482,6 +487,13 @@ export default {
   animation-timing-function: ease-in-out;
 }
 
+
+.leave-border-animation {
+  animation-name: leave-flash-border;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
 .tooltip-label {
   color: #409EFF;
   font-weight: 500;
@@ -521,6 +533,25 @@ export default {
     background-color: #ffeaea;
   }
 }
+
+
+@keyframes leave-flash-border {
+  0% {
+    border-color: #c0c4cc;        /* 初始边框：Element UI 中性灰 */
+    background-color: #f0f2f5;    /* 初始背景：Element UI 背景灰 */
+  }
+
+  50% {
+    border-color: transparent;
+    background-color: transparent;
+  }
+
+  100% {
+    border-color: #c0c4cc;        /* 回到初始灰色边框 */
+    background-color: #f0f2f5;    /* 回到初始背景 */
+  }
+}
+
 
 /* 新增：卡片容器，支持自动换行 */
 .card-container {
