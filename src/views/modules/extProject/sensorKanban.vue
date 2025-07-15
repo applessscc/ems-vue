@@ -22,10 +22,21 @@
             <el-option v-for="device in availableDevices" :key="device" :label="device" :value="device" />
           </el-select>
         </el-form-item>
-        <el-form-item label="日期范围">
-          <el-date-picker v-model="form.dateRange" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-            format="yyyy-MM-dd" value-format="yyyy-MM-dd" />
-        </el-form-item>
+<el-form-item label="日期范围">
+  <el-date-picker
+    v-model="form.dateRange"
+    type="daterange"
+    align="right"
+    unlink-panels
+    range-separator="至"
+    start-placeholder="开始日期"
+    end-placeholder="结束日期"
+    format="yyyy-MM-dd"
+    value-format="yyyy-MM-dd"
+    :picker-options="pickerOptions">
+  </el-date-picker>
+</el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="getSensorKanban">查询</el-button>
         </el-form-item>
@@ -47,28 +58,76 @@ import * as echarts from 'echarts';
 
 export default {
   name: 'LineChart',
-  data() {
-    return {
-      form: {
-        deviceName: '',
-        dateRange: ['2025-07-14', '2025-07-15']
-      },
-      selectedLevel1: '',
-      selectedLevel2: '',
-      selectedLevel3: '',
+data() {
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10); // 'YYYY-MM-DD'
 
-      level1Options: [],
-      level2Options: [],
-      level3Options: [],
+  return {
+    form: {
+      deviceName: '',
+      dateRange: [todayStr, todayStr]
+    },
 
-      availableDevices: [],
-      fullDataMap: {},
+    pickerOptions: {
+      shortcuts: [
 
-      chart: null,
-      level2Map: {},
-      level3Map: {}
-    };
-  },
+          {
+      text: '今天',
+      onClick(picker) {
+        const today = new Date();
+        // 只选今天这一天，开始和结束都设为今天
+        picker.$emit('pick', [today, today]);
+      }
+    },
+        {
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(start.getDate() - 7);
+            picker.$emit('pick', [start, end]);
+          }
+        },
+        {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setMonth(start.getMonth() - 1);
+            picker.$emit('pick', [start, end]);
+          }
+        },
+        {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setMonth(start.getMonth() - 3);
+            picker.$emit('pick', [start, end]);
+          }
+        }
+      ],
+      disabledDate(time) {
+        // 禁止选择今天之后的日期
+        return time.getTime() > Date.now();
+      }
+    },
+
+    // 其他数据...
+    selectedLevel1: '',
+    selectedLevel2: '',
+    selectedLevel3: '',
+    level1Options: [],
+    level2Options: [],
+    level3Options: [],
+    availableDevices: [],
+    fullDataMap: {},
+    chart: null,
+    level2Map: {},
+    level3Map: {}
+  };
+},
+
   mounted() {
     this.initChart();
     this.getSensorTreeData().then(() => {
