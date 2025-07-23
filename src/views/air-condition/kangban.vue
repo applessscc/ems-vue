@@ -663,6 +663,18 @@ export default {
                     bottom: '10%',
                     containLabel: true,
                 },
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        xAxisIndex: 0,
+                    },
+                    {
+                        type: 'slider',
+                        xAxisIndex: 0,
+                        height: 17,
+                        bottom: 8,
+                    },
+                ],
                 series: series
             };
 

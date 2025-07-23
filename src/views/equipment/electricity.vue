@@ -274,7 +274,7 @@ export default {
         } else {
           this.monthParams.cacheKey = query_type + ':' + month + ':' + bu_name;
         }
-
+        this.monthParams.t = null;
 
         this.$refs.chartLineBar2.getDataList(this.monthParams, '/report/electricitybu/queryElectricityConsumptionByDay');
       }
@@ -287,6 +287,7 @@ export default {
         }
         this.yearParams.date_type = "year";
         this.yearParams.title = this.getChartTitle('月') + '(' + this.yearParams.year + ')';
+        this.yearParams.t = null;
         this.$refs.chartLineBar3.getDataList(this.yearParams, '/report/electricitybu/queryElectricityConsumptionByMonth');
       }
 
