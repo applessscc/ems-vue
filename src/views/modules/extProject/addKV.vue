@@ -224,6 +224,10 @@
                 inactive-color="#409EFF" :active-value="'1'" :inactive-value="'2'" active-text="自动"
                 inactive-text="手动" />
 
+              <!-- <el-select v-model="selectedTimezone" placeholder="选择时区" filterable>
+                <el-option v-for="tz in timezones" :key="tz" :label="tz" :value="tz" />
+              </el-select> -->
+
             </el-form-item>
 
           </el-col>
@@ -297,9 +301,12 @@
 </template>
 
 <script>
+import moment from 'moment-timezone';
 export default {
   data() {
     return {
+      selectedTimezone: '',
+      timezones: moment.tz.names(),
       offlineDevice: [],
       selectedDate: new Date(),
       calendarSbu: 2,
@@ -412,6 +419,8 @@ export default {
   },
   created() {
     this.getAppInfoList();
+        this.timezones = moment.tz.names();
+
     this.getThRecord();
     this.getThKvRecordGroups();
     this.getWorkDayList();

@@ -567,7 +567,11 @@ export default {
                                     tooltipContent += getColorDot(item.color);
                                     tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;  font-weight: bold;">设备ID:</span> ${data.id} <br>`;
                                     tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    if (data.id === "airtemp") {
+                                        tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">气象温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    } else {
+                                        tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">温度:</span> ${data.t !== null ? data.t + ' °C' : ''} <br>`;
+                                    }
                                     tooltipContent += getColorDot(item.color);
                                     tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif; ">湿度:</span> ${data.h !== null ? data.h + '%' : ''} <br>`;
                                 }
