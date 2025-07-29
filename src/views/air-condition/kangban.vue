@@ -2,7 +2,14 @@
     <div>
 
         <div class="header">
+
             <el-form :inline="true" :model="formInline" class="demo-form-inline">
+
+                <el-form-item label="实时数据" style="margin-right: 20px;">
+                    <el-switch v-model="realtimeSwitch" active-color="#13ce66" inactive-color="#409EFF">
+                    </el-switch>
+                </el-form-item>
+
                 <el-form-item label="Date" style="margin-right: 20px;">
                     <el-date-picker v-model="formInline.createTime" type="date" placeholder="Select date"
                         value-format="yyyy-MM-dd" style="width: 150px">
@@ -62,6 +69,24 @@ import _ from 'lodash';
 export default {
     name: 'MyChart',
     watch: {
+
+
+        'realtimeSwitch'(newVal) {
+            if (newVal) {
+                // 开启实时，开启定时器
+                                this.getAirStatusKanban();
+
+                this.intervalId = setInterval(() => {
+                    this.getAirStatusKanban();
+                }, 20000);
+            } else {
+                // 关闭实时，清除定时器
+                if (this.intervalId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                }
+            }
+        },
         "formInline.createTime"(n, o) {
             this.getAirStatusKanban();
         },
@@ -95,6 +120,8 @@ export default {
 
     data() {
         return {
+            realtimeSwitch: true,
+            intervalId: null,
             airDevices: [],
             groupIds: [],
             devices: [],
@@ -122,6 +149,13 @@ export default {
     created() {
 
     },
+    beforeDestroy() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+    },
+
     mounted() {
         this.$nextTick(() => {
             this.getThKvRecordGroups();
@@ -131,10 +165,11 @@ export default {
             this.getAirStatusKanban();
         });
 
-        this.intervalId = setInterval(() => {
-            this.getAirStatusKanban();
-
-        }, 20000); // 5000 毫秒，即 5 秒
+        if (this.realtimeSwitch) {
+            this.intervalId = setInterval(() => {
+                this.getAirStatusKanban();
+            }, 20000);
+        }
     },
     methods: {
         getThRecord() {
@@ -559,7 +594,7 @@ export default {
                                     tooltipContent += getColorDot(item.color);
                                     tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;">温区温度2:</span> ${data.t !== null ? data.t + '°C' : ''} <br>`;
                                     tooltipContent += getColorDot(item.color);
-                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;">气象温度:</span> ${data.h !== null ? data.h + '°C' : ''} <br>`;
+                                    tooltipContent += `<span style="font-family: 'Your Fancy Air Status Font', serif;">空调温度:</span> ${data.h !== null ? data.h + '°C' : ''} <br>`;
                                 }
                             } else if (item.seriesName === 'sensorTemperature') {
                                 const data = this.thRecords.find(aItem => this.formatTime(aItem.createTime) === item.axisValue);

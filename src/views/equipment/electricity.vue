@@ -288,6 +288,12 @@ export default {
         this.yearParams.date_type = "year";
         this.yearParams.title = this.getChartTitle('月') + '(' + this.yearParams.year + ')';
         this.yearParams.t = null;
+        this.yearParams.cacheKey = String(new Date().getDate()).padStart(2, '0') + ':'  
+        + this.yearParams.query_type + ':' 
+        + this.yearParams.bu_name+ ':' 
+        + this.yearParams.counter_id+ ':' 
+        +this.yearParams.counter_type+':'
+        +this.yearParams.position_name;
         this.$refs.chartLineBar3.getDataList(this.yearParams, '/report/electricitybu/queryElectricityConsumptionByMonth');
       }
 

@@ -23,18 +23,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="日期范围">
-          <el-date-picker
-            v-model="form.dateRange"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            format="yyyy-MM-dd"
-            value-format="yyyy-MM-dd"
-            :picker-options="pickerOptions"
-          >
+          <el-date-picker v-model="form.dateRange" type="daterange" align="right" unlink-panels range-separator="至"
+            start-placeholder="开始日期" end-placeholder="结束日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd"
+            :picker-options="pickerOptions">
           </el-date-picker>
         </el-form-item>
 
@@ -56,6 +47,7 @@
 
 <script>
 import * as echarts from 'echarts';
+import { param } from 'jquery';
 
 export default {
   name: 'LineChart',
@@ -67,6 +59,10 @@ export default {
       form: {
         deviceName: '',
         dateRange: [todayStr, todayStr],
+        dampUpper: '',
+        dampLimit: '',
+        tempUpper: '',
+        tempLimit: '',
       },
 
       pickerOptions: {
@@ -131,7 +127,6 @@ export default {
     this.getSensorTreeData().then(() => {
       const groupName = this.$route.query.groupName;
       const deviceName = this.$route.query.deviceName;
-
       if (groupName && deviceName) {
         const parts = groupName.split('-');
         if (parts.length === 3) {
@@ -241,11 +236,30 @@ export default {
         this.form.deviceName = '';
       }
     },
-
+    getDeviceInfo() {
+      const params = {
+        deviceName: this.form.deviceName ||this.$route.query.deviceName
+      };
+      this.$http({
+        url: this.$http.adornUrl('/extProject/getDeviceInfo'),
+        method: 'get',
+        params: params
+      }).then((response) => {
+        const data = response.data.data;
+        this.form.dampUpper = data.dampUpper;
+        this.form.dampLimit = data.dampLimit;
+        this.form.tempUpper = data.tempUpper;
+        this.form.tempLimit = data.tempLimit;
+        console.info('设备信息:', data);
+      }).catch((error) => {
+        console.error('获取设备信息失败:', error);
+        this.$message.error('获取设备信息失败，请稍后重试。');
+      });
+    },
     getSensorKanban() {
       const dateRange = this.form.dateRange;
       const deviceName = this.form.deviceName;
-
+this.getDeviceInfo()
       if (!dateRange || dateRange.length !== 2) {
         this.$message.warning('请选择日期范围');
         return;
@@ -342,22 +356,78 @@ export default {
             axisLabel: { formatter: '{value} ℃' },
           },
         ],
-        series: [
-          {
-            name: '湿度',
-            type: 'line',
-            yAxisIndex: 0,
-            smooth: true,
-            data: dampSeries,
-          },
-          {
-            name: '温度',
-            type: 'line',
-            yAxisIndex: 1,
-            smooth: true,
-            data: tempSeries,
-          },
-        ],
+series: [
+  {
+    name: '湿度',
+    type: 'line',
+    yAxisIndex: 0,
+    smooth: true,
+    data: dampSeries,
+    itemStyle: {
+      color: '#5470C6' // 蓝色
+    },
+    markLine: {
+      symbol: 'none',
+      label: {
+        show: true,
+        formatter: (params) => {
+          if (params.dataIndex === 0) {
+            return 'dampUpper: ' + this.form.dampUpper + '%';
+          } else {
+            return 'dampLimit: ' + this.form.dampLimit + '%';
+          }
+        },
+        color: '#5470C6',
+        position: 'end',
+        offset: [-100, 20],
+      },
+      lineStyle: {
+        type: 'dashed',
+        color: '#5470C6',
+      },
+      data: [
+        { yAxis: this.form.dampUpper },
+        { yAxis: this.form.dampLimit }
+      ]
+    }
+  },
+  {
+    name: '温度',
+    type: 'line',
+    yAxisIndex: 1,
+    smooth: true,
+    data: tempSeries,
+    itemStyle: {
+      color: '#91CC75' // 绿色
+    },
+    markLine: {
+      symbol: 'none',
+      label: {
+        show: true,
+        formatter: (params) => {
+          if (params.dataIndex === 0) {
+            return 'tempUpper: ' + this.form.tempUpper + '℃';
+          } else {
+            return 'tempLimit: ' + this.form.tempLimit + '℃';
+          }
+        },
+        color: '#91CC75',
+        position: 'start',
+        offset: [100, -20],
+      },
+      lineStyle: {
+        type: 'dashed',
+        color: '#91CC75',
+      },
+      data: [
+        { yAxis: this.form.tempUpper },
+        { yAxis: this.form.tempLimit }
+      ]
+    }
+  }
+]
+
+
       };
 
       this.chart.setOption(option);
