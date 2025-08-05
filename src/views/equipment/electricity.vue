@@ -270,9 +270,15 @@ export default {
         const { month, query_type, bu_name } = this.monthParams;
         if (month === currentMonth) {
           const currentDate = currentMonth + String(now.getDate()).padStart(2, '0'); // 20250709
-          this.monthParams.cacheKey = query_type + ':' + currentDate + ':' + bu_name;
+          this.monthParams.cacheKey = query_type + ':' + currentDate + ':' + bu_name+ ':'
+            + this.monthParams.counter_id + ':'
+            + this.monthParams.counter_type + ':'
+            + this.monthParams.position_name;
         } else {
-          this.monthParams.cacheKey = query_type + ':' + month + ':' + bu_name;
+          this.monthParams.cacheKey = query_type + ':' + month + ':' + bu_name + ':'
+            + this.monthParams.counter_id + ':'
+            + this.monthParams.counter_type + ':'
+            + this.monthParams.position_name;
         }
         this.monthParams.t = null;
 
@@ -288,12 +294,12 @@ export default {
         this.yearParams.date_type = "year";
         this.yearParams.title = this.getChartTitle('月') + '(' + this.yearParams.year + ')';
         this.yearParams.t = null;
-        this.yearParams.cacheKey = String(new Date().getDate()).padStart(2, '0') + ':'  
-        + this.yearParams.query_type + ':' 
-        + this.yearParams.bu_name+ ':' 
-        + this.yearParams.counter_id+ ':' 
-        +this.yearParams.counter_type+':'
-        +this.yearParams.position_name;
+        this.yearParams.cacheKey = String(new Date().getDate()).padStart(2, '0') + ':'
+          + this.yearParams.query_type + ':'
+          + this.yearParams.bu_name + ':'
+          + this.yearParams.counter_id + ':'
+          + this.yearParams.counter_type + ':'
+          + this.yearParams.position_name;
         this.$refs.chartLineBar3.getDataList(this.yearParams, '/report/electricitybu/queryElectricityConsumptionByMonth');
       }
 
