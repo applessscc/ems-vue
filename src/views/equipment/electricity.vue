@@ -6,8 +6,7 @@
           <el-switch v-model="pageTimerSwitch" active-text="实时数据" @change="pageTimerSwitchChange($event)" />
         </div>
         <div>
-          <el-select v-model="form.bu_name" placeholder="请选择BU" @change="selectChange()" :clearable="true" multiple
-            collapse-tags>
+          <el-select :value="form.bu_name[0] || ''" placeholder="请选择BU" @input="handleInput" :clearable="true">
             <el-option v-for="op in buNameOptions" :key="op.item" :label="op.value" :value="op.item" />
           </el-select>
         </div>
@@ -180,6 +179,11 @@ export default {
     // setInterval(this.queryTransformerNowByDict, 1000 * 30)
   },
   methods: {
+    handleChange(val) {
+      if (!Array.isArray(val)) {
+        this.form.bu_name = val ? [val] : []; // 保证永远是数组
+      }
+    },
     goHistory(date_type) {
       if (date_type == 'date' && this.dateParams) {
         this.setCounterIdByCode(this.dateParams);
@@ -270,7 +274,7 @@ export default {
         const { month, query_type, bu_name } = this.monthParams;
         if (month === currentMonth) {
           const currentDate = currentMonth + String(now.getDate()).padStart(2, '0'); // 20250709
-          this.monthParams.cacheKey = query_type + ':' + currentDate + ':' + bu_name+ ':'
+          this.monthParams.cacheKey = query_type + ':' + currentDate + ':' + bu_name + ':'
             + this.monthParams.counter_id + ':'
             + this.monthParams.counter_type + ':'
             + this.monthParams.position_name;
@@ -325,6 +329,11 @@ export default {
       } else {
         this.clearTimer();
       }
+    },
+    handleInput(val) {
+      // 强制变成数组
+      this.form.bu_name = val ? [val] : [];
+      this.selectChange();
     },
     selectChange() {
       if (this.form.bu_name.length == 0) {
@@ -394,7 +403,9 @@ export default {
 
 
       const requestData = {
-        bu_name: this.form.bu_name,  // 从 form 中获取 bu_name 数组
+        bu_name: Array.isArray(this.form.bu_name)
+          ? this.form.bu_name
+          : (this.form.bu_name ? [this.form.bu_name] : [])
       };
       this.$http({
         data: this.$http.adornData(requestData),
