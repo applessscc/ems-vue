@@ -188,7 +188,7 @@
         </el-row>
 
         <el-row>
-          <el-col :span="6">
+          <el-col :span="4.8">
             <el-form-item label="温区sbu">
 
               <el-select v-model="form.groupSbu" placeholder="温区sbu" filterable style="width: 120px">
@@ -199,14 +199,14 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :span="4.8">
             <el-form-item label="温区名称">
               <el-input v-model="form.groupName" style="width: 170px" placeholder="groupName"></el-input>
             </el-form-item>
           </el-col>
 
 
-          <el-col :span="6">
+          <el-col :span="4.8">
             <el-form-item label="空调">
               <el-select v-model="form.appGroup.appId" placeholder="请选择设备" clearable filterable style="width: 170px">
                 <el-option v-for="airDevice in airDevices" :key="airDevice.appId" :label="airDevice.name"
@@ -217,7 +217,15 @@
             </el-form-item>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :span="4.8">
+            <el-form-item label="时区">
+              <el-select v-model="selectedTimezone" placeholder="选择时区" filterable>
+                <el-option v-for="tz in timezones" :key="tz.value" :label="tz.label" :value="tz.value" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="4.8">
             <el-form-item v-if="form.appGroup != null && form.appGroup.appId != ''">
 
               <el-switch style="display: block" v-model="form.appGroup.mode" active-color="#13ce66"
@@ -306,7 +314,12 @@ export default {
   data() {
     return {
       selectedTimezone: '',
-      timezones: moment.tz.names(),
+      timezones: [
+        { value: 'Asia/Shanghai', label: '中国标准时间' },
+        { value: 'Asia/Hong_Kong', label: '香港时间' },
+        { value: 'America/Mexico_City', label: '墨西哥时间' },
+        { value: 'Asia/Kuala_Lumpur', label: '马来西亚时间' }
+      ],
       offlineDevice: [],
       selectedDate: new Date(),
       calendarSbu: 2,
@@ -419,7 +432,6 @@ export default {
   },
   created() {
     this.getAppInfoList();
-        this.timezones = moment.tz.names();
 
     this.getThRecord();
     this.getThKvRecordGroups();
@@ -429,6 +441,21 @@ export default {
     // saveVisitLog('温度系数比值');
   },
   mounted() {
+if (!this.selectedTimezone) {
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log("localTz：", localTz);
+
+  const found = this.timezones.find(tz => tz.value === localTz);
+
+  if (found) {
+    this.selectedTimezone = found.value;
+  } else {
+    const newLabel = `本地时区 (${localTz})`;
+    this.timezones.unshift({ value: localTz, label: newLabel });
+    this.selectedTimezone = localTz;
+  }
+}
+
     this.intervalId = setInterval(() => {
       this.getExceptionThKvRecord()
     }, 20000);
@@ -665,6 +692,7 @@ export default {
     clean() {
       this.groupId = '';
       this.tableData = [];
+      // this.selectedTimezone = '';
       this.form = {
         groupSbu: '',
         expMinTem: '',
@@ -715,6 +743,7 @@ export default {
         aEndTime: this.form.aEndTime,
         eStartTime: this.form.eStartTime,
         eEndTime: this.form.eEndTime,
+        selectedTimezone: this.selectedTimezone,
       };
       console.log("data", data);
       this.$http({
@@ -859,6 +888,7 @@ export default {
         this.form.eEndTime = data[0].eEndTime;
         this.form.appGroup = data[0].appGroup;
         this.form.extT = data[0].extT
+        this.selectedTimezone = data[0].selectedTimezone || this.selectedTimezone; 
       }).catch((error) => {
         console.log('Error:', error);
       });
