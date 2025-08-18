@@ -216,6 +216,10 @@ export default {
         this.$router.push('/home')
         this.openNew('/cookerJob/cookerJobKanban')
         return
+      }else if (routePath === '/extProject-edgeTerManKanban') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/edgeTerManKanban')
+        return
       }else if (routePath === '/extProject-sensorStatus') {
         this.$router.push('/home')
         this.openNew('modules/extProject/sensorStatus')

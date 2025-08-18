@@ -618,18 +618,10 @@ export default {
   cursor: default;
   user-select: none;
 
-  /* 轻微阴影给容器增加浮感 */
-  /* box-shadow: 0 2px 5px rgba(74, 144, 226, 0.2); */
 
-  /* 圆角和内边距增加可读性 */
   padding: 4px 12px;
 }
 
-/* .item-desc:hover {
-  transform: scale(1.025);
-  box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);
-
-} */
 
 .info-content {
   margin: 5px;

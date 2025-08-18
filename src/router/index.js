@@ -42,6 +42,8 @@ const globalRoutes = [
   { path: '/modules/extProject/sensorKanban', component: _import('modules/extProject/sensorKanban'), name: 'sensorKanban', meta: { title: 'sensorKanban' } },
   { path: '/modules/extProject/sensorStatus', component: _import('modules/extProject/sensorStatus'), name: 'sensorStatus', meta: { title: 'sensorStatus' } },
 
+  { path: '/modules/extProject/edgeTerManKanban', component: _import('modules/extProject/edgeTerManKanban'), name: 'edgeTerManKanban', meta: { title: 'edgeTerManKanban' } },
+
   { path: '/demo/test', component: _import('demo/test'), name: 'test', meta: { title: '看板测试' } }
 
 ]
