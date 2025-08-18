@@ -14,6 +14,7 @@
       <div class="container-wrapper-title">
         <h2>实时概况</h2>
       </div>
+
       <div class="group-container">
         <div class="group-block" v-for="(items, groupName) in statusMap" :key="groupName">
           <h3 class="group-title">{{ groupName }}</h3>
@@ -28,6 +29,7 @@
         </div>
       </div>
 
+
     </div>
 
     <!-- 折线主容器 -->
@@ -36,13 +38,22 @@
         <h2>历史趋势</h2>
       </div>
       <div class="tag-row">
+
         <!-- 左侧按钮组 -->
         <div class="tag-left">
+          <!-- 原有 tags 按钮 -->
           <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"
             size="small" @click="toggleTag(item)" plain>
             {{ item }}
           </el-button>
+
+          <!-- 用电按钮放在最后 -->
+          <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain>
+            用电
+          </el-button>
         </div>
+
+
 
         <!-- 右侧操作组 -->
         <div class="tag-right">
@@ -62,6 +73,7 @@
 
 <script>
 import * as echarts from 'echarts';
+
 
 export default {
   name: 'MyChart',
@@ -231,20 +243,24 @@ export default {
         data: item.dataList,
         emphasis: { focus: 'series' }
       }));
-
-      function getNiceStep(range) {
-        const roughStep = range / 5; // 期望分成 5 段
-        const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep))); // 10 的倍数
-        const residual = roughStep / magnitude;
-        if (residual >= 5) return 5 * magnitude;
-        if (residual >= 2) return 2 * magnitude;
-        return magnitude;
+      let yAxisMin = null;
+      let yAxisMax = null;
+      let unit = this.chatData.unit || '';
+      if (unit === 'pe') {
+        yAxisMin = 0;
+        yAxisMax = 1;
+      } else if (unit === 'Hz') {
+        yAxisMin = 0;
+        yAxisMax = 100;
+      } else if (unit === 'V') {
+        yAxisMin = 0;
+        yAxisMax = 500;
       }
       const option = {
         tooltip: { trigger: 'axis' },
         legend: { data: this.chatData.yList.map(item => item.name) },
         grid: {
-          top: 10,     // 上边距
+          top: 30,     // 上边距
           right: 10,   // 右边距
           bottom: 10,  // 下边距
           left: 10,    // 左边距
@@ -254,8 +270,8 @@ export default {
         yAxis: {
           type: 'value',
           name: this.chatData.unit,
-          min: ({ min, max }) => Math.floor((min - (max - min) * 0.2) / 10) * 10,
-          max: ({ min, max }) => Math.ceil((max + (max - min) * 0.2) / 10) * 10,
+          min: yAxisMin,
+          max: yAxisMax,
           scale: true,
           axisLabel: { formatter: val => val.toFixed(2) }
         },
@@ -279,15 +295,18 @@ export default {
     },
 
     toggleTag(item) {
-      if (this.selected !== item) {
-        this.selected = item;
-        this.form.varCodes = this.tagVarCodeMap[item] || [];
+      this.selected = item;
+      let appTypeCode = null;
+      if (item === '用电') {
+        // 和“电度”按钮传参一样
+        this.form.varCodes = this.tagVarCodeMap['电度'] || [];
+        appTypeCode = 'EPf';
       } else {
-        this.selected = null;
-        this.form.varCodes = [];
+        this.form.varCodes = this.tagVarCodeMap[item] || [];
       }
-      this.getHistoricalTrend();
+      this.getHistoricalTrend(appTypeCode);
     },
+
 
     toggleChartType() {
       this.currentType = this.currentType === 'line' ? 'bar' : 'line';
@@ -299,7 +318,7 @@ export default {
       this.myChart.setOption({ series: updatedSeries });
     },
 
-    getHistoricalTrend() {
+    getHistoricalTrend(appTypeCode) {
       if (this.form.varCodes.length === 0) {
         this.chatData.yList = [];
         this.initChart();
@@ -313,6 +332,8 @@ export default {
           startTime: this.form.startTime,
           endTime: this.form.endTime,
           varCodes: this.form.varCodes,
+          groupName: this.selected,
+          appTypeCode: appTypeCode,
         }
       }).then((response) => {
         if (response.data.code === 200) {
