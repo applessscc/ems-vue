@@ -91,6 +91,8 @@ export default {
         endTime: new Date(),
         varCodes: [],
         deviceCode: '',
+        appTypeCode: null,
+
       },
       dateRange: [new Date(), new Date()],
       chatData: {
@@ -296,15 +298,15 @@ export default {
 
     toggleTag(item) {
       this.selected = item;
-      let appTypeCode = null;
       if (item === '用电') {
         // 和“电度”按钮传参一样
         this.form.varCodes = this.tagVarCodeMap['电度'] || [];
-        appTypeCode = 'EPf';
+        this.form.appTypeCode  = 'EPf';
       } else {
         this.form.varCodes = this.tagVarCodeMap[item] || [];
+        this.form.appTypeCode = null;
       }
-      this.getHistoricalTrend(appTypeCode);
+      this.getHistoricalTrend();
     },
 
 
@@ -318,7 +320,7 @@ export default {
       this.myChart.setOption({ series: updatedSeries });
     },
 
-    getHistoricalTrend(appTypeCode) {
+    getHistoricalTrend() {
       if (this.form.varCodes.length === 0) {
         this.chatData.yList = [];
         this.initChart();
@@ -333,7 +335,7 @@ export default {
           endTime: this.form.endTime,
           varCodes: this.form.varCodes,
           groupName: this.selected,
-          appTypeCode: appTypeCode,
+          appTypeCode: this.form.appTypeCode,
         }
       }).then((response) => {
         if (response.data.code === 200) {
