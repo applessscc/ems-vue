@@ -57,12 +57,23 @@
 
         <!-- 右侧操作组 -->
         <div class="tag-right">
-          日期：<el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
+          日期：
+          <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
             end-placeholder="结束日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd" @change="onDateChange" unlink-panels
             size="small" />
-          <el-button size="small" type="primary" @click="toggleChartType">
-            切换折线/柱形
-          </el-button>
+
+          <el-select v-model="form.queryType" placeholder="请选择" size="small" style="width: 70px;"
+            @change="onQueryTypeChange">
+            <el-option label="分" value="min"></el-option>
+            <el-option label="时" value="hour"></el-option>
+            <!-- <el-option label="天" value="day"></el-option> -->
+          </el-select>
+
+          <el-select v-model="currentType" placeholder="图表类型" size="small" @change="onChartTypeChange"
+            style="width: 100px;">
+            <el-option label="折线" value="line"></el-option>
+            <el-option label="柱形" value="bar"></el-option>
+          </el-select>
         </div>
       </div>
 
@@ -79,6 +90,7 @@ export default {
   name: 'MyChart',
   data() {
     return {
+      currentType: 'line',
       statusMap: {},
       deviceList: [],
       selectedDeviceCode: '',
@@ -92,6 +104,7 @@ export default {
         varCodes: [],
         deviceCode: '',
         appTypeCode: null,
+        queryType: 'min'
 
       },
       dateRange: [new Date(), new Date()],
@@ -301,7 +314,7 @@ export default {
       if (item === '用电') {
         // 和“电度”按钮传参一样
         this.form.varCodes = this.tagVarCodeMap['电度'] || [];
-        this.form.appTypeCode  = 'EPf';
+        this.form.appTypeCode = 'EPf';
       } else {
         this.form.varCodes = this.tagVarCodeMap[item] || [];
         this.form.appTypeCode = null;
@@ -310,14 +323,18 @@ export default {
     },
 
 
-    toggleChartType() {
-      this.currentType = this.currentType === 'line' ? 'bar' : 'line';
+    onQueryTypeChange(value) {
+      this.getHistoricalTrend();
+    },
+    onChartTypeChange(value) {
       const updatedSeries = this.chatData.yList.map(item => ({
         name: item.name,
         type: this.currentType,
         data: item.dataList
       }));
-      this.myChart.setOption({ series: updatedSeries });
+      if (this.myChart) {
+        this.myChart.setOption({ series: updatedSeries });
+      }
     },
 
     getHistoricalTrend() {
@@ -336,13 +353,35 @@ export default {
           varCodes: this.form.varCodes,
           groupName: this.selected,
           appTypeCode: this.form.appTypeCode,
+          queryType: this.form.queryType,
         }
       }).then((response) => {
         if (response.data.code === 200) {
           const res = response.data.data;
           this.chatData.unit = res.unit;
           this.chatData.xAxis = res.times;
-          this.chatData.yList = res.ylist;
+
+          let yList = res.ylist;
+
+          // 如果是“用电”，计算差值
+          if (this.selected === '用电' && yList.length > 0) {
+            yList = yList.map(series => {
+              const diffData = [];
+              for (let i = 1; i < series.dataList.length; i++) {
+                diffData.push(Math.round((series.dataList[i] - series.dataList[i - 1]) * 100) / 100);
+              }
+              return {
+                ...series,
+                // x 轴保持不变，y 数据用差分后的
+                dataList: diffData
+              };
+            });
+
+            // x 轴也要对齐（因为第一项没法算差分，去掉一个）
+            this.chatData.xAxis = this.chatData.xAxis.slice(1);
+          }
+
+          this.chatData.yList = yList;
           this.initChart();
         } else {
           this.$message.error(response.data.msg);
@@ -351,6 +390,7 @@ export default {
         console.error(error);
       });
     }
+
   }
 };
 </script>
