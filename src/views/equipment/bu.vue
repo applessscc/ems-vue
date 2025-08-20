@@ -54,12 +54,49 @@ export default {
         { name: 'KW/HA', type: 'value' }
       ],
       daySeries: [
-        // { type: 'bar', label: { show: false, position: 'top', color: '#fff' }},
-        // { type: 'bar', label: { show: false, position: 'top', color: '#fff' }},
-        // { type: 'bar', label: { show: false, position: 'top', color: '#fff' }},
-        // { type: 'bar', label: { show: false, position: 'top', color: '#fff' }},
-        // { type: 'bar', label: { show: false, position: 'top', color: '#fff' }},
+        {
+          type: 'bar',
+          stack: 'bu',
+          itemStyle: {
+            color: '#8e21d5',       // 填充颜色
+            borderColor: '#ffffff', // 边框颜色
+            borderWidth: 1          // 边框宽度
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#00134f',
+            borderColor: '#ffffff',
+            borderWidth: 1
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#008e3e',
+            borderColor: '#ffffff',
+            borderWidth: 1
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#008ec2',
+            borderColor: '#ffffff',
+            borderWidth: 1
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#d9d900',
+            borderColor: '#ffffff',
+            borderWidth: 1
+          }
+        }
       ],
+
       monthData: {
         dimensions: [],
         source: []
@@ -68,12 +105,50 @@ export default {
         { name: 'KW/HA', type: 'value' }
       ],
       monthSeries: [
-        // { type: 'bar', label: { show: true, position: 'top', color: '#fff' }, stack: 'bu',},
-        // { type: 'bar', label: { show: true, position: 'top', color: '#fff' } },
-        // { type: 'bar', label: { show: true, position: 'top', color: '#fff' } },
-        // { type: 'bar', label: { show: true, position: 'top', color: '#fff' } },
-        // { type: 'bar', label: { show: true, position: 'top', color: '#fff' } },
+        {
+          type: 'bar',
+          stack: 'bu',
+          itemStyle: {
+            color: '#8e21d5',     // 填充色
+            borderColor: '#fff',  // 边框颜色
+            borderWidth: 2        // 边框宽度
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#00134f',
+            borderColor: '#fff',
+            borderWidth: 1
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#008e3e',
+            borderColor: '#fff',
+            borderWidth: 1
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#008ec2',
+            borderColor: '#fff',
+            borderWidth: 1
+          }
+        },
+        {
+          type: 'bar',
+          itemStyle: {
+            color: '#d9d900',
+            borderColor: '#fff',
+            borderWidth: 1
+          }
+        }
       ]
+
+
     }
   },
   created() {
