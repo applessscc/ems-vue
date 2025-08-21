@@ -12,7 +12,7 @@
     <!--实时概况容器-->
     <div class="container-wrapper">
       <div class="container-wrapper-title">
-        <h2>实时概况</h2>
+        <h2 style="margin-bottom: 5px; margin-top: 5px;">实时概况</h2>
       </div>
 
       <div class="group-container">
@@ -35,7 +35,7 @@
     <!-- 折线主容器 -->
     <div class="container">
       <div class="container-wrapper-title" style="width: 100%;">
-        <h2>历史趋势</h2>
+        <h2 style="margin-bottom: 5px; margin-top: 5px;">历史趋势</h2>
       </div>
       <div class="tag-row">
 
@@ -77,8 +77,48 @@
         </div>
       </div>
 
-      <div id="chart" style="width: 100%; height: 330px; margin-top: 25px;"></div>
+      <div id="chart" style="width: 100%; height: 230px; margin-top: 25px;"></div>
     </div>
+
+    <div class="bottom-container">
+      <div class="container-wrapper-title" style="width: 100%;">
+        <h2 style="margin-bottom: 5px; margin-top: 5px;" >用电</h2>
+      </div>
+
+      <div class="card-container">
+        <!-- 左边卡片 -->
+        <div class="card">
+          <div class="card-sub">当日用电 (kWh)</div>
+          <div class="card-value">126.8</div>
+
+          <div class="card-sub">昨日同期</div>
+          <div class="card-value flex-between">
+            <span>180.3</span>
+            <span class="compare">9.7%</span>
+          </div>
+        </div>
+
+
+        <!-- 右边卡片 -->
+        <div class="card">
+          <div class="card-header">
+            <span>当月用电 (kWh)</span>
+          </div>
+          <div class="card-value">210.5</div>
+
+          <div class="card-sub">上月同期</div>
+          <div class="card-value flex-between">
+            <span>249.0</span>
+            <span class="compare">-15.42%</span>
+          </div>
+        </div>
+
+      </div>
+
+
+    </div>
+
+
   </div>
 </template>
 
@@ -127,9 +167,6 @@ export default {
 
   },
   methods: {
-
-
-
     chunkArray(arr, size) {
       const result = [];
       for (let i = 0; i < arr.length; i += size) {
@@ -461,21 +498,21 @@ export default {
 
 .group-container {
   width: 90%;
-  margin: 10px auto;
-  padding: 10px;
+  margin: 9px auto;
+  padding: 5px;
 
   display: flex;
   /* 改成 flex 布局 */
   flex-wrap: wrap;
   /* 超出自动换行 */
-  gap: 10px;
+  gap: 7px;
   /* 卡片间距 */
 
 }
 
 .container-wrapper-title {
   width: 90%;
-  margin: 10px auto;
+  margin: 9px auto;
   color: #fc8517;
   font-weight: 700;
   font-size: 15px;
@@ -501,11 +538,11 @@ export default {
 }
 
 .group-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   border-bottom: 1px solid #ddd;
-  padding-bottom: 6px;
-  margin: 10px;
+  padding-bottom: 5px;
+  margin: 5px;
 }
 
 .group-items {
@@ -544,5 +581,80 @@ export default {
   margin-top: 20px;
   text-align: center;
   color: #888;
+}
+
+/* 用电容器整体 */
+.bottom-container {
+  width: 90%;
+  margin: 10px auto 0 auto;
+  box-sizing: border-box;
+}
+
+/* 卡片容器：横向排列卡片 */
+.card-container {
+  display: flex;
+  gap: 20px;
+  /* 卡片间距 */
+  margin-top: 10px;
+  flex-wrap: wrap;
+  /* 窄屏时自动换行 */
+}
+
+/* 单个卡片 */
+.card {
+  flex: 1;
+  /* 平分父容器宽度 */
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 200px;
+  /* 确保最小宽度 */
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* 卡片标题，用于显示“当日用电” */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+/* 卡片副标题，小字信息 */
+.card-sub {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* 卡片主要数值 */
+.card-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 6px 0;
+}
+
+.card-value.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 同比百分比显示 */
+.compare {
+  color: #e74c3c;
+  /* 负数红色 */
+  font-weight: bold;
+  margin-left: 6px;
 }
 </style>
