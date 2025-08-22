@@ -26,6 +26,7 @@
     <!-- 历史趋势 -->
     <div class="container-wrapper">
       <div class="container-wrapper-title">历史趋势</div>
+      <div class="chart-wrapper">
       <div class="tag-row">
         <div class="tag-left">
           <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"  :class="{ 'is-selected': selected === item }"
@@ -54,6 +55,7 @@
         </div>
       </div>
       <div id="chart"></div>
+       </div>
     </div>
 
     <!-- 用电卡片 -->
@@ -463,7 +465,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-wrap: nowrap;
-  padding: 8px 0;
+  padding: 8px;
   gap: 8px;
 }
 
@@ -486,16 +488,19 @@ export default {
   margin-top: 20px;
   background: rgba(255, 255, 255, 0.8); /* 半透明白 */
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
   padding: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 动画过渡 */
 }
 
-/* hover 放大 + 阴影 */
-#chart:hover {
-  transform: scale(1.005); 
+.chart-wrapper {
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 动画过渡 */
+  border-radius: 12px;
+}
+
+.chart-wrapper:hover {
+  /* transform: scale(1.005);  */
   box-shadow: 0 6px 16px rgba(31, 120, 209, 0.3);
 }
+
 
 
 
