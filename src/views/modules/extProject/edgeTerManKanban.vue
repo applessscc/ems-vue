@@ -399,6 +399,7 @@ export default {
 .group-block {
   flex: 1 1 300px;
   padding: 7px;
+  padding-top:0px;
   border: 0.5px solid #d0e3f8;
   border-radius: 8px;
   background: #ffffff;
