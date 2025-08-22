@@ -404,7 +404,7 @@ export default {
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .group-block:hover {
@@ -531,7 +531,7 @@ export default {
 }
 
 .compare.positive {
-  color: #4a90e2; /* 正增长亮蓝 */
+  color: #2ecc71; /* 正增长绿色 */
   font-weight: bold;
 }
 

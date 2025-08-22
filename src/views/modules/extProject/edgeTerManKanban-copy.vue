@@ -364,6 +364,9 @@ export default {
 .all-container {
   width: 90%;
   margin: 0 auto;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color: #2c3e50; /* 主文本深灰 */
+  background-color: #f8faff; /* 整体浅蓝背景 */
 }
 
 /* header */
@@ -371,15 +374,17 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 20px 0;
+  margin: 12px 0;
+  color: #1f78d1; /* 主色调 */
+  font-weight: bold;
 }
 
 /* 标题 */
 .container-wrapper-title {
-  color: #fc8517;
-  font-weight: 750;
+  color: #1f78d1;
+  font-weight: 700;
   font-size: 20px;
-  border-left: 3px solid #fc8517;
+  border-left: 3px solid #1f78d1;
   padding-left: 8px;
   margin: 10px 0;
 }
@@ -393,25 +398,27 @@ export default {
 
 .group-block {
   flex: 1 1 300px;
-  padding: 5px;
-  border: 1px solid #eee;
+  padding: 7px;
+  padding-top:0px;
+  border: 0.5px solid #d0e3f8;
   border-radius: 8px;
-  background: #fafafa;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .group-block:hover {
   transform: translateY(-3px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(31, 120, 209, 0.25);
 }
 
 .group-title {
   font-size: 14px;
   font-weight: bold;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 0.5px solid #d0e3f8;
   padding: 5px;
-  margin: 5px;
+  margin: 5px 0;
+  color: #1f78d1;
 }
 
 /* 自动换列，每列最多 3 行 */
@@ -427,24 +434,27 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  white-space: nowrap;
-  /* 内容不换行 */
+  white-space: nowrap; /* 内容不换行 */
   font-size: 14px;
 }
 
 .group-row .label {
   flex: 1 1 auto;
   min-width: 0;
-  color: #888;
-
+  color: #555d6b; /* 副文字色 */
 }
 
 .group-row .value {
   flex-shrink: 0;
   margin-left: 8px;
-  color: #409EFF;
+  color: #1f78d1; /* 主色 */
   font-weight: bold;
+  font-size: 16px;
   text-align: right;
+}
+
+.group-row .value.updated {
+  transform: scale(1.05);
 }
 
 /* 历史趋势 */
@@ -474,37 +484,36 @@ export default {
   width: 100%;
   height: 260px;
   margin-top: 20px;
+  background: #f8faff;
 }
 
 /* 用电卡片 */
 .card-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  /* 固定 2 列 */
   gap: 20px;
   margin-top: 10px;
 }
 
 .card {
-  background: #f9f9f9;
+  background: #ffffff;
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #d0e3f8;
+  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-
 }
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(31, 120, 209, 0.25);
 }
 
 .card-sub {
   font-size: 13px;
-  color: #888;
+  color: #555d6b;
   margin-top: 4px;
 }
 
@@ -512,7 +521,7 @@ export default {
   font-size: 24px;
   font-weight: bold;
   margin: 6px 0;
-
+  color: #1f78d1;
 }
 
 .card-value.flex-between {
@@ -522,31 +531,13 @@ export default {
 }
 
 .compare.positive {
-  color: #27ae60; /* 绿色 */
+  color: #2ecc71; /* 正增长绿色 */
   font-weight: bold;
 }
 
 .compare.negative {
-  color: #e74c3c; /* 红色 */
+  color: #e74c3c; /* 负增长红色 */
   font-weight: bold;
-}
-
-
-
-.group-row .value {
-  flex-shrink: 0;
-  margin-left: 8px;
-  color: #1f78d1; /* 深蓝色，更醒目 */
-  font-weight: bold;
-  font-size: 16px; /* 从14px提升到16px */
-  text-align: right;
-  font-family: "Helvetica Neue", Arial, sans-serif;
-}
-
-
-
-.group-row .value.updated {
-  transform: scale(1.1);
 }
 
 </style>
