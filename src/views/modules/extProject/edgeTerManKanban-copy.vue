@@ -26,13 +26,14 @@
     <!-- 历史趋势 -->
     <div class="container-wrapper">
       <div class="container-wrapper-title">历史趋势</div>
+      <div class="chart-wrapper">
       <div class="tag-row">
         <div class="tag-left">
-          <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"
+          <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"  :class="{ 'is-selected': selected === item }"
             size="small" @click="toggleTag(item)" plain>
             {{ item }}
           </el-button>
-          <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain>
+          <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain  :class="{ 'is-selected': selected === item }">
             用电
           </el-button>
         </div>
@@ -54,6 +55,7 @@
         </div>
       </div>
       <div id="chart"></div>
+       </div>
     </div>
 
     <!-- 用电卡片 -->
@@ -366,7 +368,7 @@ export default {
   margin: 0 auto;
   font-family: "Helvetica Neue", Arial, sans-serif;
   color: #2c3e50; /* 主文本深灰 */
-  background-color: #f8faff; /* 整体浅蓝背景 */
+  /* background-color: #f8faff; */
 }
 
 /* header */
@@ -463,7 +465,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-wrap: nowrap;
-  padding: 8px 0;
+  padding: 8px;
   gap: 8px;
 }
 
@@ -484,8 +486,23 @@ export default {
   width: 100%;
   height: 260px;
   margin-top: 20px;
-  background: #f8faff;
+  background: rgba(255, 255, 255, 0.8); /* 半透明白 */
+  border-radius: 12px;
+  padding: 10px;
 }
+
+.chart-wrapper {
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 动画过渡 */
+  border-radius: 12px;
+}
+
+.chart-wrapper:hover {
+  /* transform: scale(1.005);  */
+  box-shadow: 0 6px 16px rgba(31, 120, 209, 0.3);
+}
+
+
+
 
 /* 用电卡片 */
 .card-container {
@@ -539,5 +556,27 @@ export default {
   color: #e74c3c; /* 负增长红色 */
   font-weight: bold;
 }
+/* scoped 样式穿透 Element UI 内部 DOM */
+.all-container >>> .el-button.is-plain {
+  color: #409EFF !important;           /* 默认字体蓝 */
+  border-color: #409EFF !important;    /* 默认边框蓝 */
+  background-color: #ffffff !important; /* 默认背景白 */
+  transition: all 0.3s;
+}
+
+/* 悬浮状态 */
+.all-container >>> .el-button.is-plain:hover {
+  color: #ffffff !important;           
+  background-color: #409EFF !important; 
+  border-color: #409EFF !important;
+}
+
+/* 选中状态 */
+.all-container >>> .el-button.is-plain.is-selected {
+  color: #ffffff !important;           
+  background-color: #409EFF !important; 
+  border-color: #409EFF !important;
+}
+
 
 </style>
