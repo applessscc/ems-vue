@@ -366,7 +366,7 @@ export default {
   margin: 0 auto;
   font-family: "Helvetica Neue", Arial, sans-serif;
   color: #2c3e50; /* 主文本深灰 */
-  background-color: #f8faff; /* 整体浅蓝背景 */
+  /* background-color: #f8faff; */
 }
 
 /* header */
@@ -484,8 +484,20 @@ export default {
   width: 100%;
   height: 260px;
   margin-top: 20px;
-  background: #f8faff;
+  background: rgba(255, 255, 255, 0.8); /* 半透明白 */
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
+  padding: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 动画过渡 */
 }
+
+/* hover 放大 + 阴影 */
+#chart:hover {
+  transform: scale(1.005); 
+  box-shadow: 0 6px 16px rgba(31, 120, 209, 0.3);
+}
+
+
 
 /* 用电卡片 */
 .card-container {
