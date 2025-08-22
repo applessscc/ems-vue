@@ -216,7 +216,7 @@
   }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .mod-menu {
     .menu-list__input,
     .icon-list__input {

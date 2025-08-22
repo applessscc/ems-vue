@@ -28,11 +28,11 @@
       <div class="container-wrapper-title">历史趋势</div>
       <div class="tag-row">
         <div class="tag-left">
-          <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"
+          <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"  :class="{ 'is-selected': selected === item }"
             size="small" @click="toggleTag(item)" plain>
             {{ item }}
           </el-button>
-          <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain>
+          <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain  :class="{ 'is-selected': selected === item }">
             用电
           </el-button>
         </div>
@@ -539,5 +539,27 @@ export default {
   color: #e74c3c; /* 负增长红色 */
   font-weight: bold;
 }
+/* scoped 样式穿透 Element UI 内部 DOM */
+.all-container >>> .el-button.is-plain {
+  color: #409EFF !important;           /* 默认字体蓝 */
+  border-color: #409EFF !important;    /* 默认边框蓝 */
+  background-color: #ffffff !important; /* 默认背景白 */
+  transition: all 0.3s;
+}
+
+/* 悬浮状态 */
+.all-container >>> .el-button.is-plain:hover {
+  color: #ffffff !important;           
+  background-color: #409EFF !important; 
+  border-color: #409EFF !important;
+}
+
+/* 选中状态 */
+.all-container >>> .el-button.is-plain.is-selected {
+  color: #ffffff !important;           
+  background-color: #409EFF !important; 
+  border-color: #409EFF !important;
+}
+
 
 </style>
