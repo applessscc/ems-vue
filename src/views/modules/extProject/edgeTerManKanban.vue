@@ -27,35 +27,36 @@
     <div class="container-wrapper">
       <div class="container-wrapper-title">历史趋势</div>
       <div class="chart-wrapper">
-      <div class="tag-row">
-        <div class="tag-left">
-          <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"  :class="{ 'is-selected': selected === item }"
-            size="small" @click="toggleTag(item)" plain>
-            {{ item }}
-          </el-button>
-          <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain  :class="{ 'is-selected': selected === item }">
-            用电
-          </el-button>
+        <div class="tag-row">
+          <div class="tag-left">
+            <el-button v-for="(item, idx) in tags" :key="idx" :type="selected === item ? 'primary' : 'default'"
+              :class="{ 'is-selected': selected === item }" size="small" @click="toggleTag(item)" plain>
+              {{ item }}
+            </el-button>
+            <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain
+              :class="{ 'is-selected': selected === item }">
+              用电
+            </el-button>
+          </div>
+          <div class="tag-right">
+            日期：
+            <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
+              end-placeholder="结束日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd" @change="onDateChange" unlink-panels
+              size="small" />
+            <el-select v-model="form.queryType" placeholder="请选择" size="small" style="width: 70px;"
+              @change="getHistoricalTrend">
+              <el-option label="分" value="min"></el-option>
+              <el-option label="时" value="hour"></el-option>
+            </el-select>
+            <el-select v-model="currentType" placeholder="图表类型" size="small" style="width: 100px;"
+              @change="onChartTypeChange">
+              <el-option label="折线" value="line"></el-option>
+              <el-option label="柱形" value="bar"></el-option>
+            </el-select>
+          </div>
         </div>
-        <div class="tag-right">
-          日期：
-          <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
-            end-placeholder="结束日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd" @change="onDateChange" unlink-panels
-            size="small" />
-          <el-select v-model="form.queryType" placeholder="请选择" size="small" style="width: 70px;"
-            @change="getHistoricalTrend">
-            <el-option label="分" value="min"></el-option>
-            <el-option label="时" value="hour"></el-option>
-          </el-select>
-          <el-select v-model="currentType" placeholder="图表类型" size="small" style="width: 100px;"
-            @change="onChartTypeChange">
-            <el-option label="折线" value="line"></el-option>
-            <el-option label="柱形" value="bar"></el-option>
-          </el-select>
-        </div>
+        <div id="chart"></div>
       </div>
-      <div id="chart"></div>
-       </div>
     </div>
 
     <!-- 用电卡片 -->
@@ -67,41 +68,35 @@
           <div class="card-value">{{ eleData.todayDiff }}</div>
           <div class="card-sub">昨日同期</div>
 
-   <div class="card-value flex-between">
-  <span>{{ eleData.yesterdayDiff }}</span>
-  <span
-    class="compare"
-    :class="{
-      positive: eleData.dayGrowth > 0,
-      negative: eleData.dayGrowth < 0
-    }"
-  >
-    <template v-if="eleData.dayGrowth > 0">▲</template>
-    <template v-else-if="eleData.dayGrowth < 0">▼</template>
-    {{ Math.abs(eleData.dayGrowth).toFixed(1) }}%
-  </span>
-</div>
+          <div class="card-value flex-between">
+            <span>{{ eleData.yesterdayDiff }}</span>
+            <span class="compare" :class="{
+              positive: eleData.dayGrowth > 0,
+              negative: eleData.dayGrowth < 0
+            }">
+              <template v-if="eleData.dayGrowth > 0">▲</template>
+              <template v-else-if="eleData.dayGrowth < 0">▼</template>
+              {{ Math.abs(eleData.dayGrowth).toFixed(1) }}%
+            </span>
+          </div>
 
         </div>
 
         <div class="card">
           <div class="card-sub">当月用电 (kWh)</div>
-          <div class="card-value">{{eleData.thisMonthDiff}}</div>
+          <div class="card-value">{{ eleData.thisMonthDiff }}</div>
           <div class="card-sub">上月同期</div>
-<div class="card-value flex-between">
-  <span>{{ eleData.lastMonthDiff }}</span>
-  <span
-    class="compare"
-    :class="{
-      positive: eleData.monGrowth > 0,
-      negative: eleData.monGrowth < 0
-    }"
-  >
-    <template v-if="eleData.monGrowth > 0">▲</template>
-    <template v-else-if="eleData.monGrowth < 0">▼</template>
-    {{ Math.abs(eleData.monGrowth).toFixed(1) }}%
-  </span>
-</div>
+          <div class="card-value flex-between">
+            <span>{{ eleData.lastMonthDiff }}</span>
+            <span class="compare" :class="{
+              positive: eleData.monGrowth > 0,
+              negative: eleData.monGrowth < 0
+            }">
+              <template v-if="eleData.monGrowth > 0">▲</template>
+              <template v-else-if="eleData.monGrowth < 0">▼</template>
+              {{ Math.abs(eleData.monGrowth).toFixed(1) }}%
+            </span>
+          </div>
 
         </div>
       </div>
@@ -154,9 +149,16 @@ export default {
     this.getDeviceList();
     this.startTimer();
 
+    // echartresite
+    window.addEventListener("resize", this.handleResize);
+
   },
   beforeDestroy() {
     clearInterval(this.timer);
+
+    // echartresite
+    window.removeEventListener("resize", this.handleResize);
+
   },
   watch: {
     selectedDeviceCode(newVal) {
@@ -168,6 +170,11 @@ export default {
     },
   },
   methods: {
+    handleResize() {
+      if (this.myChart) {
+        this.myChart.resize();
+      }
+    },
     chunkArray(items, size) {
       const result = [];
       for (let i = 0; i < items.length; i += size) {
@@ -367,7 +374,8 @@ export default {
   width: 90%;
   margin: 0 auto;
   font-family: "Helvetica Neue", Arial, sans-serif;
-  color: #2c3e50; /* 主文本深灰 */
+  color: #2c3e50;
+  /* 主文本深灰 */
   /* background-color: #f8faff; */
 }
 
@@ -377,7 +385,8 @@ export default {
   align-items: center;
   gap: 10px;
   margin: 12px 0;
-  color: #1f78d1; /* 主色调 */
+  color: #1f78d1;
+  /* 主色调 */
   font-weight: bold;
 }
 
@@ -401,7 +410,7 @@ export default {
 .group-block {
   flex: 1 1 300px;
   padding: 7px;
-  padding-top:0px;
+  padding-top: 0px;
   border: 0.5px solid #d0e3f8;
   border-radius: 8px;
   background: #ffffff;
@@ -436,20 +445,23 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  white-space: nowrap; /* 内容不换行 */
+  white-space: nowrap;
+  /* 内容不换行 */
   font-size: 14px;
 }
 
 .group-row .label {
   flex: 1 1 auto;
   min-width: 0;
-  color: #555d6b; /* 副文字色 */
+  color: #555d6b;
+  /* 副文字色 */
 }
 
 .group-row .value {
   flex-shrink: 0;
   margin-left: 8px;
-  color: #1f78d1; /* 主色 */
+  color: #1f78d1;
+  /* 主色 */
   font-weight: bold;
   font-size: 16px;
   text-align: right;
@@ -484,15 +496,17 @@ export default {
 
 #chart {
   width: 100%;
-  height: 260px;
+  height: 250px;
   margin-top: 20px;
-  background: rgba(255, 255, 255, 0.8); /* 半透明白 */
+  background: rgba(255, 255, 255, 0.8);
+  /* 半透明白 */
   border-radius: 12px;
   padding: 10px;
 }
 
 .chart-wrapper {
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 动画过渡 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* 动画过渡 */
   border-radius: 12px;
 }
 
@@ -548,35 +562,39 @@ export default {
 }
 
 .compare.positive {
-  color: #2ecc71; /* 正增长绿色 */
+  color: #2ecc71;
+  /* 正增长绿色 */
   font-weight: bold;
 }
 
 .compare.negative {
-  color: #e74c3c; /* 负增长红色 */
+  color: #e74c3c;
+  /* 负增长红色 */
   font-weight: bold;
 }
+
 /* scoped 样式穿透 Element UI 内部 DOM */
-.all-container >>> .el-button.is-plain {
-  color: #409EFF !important;           /* 默认字体蓝 */
-  border-color: #409EFF !important;    /* 默认边框蓝 */
-  background-color: #ffffff !important; /* 默认背景白 */
+.all-container>>>.el-button.is-plain {
+  color: #409EFF !important;
+  /* 默认字体蓝 */
+  border-color: #409EFF !important;
+  /* 默认边框蓝 */
+  background-color: #ffffff !important;
+  /* 默认背景白 */
   transition: all 0.3s;
 }
 
 /* 悬浮状态 */
-.all-container >>> .el-button.is-plain:hover {
-  color: #ffffff !important;           
-  background-color: #409EFF !important; 
+.all-container>>>.el-button.is-plain:hover {
+  color: #ffffff !important;
+  background-color: #409EFF !important;
   border-color: #409EFF !important;
 }
 
 /* 选中状态 */
-.all-container >>> .el-button.is-plain.is-selected {
-  color: #ffffff !important;           
-  background-color: #409EFF !important; 
+.all-container>>>.el-button.is-plain.is-selected {
+  color: #ffffff !important;
+  background-color: #409EFF !important;
   border-color: #409EFF !important;
 }
-
-
 </style>
