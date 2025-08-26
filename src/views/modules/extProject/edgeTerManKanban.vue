@@ -7,10 +7,69 @@
         <el-option v-for="device in deviceList" :key="device.code" :label="device.name" :value="device.code" />
       </el-select>
     </div>
+
     <div class="container-wrapper-title">实时概况</div>
 
     <div class="group-container">
+      <!-- 当日用电卡片 -->
+      <div class="group-block">
+        <h3 class="group-title">当日用电</h3>
+        <div class="group-items">
+          <div class="group-row">
+            <span class="label">当日用电 (kWh)</span>
+            <span class="value">{{ eleData.todayDiff }}</span>
+          </div>
+          <div class="group-row">
+            <span class="label">昨日同期</span>
+            <span class="value flex-between">
+              <span>{{ eleData.yesterdayDiff }}</span>
+            </span>
+          </div>
+          <div class="group-row">
+            <span></span>
+            <span class="compare" :class="{
+              positive: eleData.dayGrowth > 0,
+              negative: eleData.dayGrowth < 0
+            }">
+              <template v-if="eleData.dayGrowth > 0">▲</template>
+              <template v-else-if="eleData.dayGrowth < 0">▼</template>
+              {{ Math.abs(eleData.dayGrowth).toFixed(1) }}%
+            </span>
+          </div>
+        </div>
+      </div>
 
+      <!-- 当月用电卡片 -->
+      <div class="group-block">
+        <h3 class="group-title">当月用电</h3>
+        <div class="group-items">
+          <div class="group-row">
+            <span class="label">当月用电 (kWh)</span>
+            <span class="value">{{ eleData.thisMonthDiff }}</span>
+          </div>
+          <div class="group-row">
+            <span class="label">上月同期</span>
+            <span class="value flex-between">
+              <span>{{ eleData.lastMonthDiff }}</span>
+            </span>
+          </div>
+
+          <div class="group-row">
+            <span></span>
+            <span class="compare" :class="{
+              positive: eleData.monGrowth > 0,
+              negative: eleData.monGrowth < 0
+            }">
+              <template v-if="eleData.monGrowth > 0">▲</template>
+              <template v-else-if="eleData.monGrowth < 0">▼</template>
+              {{ Math.abs(eleData.monGrowth).toFixed(1) }}%
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- statusMap 数据 -->
       <div class="group-block" v-for="(items, groupName) in statusMap" :key="groupName">
         <h3 class="group-title">{{ groupName }}</h3>
         <div class="group-items">
@@ -21,6 +80,8 @@
         </div>
       </div>
     </div>
+
+
 
 
     <!-- 历史趋势 -->
@@ -34,7 +95,7 @@
               {{ item }}
             </el-button>
             <el-button :type="selected === '用电' ? 'primary' : 'default'" size="small" @click="toggleTag('用电')" plain
-              :class="{ 'is-selected': selected === item }">
+              :class="{ 'is-selected': selected === '用电' }">
               用电
             </el-button>
           </div>
@@ -60,7 +121,7 @@
     </div>
 
     <!-- 用电卡片 -->
-    <div class="container-wrapper">
+    <!-- <div class="container-wrapper">
       <div class="container-wrapper-title">用电</div>
       <div class="card-container">
         <div class="card">
@@ -100,7 +161,7 @@
 
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -191,7 +252,7 @@ export default {
           this.getHistoricalTrend();
           this.stationDeviceVarStatusList2();
         }
-      }, 90000);
+      }, 60000);
     },
     getDeviceList() {
       this.$http
@@ -235,6 +296,7 @@ export default {
             });
             this.tags = newTags;
             this.tagVarCodeMap = newTagVarCodeMap;
+            console.log(newTags, newTagVarCodeMap);
             this.selected = newTags[0] || null;
             this.form.varCodes = newTagVarCodeMap[this.selected] || [];
             this.getHistoricalTrend();
@@ -244,15 +306,24 @@ export default {
     },
     stationDeviceVarStatusList2() {
       if (!this.selectedDeviceCode) return;
+
       this.$http
         .get(this.$http.adornUrl("/extProject/stationDeviceVarStatusList2"), {
           params: { stationCode: this.stationCode, deviceCode: this.selectedDeviceCode },
         })
         .then((res) => {
-          this.statusMap = res.data.code === 200 && res.data.data ? res.data.data : {};
+          if (res.data.code !== 200 || !res.data.data) {
+            // 数据为空直接返回
+            return;
+          }
+          this.statusMap = res.data.data;
         })
-        .catch(() => (this.statusMap = {}));
-    },
+        .catch(() => {
+          // 捕获异常时也不赋值
+          return;
+        });
+    }
+    ,
     onDateChange(val) {
       if (val && val.length === 2) {
         this.form.startTime = val[0] + " 00:00:00";
@@ -344,6 +415,10 @@ export default {
         .then((response) => {
           if (response.data.code === 200) {
             const res = response.data.data;
+            if (!res || !res.ylist || res.ylist.length === 0) {
+              // 数据为空直接返回，不赋值，不渲染
+              return;
+            }
             this.chatData.unit = res.unit;
             this.chatData.xAxis = res.times;
             let yList = res.ylist;
@@ -371,7 +446,7 @@ export default {
 </script>
 <style scoped>
 .all-container {
-  width: 90%;
+  width: 95%;
   margin: 0 auto;
   font-family: "Helvetica Neue", Arial, sans-serif;
   color: #2c3e50;
@@ -397,7 +472,7 @@ export default {
   font-size: 20px;
   border-left: 3px solid #1f78d1;
   padding-left: 8px;
-  margin: 10px 0;
+  margin: 18px 0;
 }
 
 /* 实时概况 */
@@ -496,7 +571,7 @@ export default {
 
 #chart {
   width: 100%;
-  height: 250px;
+  height: 430px;
   margin-top: 20px;
   background: rgba(255, 255, 255, 0.8);
   /* 半透明白 */
@@ -522,14 +597,15 @@ export default {
 .card-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 10px;
+  gap: 12px;
+  /* margin-top: 10px; */
+  /* margin-bottom: 12px; */
 }
 
 .card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 16px;
+  padding: 7px;
   display: flex;
   flex-direction: column;
   border: 1px solid #d0e3f8;
@@ -565,12 +641,15 @@ export default {
   color: #2ecc71;
   /* 正增长绿色 */
   font-weight: bold;
+    font-size: 20px;
+
 }
 
 .compare.negative {
   color: #e74c3c;
   /* 负增长红色 */
   font-weight: bold;
+  font-size: 20px;
 }
 
 /* scoped 样式穿透 Element UI 内部 DOM */
