@@ -6,9 +6,22 @@
       <el-select v-model="selectedDeviceCode" placeholder="请选择电表" size="small" style="width: 200px" clearable>
         <el-option v-for="device in deviceList" :key="device.code" :label="device.name" :value="device.code" />
       </el-select>
+      <span class="big-clock">{{ currentTime }}</span>
+
     </div>
 
-    <div class="container-wrapper-title">实时概况</div>
+    <div class="container-wrapper-title-row">
+      <span class="container-wrapper-title">实时概况</span>
+<span class="update-tip" 
+      :class="{ 'warning': countdown <= 10, 'paused': paused, 'frozen-border': paused }"
+      @click="togglePause">
+  下次更新：{{ countdown }} 秒
+</span>
+
+
+
+    </div>
+
 
     <div class="group-container">
       <!-- 当日用电卡片 -->
@@ -172,6 +185,13 @@ export default {
   name: "MyChart",
   data() {
     return {
+      paused: false, // 冻结标志
+
+      currentTime: this.formatTime(new Date()), // 实时时钟
+
+      countdown: 60,        // 倒计时初始值（秒）
+      updateInterval: 60,   // 刷新间隔，单位秒
+      timer: null,          // 定时器
       eleData: {
         todayDiff: 0.0,
         yesterdayDiff: 0.0,
@@ -203,21 +223,18 @@ export default {
       },
       myChart: null,
       currentType: "bar",
-      timer: null,
     };
   },
   mounted() {
+    this.startClock();       // ✅ 启动时钟
+
     this.getDeviceList();
-    this.startTimer();
-
-    // echartresite
+    this.startAutoRefresh();  // ✅ 启动自动刷新 + 倒计时
     window.addEventListener("resize", this.handleResize);
-
   },
-  beforeDestroy() {
-    clearInterval(this.timer);
 
-    // echartresite
+  beforeDestroy() {
+    clearInterval(this.timer); // 清理定时器
     window.removeEventListener("resize", this.handleResize);
 
   },
@@ -231,6 +248,42 @@ export default {
     },
   },
   methods: {
+    startClock() {
+      setInterval(() => {
+        this.currentTime = this.formatTime(new Date());
+      }, 1000);
+    },
+    formatTime(date) {
+      const h = String(date.getHours()).padStart(2, "0");
+      const m = String(date.getMinutes()).padStart(2, "0");
+      const s = String(date.getSeconds()).padStart(2, "0");
+      return `${h}:${m}:${s}`;
+    },
+    togglePause() {
+      this.paused = !this.paused;
+      // if (this.paused) {
+      //   this.$message.info('倒计时已冻结 ❄️');
+      // } else {
+      //   this.$message.success('倒计时继续');
+      // }
+    },
+    startAutoRefresh() {
+      this.countdown = this.updateInterval;
+      this.timer = setInterval(() => {
+        if (!this.paused) {  // 冻结时不更新
+          if (this.countdown > 0) {
+            this.countdown--;
+          } else {
+            // 刷新数据
+            if (this.selectedDeviceCode) {
+              this.getHistoricalTrend();
+              this.stationDeviceVarStatusList2();
+            }
+            this.countdown = this.updateInterval;
+          }
+        }
+      }, 1000);
+    },
     handleResize() {
       if (this.myChart) {
         this.myChart.resize();
@@ -345,13 +398,18 @@ export default {
     initChart() {
       const dom = document.getElementById("chart");
       if (!this.myChart) this.myChart = echarts.init(dom);
-      const seriesList = this.chatData.yList.map((item) => ({
+
+      const seriesList = this.chatData.yList.map((item, idx) => ({
         name: item.name,
         type: this.currentType,
         smooth: this.currentType === "line",
         data: item.dataList,
         emphasis: { focus: "series" },
+        animationDuration: 1000,       // 动画时长 1 秒
+        animationEasing: "cubicOut",   // 缓动效果
+        animationDelay: idx * 200,     // 每条线或柱子延迟显示
       }));
+
       let yAxisMin = null;
       let yAxisMax = null;
       const unit = this.chatData.unit || "";
@@ -365,29 +423,30 @@ export default {
         yAxisMin = 0;
         yAxisMax = 500;
       }
-      this.myChart.setOption(
-        {
-          tooltip: { trigger: "axis" },
-          legend: { data: this.chatData.yList.map((item) => item.name) },
-          grid: { top: 30, right: 10, bottom: 10, left: 10, containLabel: true },
-          xAxis: { type: "category", data: this.chatData.xAxis },
-          yAxis: {
-            type: "value",
-            name: unit,
-            min: yAxisMin,
-            max: yAxisMax,
-            scale: true,
-            axisLabel: { formatter: (val) => val.toFixed(2) },
-          },
-          series: seriesList,
-          dataZoom: [
-            { type: "slider", show: true, xAxisIndex: 0, height: 20, bottom: 10 },
-            { type: "inside", xAxisIndex: 0 },
-          ],
+
+      this.myChart.setOption({
+        tooltip: { trigger: "axis" },
+        legend: { data: this.chatData.yList.map((item) => item.name) },
+        grid: { top: 30, right: 10, bottom: 10, left: 10, containLabel: true },
+        xAxis: { type: "category", data: this.chatData.xAxis },
+        yAxis: {
+          type: "value",
+          name: unit,
+          min: yAxisMin,
+          max: yAxisMax,
+          scale: true,
+          axisLabel: { formatter: (val) => val.toFixed(2) },
         },
-        true
-      );
-    },
+        series: seriesList,
+        dataZoom: [
+          { type: "slider", show: true, xAxisIndex: 0, height: 20, bottom: 10 },
+          { type: "inside", xAxisIndex: 0 },
+        ],
+        animationDurationUpdate: 1000,   // 更新数据动画时长
+        animationEasingUpdate: "cubicOut",
+      }, true);
+    }
+    ,
     onChartTypeChange(value) {
       this.currentType = value;
       this.initChart();
@@ -472,7 +531,7 @@ export default {
   font-size: 20px;
   border-left: 3px solid #1f78d1;
   padding-left: 8px;
-  margin: 18px 0;
+  margin: 14px 0;
 }
 
 /* 实时概况 */
@@ -673,8 +732,57 @@ export default {
 
 /* 选中状态 */
 .all-container>>>.el-button.is-plain.is-selected {
+  transition: all 0.4s ease;
+
   color: #ffffff !important;
   background-color: #409EFF !important;
   border-color: #409EFF !important;
 }
+
+.container-wrapper-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.container-wrapper-title {
+  color: #1f78d1;
+  font-weight: 700;
+  font-size: 20px;
+  border-left: 3px solid #1f78d1;
+  padding-left: 8px;
+}
+
+.update-tip {
+  font-size: 12px;
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+.big-clock {
+  margin-left: auto;
+  /* 靠右显示 */
+  font-size: 28px;
+  /* 放大字体 */
+  font-weight: bold;
+  /* 加粗 */
+  color: #1f78d1;
+  /* 主色调 */
+  background: rgba(31, 120, 209, 0.1);
+  /* 半透明背景 */
+  padding: 4px 12px;
+  /* 内边距 */
+  border-radius: 8px;
+  /* 圆角 */
+  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.2);
+  /* 阴影 */
+  transition: all 0.3s ease;
+  /* 鼠标悬浮动画 */
+}
+
+.big-clock:hover {
+  background: rgba(31, 120, 209, 0.2);
+  box-shadow: 0 4px 12px rgba(31, 120, 209, 0.3);
+}
+
 </style>
