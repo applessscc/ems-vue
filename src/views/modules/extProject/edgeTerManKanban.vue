@@ -638,15 +638,16 @@ export default {
 }
 
 .compare.positive {
-  color: #2ecc71;
+  color: #e74c3c;
+
   /* 正增长绿色 */
   font-weight: bold;
-    font-size: 20px;
+  font-size: 20px;
 
 }
 
 .compare.negative {
-  color: #e74c3c;
+  color: #2ecc71;
   /* 负增长红色 */
   font-weight: bold;
   font-size: 20px;

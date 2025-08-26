@@ -296,6 +296,7 @@ export default {
             });
             this.tags = newTags;
             this.tagVarCodeMap = newTagVarCodeMap;
+            console.log(newTags, newTagVarCodeMap);
             this.selected = newTags[0] || null;
             this.form.varCodes = newTagVarCodeMap[this.selected] || [];
             this.getHistoricalTrend();
@@ -637,15 +638,19 @@ export default {
 }
 
 .compare.positive {
-  color: #2ecc71;
+  color: #e74c3c;
+
   /* 正增长绿色 */
   font-weight: bold;
+  font-size: 20px;
+
 }
 
 .compare.negative {
-  color: #e74c3c;
+  color: #2ecc71;
   /* 负增长红色 */
   font-weight: bold;
+  font-size: 20px;
 }
 
 /* scoped 样式穿透 Element UI 内部 DOM */
