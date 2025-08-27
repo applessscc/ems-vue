@@ -1,5 +1,16 @@
 <template>
   <div class="all-container">
+
+        <el-header
+      style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
+             text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
+             letter-spacing: 2px; background: #1f78d1;">
+      CMS 能耗集中监控管理系统
+      <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
+        <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
+      </span>
+    </el-header>
+
     <!-- 顶部设备选择 -->
     <div class="header">
       电表
@@ -494,6 +505,7 @@ export default {
             this.chatData.yList = yList;
             this.getEleData()
             this.initChart();
+          
           } else {
             this.$message.error(response.data.msg);
           }
@@ -509,8 +521,6 @@ export default {
   margin: 0 auto;
   font-family: "Helvetica Neue", Arial, sans-serif;
   color: #2c3e50;
-  /* 主文本深灰 */
-  /* background-color: #f8faff; */
 }
 
 /* header */
@@ -520,7 +530,6 @@ export default {
   gap: 10px;
   margin: 12px 0;
   color: #1f78d1;
-  /* 主色调 */
   font-weight: bold;
 }
 
@@ -541,6 +550,12 @@ export default {
   gap: 12px;
 }
 
+/* 统一阴影变量 */
+:root {
+  --main-shadow: 0 4px 12px rgba(31, 120, 209, 0.25);
+  --hover-shadow: 0 6px 16px rgba(31, 120, 209, 0.35);
+}
+
 .group-block {
   flex: 1 1 300px;
   padding: 7px;
@@ -548,13 +563,13 @@ export default {
   border: 0.5px solid #d0e3f8;
   border-radius: 8px;
   background: #ffffff;
-  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
+  box-shadow: var(--main-shadow);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .group-block:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(31, 120, 209, 0.25);
+  box-shadow: var(--hover-shadow);
 }
 
 .group-title {
@@ -580,7 +595,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   white-space: nowrap;
-  /* 内容不换行 */
   font-size: 14px;
 }
 
@@ -588,14 +602,12 @@ export default {
   flex: 1 1 auto;
   min-width: 0;
   color: #555d6b;
-  /* 副文字色 */
 }
 
 .group-row .value {
   flex-shrink: 0;
   margin-left: 8px;
   color: #1f78d1;
-  /* 主色 */
   font-weight: bold;
   font-size: 16px;
   text-align: right;
@@ -630,26 +642,22 @@ export default {
 
 #chart {
   width: 100%;
-  height: 430px;
+  height: 350px;
   margin-top: 20px;
   background: rgba(255, 255, 255, 0.8);
-  /* 半透明白 */
   border-radius: 12px;
   padding: 10px;
 }
 
 .chart-wrapper {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  /* 动画过渡 */
-  border-radius: 12px;
+  transition: all 0.3s ease; /* 动画平滑过渡 */
+  cursor: pointer; /* 默认鼠标变手型 */
 }
 
-.chart-wrapper:hover {
-  /* transform: scale(1.005);  */
-  box-shadow: 0 6px 16px rgba(31, 120, 209, 0.3);
-}
-
-
+/* .chart-wrapper:hover {
+  opacity: 0.85; 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); 
+} */
 
 
 /* 用电卡片 */
@@ -657,8 +665,6 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  /* margin-top: 10px; */
-  /* margin-bottom: 12px; */
 }
 
 .card {
@@ -668,13 +674,13 @@ export default {
   display: flex;
   flex-direction: column;
   border: 1px solid #d0e3f8;
-  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--main-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(31, 120, 209, 0.25);
+  box-shadow: var(--hover-shadow);
 }
 
 .card-sub {
@@ -698,16 +704,12 @@ export default {
 
 .compare.positive {
   color: #e74c3c;
-
-  /* 正增长绿色 */
   font-weight: bold;
   font-size: 20px;
-
 }
 
 .compare.negative {
   color: #2ecc71;
-  /* 负增长红色 */
   font-weight: bold;
   font-size: 20px;
 }
@@ -715,25 +717,19 @@ export default {
 /* scoped 样式穿透 Element UI 内部 DOM */
 .all-container>>>.el-button.is-plain {
   color: #409EFF !important;
-  /* 默认字体蓝 */
   border-color: #409EFF !important;
-  /* 默认边框蓝 */
   background-color: #ffffff !important;
-  /* 默认背景白 */
   transition: all 0.3s;
 }
 
-/* 悬浮状态 */
 .all-container>>>.el-button.is-plain:hover {
   color: #ffffff !important;
   background-color: #409EFF !important;
   border-color: #409EFF !important;
 }
 
-/* 选中状态 */
 .all-container>>>.el-button.is-plain.is-selected {
   transition: all 0.4s ease;
-
   color: #ffffff !important;
   background-color: #409EFF !important;
   border-color: #409EFF !important;
@@ -745,14 +741,6 @@ export default {
   align-items: center;
 }
 
-.container-wrapper-title {
-  color: #1f78d1;
-  font-weight: 700;
-  font-size: 20px;
-  border-left: 3px solid #1f78d1;
-  padding-left: 8px;
-}
-
 .update-tip {
   font-size: 12px;
   color: #999;
@@ -761,28 +749,20 @@ export default {
 
 .big-clock {
   margin-left: auto;
-  /* 靠右显示 */
   font-size: 28px;
-  /* 放大字体 */
   font-weight: bold;
-  /* 加粗 */
   color: #1f78d1;
-  /* 主色调 */
   background: rgba(31, 120, 209, 0.1);
-  /* 半透明背景 */
   padding: 4px 12px;
-  /* 内边距 */
   border-radius: 8px;
-  /* 圆角 */
-  box-shadow: 0 2px 6px rgba(31, 120, 209, 0.2);
-  /* 阴影 */
+  box-shadow: var(--main-shadow);
   transition: all 0.3s ease;
-  /* 鼠标悬浮动画 */
 }
 
 .big-clock:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--hover-shadow);
   background: rgba(31, 120, 209, 0.2);
-  box-shadow: 0 4px 12px rgba(31, 120, 209, 0.3);
 }
 
 </style>
