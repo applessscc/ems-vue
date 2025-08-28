@@ -3,8 +3,9 @@
 
     <div class="main-contain-top">
       <el-card>
-        <div style="text-align: center;" :style="{ animation: getBackgroundCloud()}">
-          <span style="font-weight: bold; font-size: 86px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</span>
+        <div style="text-align: center;" :style="{ animation: getBackgroundCloud() }">
+          <span style="font-weight: bold; font-size: 86px;">SN：{{ currentSn && currentSn.sn ? currentSn.sn : '暂无'
+            }}</span>
         </div>
       </el-card>
     </div>
@@ -16,14 +17,15 @@
           <el-row type="flex" justify="space-between" align="middle">
             <el-button type="primary" @click="openNew('cookerJobKanban')">任务看板</el-button>
 
-                        <!-- <el-button type="primary" @click="getView">getView</el-button> -->
+            <!-- <el-button type="primary" @click="getView">getView</el-button> -->
 
           </el-row>
 
         </div>
         <div class="curent-job-contain-top">
           <el-descriptions :column="3" border>
-            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{ currentSn && currentSn.sn ? currentSn.sn : '暂无' }}</el-descriptions-item>
+            <el-descriptions-item label="SN" label-class-name="my-label" content-class-name="my-content">{{ currentSn &&
+              currentSn.sn ? currentSn.sn : '暂无' }}</el-descriptions-item>
             <el-descriptions-item label="SO">暂无</el-descriptions-item>
             <el-descriptions-item label="Nadel">暂无</el-descriptions-item>
             <el-descriptions-item label="状态" v-if="false">
@@ -38,7 +40,8 @@
         <div class="main-form-container" v-if="switchValue">
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput" :disabled="inputDisabled"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"
+                @keydown.native.enter="onSubmit()" ref="snInput" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <el-form-item>
               <el-radio-group v-model="form.operationType">
@@ -59,7 +62,8 @@
         <div class="main-form-container" v-else>
           <el-form ref="form" :model="form" :rules="dataRule" label-width="80px">
             <el-form-item label="SN">
-              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;" @keydown.native.enter="onSubmit()" ref="snInput" :disabled="inputDisabled"></el-input>
+              <el-input v-model="form.sn" placeholder="请输入SN号" style="max-width: 200px;"
+                @keydown.native.enter="onSubmit()" ref="snInput" :disabled="inputDisabled"></el-input>
             </el-form-item>
             <!-- <el-form-item>
               <el-button type="primary" @click="onSubmit(1)">进站</el-button>
@@ -154,7 +158,7 @@ export default {
 
   data() {
     return {
-
+      intervalId,
       inputDisabled: false,
 
       // 总进站数和不良品数
@@ -307,10 +311,14 @@ export default {
   },
 
   beforeDestroy() {
-
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+      console.log('定时器已清除');
+    }
   },
   created() {
-     saveVisitLog('CMS 炒菜机任务-访问');
+    saveVisitLog('CMS 炒菜机任务-访问');
     if (this.$route.query.switchValue) {
       this.switchValue = this.$route.query.switchValue === 'true'; // 确保是布尔值
     }
@@ -327,9 +335,7 @@ export default {
     this.intervalId = setInterval(() => {
       this.fetchData();
       this.$refs.snInput.focus();
-
-    }, 3000);
-
+    }, 10000);
 
   },
   methods: {
@@ -337,11 +343,11 @@ export default {
       const width = window.innerWidth; // 获取视口宽度
       const height = window.innerHeight; // 获取视口高度
 
-             this.$message({
-          message: `Width: ${width}, Height: ${height}`,
-          type: 'warn',
-          duration: 3000
-        });
+      this.$message({
+        message: `Width: ${width}, Height: ${height}`,
+        type: 'warn',
+        duration: 3000
+      });
     },
 
     getBackgroundCloud() {
@@ -652,7 +658,7 @@ export default {
   }
 }
 </script>
-<style >
+<style>
 .main-contain {
   /* background-color: rgb(184, 31, 31); */
   /* position: fixed;
@@ -666,6 +672,7 @@ export default {
   top: 62%;
   width: 64.5%;
 }
+
 .left-top-contain {
   /* position: fixed;
   top: 95px;
@@ -677,13 +684,17 @@ export default {
   width: 35%;
   height: 36%;
 }
+
 .left-top-contain-img {
   background-image: url("../../assets/img/left-top-bg.jpg");
-  background-size: cover; /* 让背景图片覆盖整个 div */
-  background-position: center; /* 图片居中 */
+  background-size: cover;
+  /* 让背景图片覆盖整个 div */
+  background-position: center;
+  /* 图片居中 */
   width: 100%;
   height: 190px;
 }
+
 .left-bottom-contain {
   /* position: fixed;
   top: 480px;
@@ -695,11 +706,13 @@ export default {
   width: 35%;
   height: 30%;
 }
+
 .left-bottom-contain-table {
   overflow-y: auto;
   width: 100%;
   height: 100%;
 }
+
 .curent-job-contain {
   /* position: fixed;
   left: 800px;
@@ -712,6 +725,7 @@ export default {
   top: 21%;
   width: 64.5%;
 }
+
 .main-contain-top {
   /* top: 95px;
   left: 800px;
@@ -720,50 +734,68 @@ export default {
   width: 100%;
   position: fixed;
 }
+
 .el-switch__core {
   left: 10px;
 }
+
 .curent-job-contain-bottom {
   margin-top: 25px;
   margin-left: 5px;
 }
+
 .main-form-container {
   margin-top: 25px;
 }
 
 @keyframes flashing-background-pass {
   0% {
-    background-color: rgb(101, 224, 101); /* 初始绿色 */
+    background-color: rgb(101, 224, 101);
+    /* 初始绿色 */
   }
+
   50% {
-    background-color: rgb(101, 224, 101); /* 中间透明 */
+    background-color: rgb(101, 224, 101);
+    /* 中间透明 */
   }
+
   100% {
-    background-color: rgb(101, 224, 101); /* 结束绿色 */
+    background-color: rgb(101, 224, 101);
+    /* 结束绿色 */
   }
 }
 
 @keyframes flashing-background-fail {
   0% {
-    background-color: rgb(228, 120, 120); /* 初始绿色 */
+    background-color: rgb(228, 120, 120);
+    /* 初始绿色 */
   }
+
   50% {
-    background-color: transparent; /* 中间透明 */
+    background-color: transparent;
+    /* 中间透明 */
   }
+
   100% {
-    background-color: rgb(228, 120, 120); /* 结束绿色 */
+    background-color: rgb(228, 120, 120);
+    /* 结束绿色 */
   }
 }
 
 @keyframes flashing-background-testing {
   0% {
-    background-color: rgb(99, 165, 226); /* 初始绿色 */
+    background-color: rgb(99, 165, 226);
+    /* 初始绿色 */
   }
+
   50% {
-    background-color: transparent; /* 中间透明 */
+    background-color: transparent;
+    /* 中间透明 */
   }
+
   100% {
-    background-color: rgb(99, 165, 226); /* 结束绿色 */
+    background-color: rgb(99, 165, 226);
+    /* 结束绿色 */
   }
 }
 </style>
