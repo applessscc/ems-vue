@@ -360,7 +360,6 @@ export default {
             });
             this.tags = newTags;
             this.tagVarCodeMap = newTagVarCodeMap;
-            console.log(newTags, newTagVarCodeMap);
             this.selected = newTags[0] || null;
             this.form.varCodes = newTagVarCodeMap[this.selected] || [];
             this.getHistoricalTrend();
@@ -376,10 +375,10 @@ export default {
           params: { stationCode: this.stationCode, deviceCode: this.selectedDeviceCode },
         })
         .then((res) => {
-          if (res.data.code !== 200 || !res.data.data) {
-            // 数据为空直接返回
-            return;
-          }
+          // if (res.data.code !== 200 || !res.data.data) {
+          //   // 数据为空直接返回
+          //   return;
+          // }
           this.statusMap = res.data.data;
         })
         .catch(() => {
@@ -468,7 +467,7 @@ export default {
         .post(this.$http.adornUrl("/extProject/getEleData"), this.form)
         .then((response) => {
           if (response.data.code === 200) {
-            this.eleData = response.data.data;
+            this.eleData = response.data.data == null ? {}:response.data.data;
           } else {
             this.$message.error(response.data.msg);
           }
@@ -485,10 +484,10 @@ export default {
         .then((response) => {
           if (response.data.code === 200) {
             const res = response.data.data;
-            if (!res || !res.ylist || res.ylist.length === 0) {
-              // 数据为空直接返回，不赋值，不渲染
-              return;
-            }
+            // if (!res || !res.ylist || res.ylist.length === 0) {
+            //   // 数据为空直接返回，不赋值，不渲染
+            //   return;
+            // }
             this.chatData.unit = res.unit;
             this.chatData.xAxis = res.times;
             let yList = res.ylist;

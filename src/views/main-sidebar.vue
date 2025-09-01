@@ -224,10 +224,13 @@ export default {
         this.$router.push('/home')
         this.openNew('modules/extProject/sensorStatus')
         return
-      }
-      else if (routePath === '/extProject-sensorKanban') {
+      }else if (routePath === '/extProject-sensorKanban') {
         this.$router.push('/home')
         this.openNew('modules/extProject/sensorKanban')
+        return
+      }else if (routePath === '/extProject-edgeTerManStatus') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/edgeTerManStatus')
         return
       }
       if (route.meta.isTab) {

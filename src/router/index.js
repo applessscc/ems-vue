@@ -41,6 +41,7 @@ const globalRoutes = [
   { path: '/modules/extProject/video', component: _import('modules/extProject/video'), name: 'video', meta: { title: 'video' } },
   { path: '/modules/extProject/sensorKanban', component: _import('modules/extProject/sensorKanban'), name: 'sensorKanban', meta: { title: 'sensorKanban' } },
   { path: '/modules/extProject/sensorStatus', component: _import('modules/extProject/sensorStatus'), name: 'sensorStatus', meta: { title: 'sensorStatus' } },
+  { path: '/modules/extProject/edgeTerManStatus', component: _import('modules/extProject/edgeTerManStatus'), name: 'edgeTerManStatus', meta: { title: 'edgeTerManStatus' } },
 
   { path: '/modules/extProject/edgeTerManKanban', component: _import('modules/extProject/edgeTerManKanban'), name: 'edgeTerManKanban', meta: { title: 'edgeTerManKanban' } },
 

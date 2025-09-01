@@ -157,12 +157,12 @@ export default {
 
     'form.ip'(newVal, oldVal) {
       if (newVal && newVal !== oldVal && this.$route.query.ip !== newVal) {
-        this.$router.replace({
-          query: {
-            ...this.$route.query,
-            ip: newVal
-          }
-        });
+        // this.$router.replace({
+        //   query: {
+        //     ...this.$route.query,
+        //     ip: newVal
+        //   }
+        // });
       }
     },
 
@@ -175,12 +175,12 @@ export default {
 
     'form.password'(newVal, oldVal) {
       if (newVal && newVal !== oldVal && this.$route.query.password !== newVal) {
-        this.$router.replace({
-          query: {
-            ...this.$route.query,
-            password: newVal
-          }
-        });
+        // this.$router.replace({
+        //   query: {
+        //     ...this.$route.query,
+        //     password: newVal
+        //   }
+        // });
       }
     },
     'videoInfoList'(newVal, oldVal) {
@@ -242,7 +242,7 @@ export default {
     startPlay() {
       // this.m3u8Url = this.$http.adornUrl(`/videos/` + this.$route.query.ip + `stream1.m3u8`),
       this.m3u8Url = this.$http.adornUrl(
-        `/videos/` + this.$route.query.ip +
+        `/videos/` + this.form.ip +
         ((this.$route.query.videoUrl && this.$route.query.videoUrl.length > 1)
           ? this.$route.query.videoUrl.split(',')[0] + '.m3u8'
           : 'stream1.m3u8')
@@ -251,7 +251,7 @@ export default {
       this.initPlayer(this.$refs.videoPlayer, this.m3u8Url);
       if (this.$route.query.videoUrl? this.$route.query.videoUrl.split(',').length > 1 : false) {
         this.thermalUrl = this.$http.adornUrl(
-          `/videos/` + this.$route.query.ip +
+          `/videos/` + this.form.ip +
           ((this.$route.query.videoUrl && this.$route.query.videoUrl.length > 2)
             ? this.$route.query.videoUrl.split(',')[1] + '.m3u8'
             : 'stream1&channel=2.m3u8')
