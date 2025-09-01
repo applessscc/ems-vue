@@ -13,7 +13,7 @@
     <el-container>
       <el-aside width="250px" class="aside">
         <div>
-          <el-tree :data="treeData" show-checkbox node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys":props="{ label: 'label', children: 'children' }" />
+          <el-tree :data="treeData" show-checkbox node-key="nodeKey" :default-expanded-keys="defaultExpandedKeys":props="{ label: 'label', children: 'children' }" :default-checked-keys="defaultCheckedKeys"/>
         </div>
       </el-aside>
 
@@ -60,7 +60,11 @@ export default {
   data() {
     return {
       treeData: [],
+
+      // 默认张开的key
       defaultExpandedKeys: [],
+      // 默认勾选的key
+      defaultCheckedKeys: [],
 
 
       checkedNodes: [],
@@ -124,6 +128,9 @@ export default {
             { label: 'CMS', nodeKey: 'cms-root', children: tree }
           ]
           this.defaultExpandedKeys = ['cms-root']
+
+          // 默认勾选所有节点
+          this.defaultCheckedKeys = ['cms-root', ...list.map(item => item.id)]
         })
         .catch(err => {
           console.error('获取树失败:', err)
