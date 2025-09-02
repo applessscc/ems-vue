@@ -1,8 +1,7 @@
 <template>
   <div class="all-container">
 
-        <el-header
-      style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
+    <el-header style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
              text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
              letter-spacing: 2px; background: #1f78d1;">
       CMS 能耗集中监控管理系统
@@ -23,11 +22,10 @@
 
     <div class="container-wrapper-title-row">
       <span class="container-wrapper-title">实时概况</span>
-<span class="update-tip" 
-      :class="{ 'warning': countdown <= 10, 'paused': paused, 'frozen-border': paused }"
-      @click="togglePause">
-  下次更新：{{ countdown }} 秒
-</span>
+      <span class="update-tip" :class="{ 'warning': countdown <= 10, 'paused': paused, 'frozen-border': paused }"
+        @click="togglePause">
+        下次更新：{{ countdown }} 秒
+      </span>
 
 
 
@@ -467,7 +465,7 @@ export default {
         .post(this.$http.adornUrl("/extProject/getEleData"), this.form)
         .then((response) => {
           if (response.data.code === 200) {
-            this.eleData = response.data.data == null ? {}:response.data.data;
+            this.eleData = response.data.data == null ? {} : response.data.data;
           } else {
             this.$message.error(response.data.msg);
           }
@@ -504,7 +502,7 @@ export default {
             this.chatData.yList = yList;
             this.getEleData()
             this.initChart();
-          
+
           } else {
             this.$message.error(response.data.msg);
           }
@@ -649,8 +647,10 @@ export default {
 }
 
 .chart-wrapper {
-  transition: all 0.3s ease; /* 动画平滑过渡 */
-  cursor: pointer; /* 默认鼠标变手型 */
+  transition: all 0.3s ease;
+  /* 动画平滑过渡 */
+  cursor: pointer;
+  /* 默认鼠标变手型 */
 }
 
 /* .chart-wrapper:hover {

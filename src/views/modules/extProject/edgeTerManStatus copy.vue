@@ -18,49 +18,30 @@
 
       <el-main class="main">
         <div class="card-container">
+          <div v-for="(item, index) in tableData" :key="index" class="custom-card card-wrapper">
+            <div class="item-desc">{{ item.deviceName }}</div>
 
-
-
-          <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
-
-            <div class="custom-card" @click="openNew('sensorKanban', item.groupName, item.deviceName)"
-              :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
-              :class="['marquee-border', getBorderColor(item).animationClass]">
-              <div class="right-status-container" style="margin-top: 8px;">
-
-                <div class="item-desc">{{ item.deviceName }}</div>
-
-                <div class="info-content">
-
-                  <div style="display: flex; flex-direction: column; text-align: left;">
-
-                    <div class="info-item">
-                      <i class="el-icon-s-data" style="color: #3498db; margin-right: 4px;"></i>
-                      <span class="label">用电:</span>
-                      <span class="value">{{ item.todayDiff }} kWh</span>
-                    </div>
-
-                    <div class="info-item">
-                      <i class="el-icon-lightning" style="color: #9b59b6; margin-right: 4px;"></i>
-                      <span class="label">功率:</span>
-                      <span class="value">{{ item.k }} kW</span>
-                    </div>
-
-                  </div>
-
-                  <div class="info-tag">
-                    <el-tag :type="getStatusType(item)" class="status-tag">
-                      {{ getStatusText(item) }}
-                    </el-tag>
-                  </div>
-
+            <div class="info-content">
+              <div style="display: flex; flex-direction: column; text-align: left;">
+                <div class="info-item">
+                  <i class="el-icon-s-data" style="color: #3498db; margin-right: 4px;"></i>
+                  <span class="label">今日用电:</span>
+                  <span class="value">{{ item.todayDiff }} kWh</span>
                 </div>
-
+                <div class="info-item">
+                  <i class="el-icon-lightning" style="color: #9b59b6; margin-right: 4px;"></i>
+                  <span class="label">功率:</span>
+                  <span class="value">{{ item.k }} kW</span>
+                </div>
+              </div>
+              <div class="info-tag">
+              <el-tag  class="status-tag">
+                      正常
+              </el-tag>
               </div>
             </div>
+
           </div>
-
-
         </div>
       </el-main>
     </el-container>
@@ -69,17 +50,25 @@
 
 <script>
 export default {
+  watch: {
+    secondLevelChecked(n, o) {
+      if (n !== o) {
+        this.getEdgeTerManStatus();
+      }
+    },
+  },
 
   mounted() {
     this.getAllDevice();
     this.$nextTick(() => {
       this.$refs.tree.setCheckedKeys(['cms-root']);
     });
-    this.getEdgeTerManStatus();
-this.timer = setInterval(() => {
-  this.getEdgeTerManStatus();
-}, 60000); // 1 分钟刷新一次
 
+    this.getEdgeTerManStatus();
+
+    this.timer = setInterval(() => {
+      this.getEdgeTerManStatus();
+    }, 15000);
   },
 
   data() {
@@ -94,36 +83,6 @@ this.timer = setInterval(() => {
   },
 
   methods: {
-    getBorderColor(item) {
-      if (item && item.status === 2) {
-        return {
-          color: '#F56C6C',
-          animationClass: 'alarm-border-animation',
-        };
-      } else if (item && item.status === 3) {
-        return {
-          color: '#909399',
-          animationClass: 'leave-border-animation',
-        };
-      }
-      return {
-        color: '#67C23A',
-        animationClass: 'marquee-border-testing',
-      };
-    },
-    getStatusType(item) {
-      if (!item) return '';
-      if (item.status === 2) return 'danger';     // 异常 - 红色
-      if (item.status === 3) return 'info';       // 离线 - 灰色（Element UI 中 'info' 是灰色）
-      return 'success';                           // 正常 - 绿色
-    },
-
-    getStatusText(item) {
-      if (!item) return '';
-      if (item.status === 2) return '异常';
-      if (item.status === 3) return '离线';
-      return '正常';
-    },
     /** 获取所有设备，生成树结构 */
     getAllDevice() {
       this.$http({
@@ -157,10 +116,6 @@ this.timer = setInterval(() => {
           this.treeData = [{ label: 'CMS', nodeKey: 'cms-root', children: tree }];
           this.defaultExpandedKeys = ['cms-root'];
           this.defaultCheckedKeys = ['cms-root', ...list.map((item) => item.id)];
-          this.$nextTick(() => {
-            this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
-          });
-
         })
         .catch((err) => {
           console.error('获取树失败:', err);
@@ -192,7 +147,6 @@ this.timer = setInterval(() => {
     /** 勾选设备节点 */
     handleCheckChange() {
       this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
-      this.getEdgeTerManStatus();
     },
   },
 
@@ -250,7 +204,7 @@ this.timer = setInterval(() => {
 }
 
 .card-wrapper {
-  min-width: 260px;
+  width: 240px;
 }
 
 .custom-card {
@@ -309,95 +263,5 @@ this.timer = setInterval(() => {
   color: #409eff;
   font-weight: 500;
   margin-right: 4px;
-}
-
-.right-status-container {
-  margin: 8px;
-}
-
-/* 动画样式 */
-.marquee-border {
-  animation: 2s linear infinite;
-}
-
-.marquee-border-testing {
-  animation-name: testing-marquee-border;
-}
-
-.alarm-border-animation {
-  animation-name: alarm-flash-border;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-}
-
-
-.leave-border-animation {
-  animation-name: leave-flash-border;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-}
-
-.tooltip-label {
-  color: #409EFF;
-  font-weight: 500;
-  margin-right: 4px;
-}
-
-@keyframes testing-marquee-border {
-  0% {
-    border-color: #91e991;
-    background-color: #ebffeb;
-  }
-
-  50% {
-    border-color: #91e991;
-    background-color: #ebffeb;
-  }
-
-  100% {
-    border-color: #91e991;
-    background-color: #ebffeb;
-  }
-}
-
-@keyframes alarm-flash-border {
-  0% {
-    border-color: #F56C6C;
-    background-color: #ffeaea;
-  }
-
-  50% {
-    border-color: transparent;
-    background-color: transparent;
-  }
-
-  100% {
-    border-color: #F56C6C;
-    background-color: #ffeaea;
-  }
-}
-
-
-@keyframes leave-flash-border {
-  0% {
-    border-color: #c0c4cc;
-    /* 初始边框：Element UI 中性灰 */
-    background-color: #f0f2f5;
-    /* 初始背景：Element UI 背景灰 */
-  }
-
-  50% {
-    border-color: transparent;
-    background-color: transparent;
-  }
-
-  100% {
-    border-color: #c0c4cc;
-    /* 回到初始灰色边框 */
-    background-color: #f0f2f5;
-    /* 回到初始背景 */
-  }
 }
 </style>
