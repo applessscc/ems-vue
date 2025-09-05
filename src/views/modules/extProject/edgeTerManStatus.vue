@@ -1,8 +1,8 @@
 <template>
   <el-container>
-    <el-header class="header" style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
-         text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
-         letter-spacing: 2px;">
+    <el-header style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
+             text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
+             letter-spacing: 2px; background: #1f78d1;">
       CMS 能耗集中监控管理系统
       <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
         <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
@@ -21,9 +21,9 @@
 
 
 
-          <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
+          <div v-for="(item, index) in tableData" :key="index" class="card-wrapper" >
 
-            <div class="custom-card" @click="openNew('sensorKanban', item.groupName, item.deviceName)"
+            <div class="custom-card" @click="openNew('edgeTerManKanban', item.deviceCode, item.stationCode)"
               :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
               :class="['marquee-border', getBorderColor(item).animationClass]">
               <div class="right-status-container" style="margin-top: 8px;">
@@ -35,15 +35,15 @@
                   <div style="display: flex; flex-direction: column; text-align: left;">
 
                     <div class="info-item">
-                      <i class="el-icon-s-data" style="color: #3498db; margin-right: 4px;"></i>
+                      <i class="el-icon-s-data" style="color: #2980b9; margin-right: 4px;"></i>
                       <span class="label">用电:</span>
-                      <span class="value">{{ item.todayDiff }} kWh</span>
+                      <span class="value"  :style="{ color:  '#2980b9'}">{{ item.todayDiff == null? 0 :item.todayDiff }} kWh</span>
                     </div>
 
                     <div class="info-item">
-                      <i class="el-icon-lightning" style="color: #9b59b6; margin-right: 4px;"></i>
+                      <i class="el-icon-lightning" style="color: #e67e22; margin-right: 4px;"></i>
                       <span class="label">功率:</span>
-                      <span class="value">{{ item.k }} kW</span>
+                      <span class="value"  :style="{ color:  '#e67e22'}" >{{ item.k == null ? 0 : item.k }} kW</span>
                     </div>
 
                   </div>
@@ -94,6 +94,17 @@ this.timer = setInterval(() => {
   },
 
   methods: {
+      openNew(path, deviceCode, stationCode) {
+      const newUrl = this.$router.resolve({
+        path: path,
+        query: {
+          deviceCode: deviceCode,
+          stationCode: stationCode
+        }
+      });
+      console.log('打开新页面的URL:', newUrl.href);
+      window.open(newUrl.href, '_blank');
+    },
     getBorderColor(item) {
       if (item && item.status === 2) {
         return {
@@ -276,15 +287,37 @@ this.timer = setInterval(() => {
 
 }
 
+
+.info-item {
+  margin-bottom: 2px;
+}
+
 .item-desc {
+  border-radius: 20px;
   margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+
   margin-bottom: 15px;
   text-align: center;
   font-weight: 550;
   font-size: 15px;
-  color: #000;
-}
+  color: #000000;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: default;
+  user-select: none;
+
+
+  padding: 4px 12px;
+}
+.info-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 15px;
+}
 .info-content {
   margin: 5px;
   display: flex;
@@ -302,7 +335,6 @@ this.timer = setInterval(() => {
 .info-content:hover {
   transform: scale(1.025);
   box-shadow: 0 3px 10px rgba(74, 144, 226, 0.2);
-
 }
 
 .tooltip-label {

@@ -235,11 +235,11 @@ export default {
     };
   },
   mounted() {
-    this.startClock();       // ✅ 启动时钟
-
-    this.getDeviceList();
-    this.startAutoRefresh();  // ✅ 启动自动刷新 + 倒计时
+    this.startClock();
+    this.startAutoRefresh();
     window.addEventListener("resize", this.handleResize);
+
+    this.handleRouteChange(this.$route.query);
   },
 
   beforeDestroy() {
@@ -248,6 +248,12 @@ export default {
 
   },
   watch: {
+    '$route.query': {
+      handler(newQuery) {
+        this.handleRouteChange(newQuery);
+      },
+      immediate: true, // ✅ 页面一进来就会执行
+    },
     selectedDeviceCode(newVal) {
       if (newVal) {
         this.form.deviceCode = newVal;
@@ -257,6 +263,22 @@ export default {
     },
   },
   methods: {
+    handleRouteChange(query) {
+      if (query.deviceCode) {
+        this.selectedDeviceCode = query.deviceCode;
+        this.form.deviceCode = query.deviceCode;
+      }
+      if (query.stationCode) {
+        this.stationCode = query.stationCode;
+      }
+
+      // 拉设备列表和点位数据
+      this.getDeviceList();
+      if (this.selectedDeviceCode) {
+        this.getPoints();
+        this.stationDeviceVarStatusList2();
+      }
+    },
     startClock() {
       setInterval(() => {
         this.currentTime = this.formatTime(new Date());
@@ -324,9 +346,10 @@ export default {
         .then((res) => {
           if (res.data.code === 200) {
             this.deviceList = res.data.data.filter((d) => d.isGroup === 0);
-            if (this.deviceList.length > 0) {
+            if (this.deviceList.length > 0 && !this.selectedDeviceCode) {
               this.selectedDeviceCode = this.deviceList[0].code;
               this.form.deviceCode = this.selectedDeviceCode;
+
             }
           }
         })
@@ -763,5 +786,4 @@ export default {
   box-shadow: var(--hover-shadow);
   background: rgba(31, 120, 209, 0.2);
 }
-
 </style>
