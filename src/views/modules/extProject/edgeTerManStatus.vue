@@ -21,7 +21,7 @@
 
 
 
-          <div v-for="(item, index) in tableData" :key="index" class="card-wrapper" >
+          <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
 
             <div class="custom-card" @click="openNew('edgeTerManKanban', item.deviceCode, item.stationCode)"
               :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
@@ -37,13 +37,15 @@
                     <div class="info-item">
                       <i class="el-icon-s-data" style="color: #2980b9; margin-right: 4px;"></i>
                       <span class="label">用电:</span>
-                      <span class="value"  :style="{ color:  '#2980b9'}">{{ item.todayDiff == null? 0 :item.todayDiff }} kWh</span>
+                      <span class="value" :style="{ color: '#2980b9' }">{{ item.todayDiff == null ? 0 : item.todayDiff
+                        }}
+                        kWh</span>
                     </div>
 
                     <div class="info-item">
                       <i class="el-icon-lightning" style="color: #e67e22; margin-right: 4px;"></i>
                       <span class="label">功率:</span>
-                      <span class="value"  :style="{ color:  '#e67e22'}" >{{ item.k == null ? 0 : item.k }} kW</span>
+                      <span class="value" :style="{ color: '#e67e22' }">{{ item.k == null ? 0 : item.k }} kW</span>
                     </div>
 
                   </div>
@@ -75,10 +77,9 @@ export default {
     this.$nextTick(() => {
       this.$refs.tree.setCheckedKeys(['cms-root']);
     });
-    this.getEdgeTerManStatus();
-this.timer = setInterval(() => {
-  this.getEdgeTerManStatus();
-}, 60000); // 1 分钟刷新一次
+    this.timer = setInterval(() => {
+      this.getEdgeTerManStatus();
+    }, 60000); // 1 分钟刷新一次
 
   },
 
@@ -94,7 +95,7 @@ this.timer = setInterval(() => {
   },
 
   methods: {
-      openNew(path, deviceCode, stationCode) {
+    openNew(path, deviceCode, stationCode) {
       const newUrl = this.$router.resolve({
         path: path,
         query: {
@@ -170,7 +171,10 @@ this.timer = setInterval(() => {
           this.defaultCheckedKeys = ['cms-root', ...list.map((item) => item.id)];
           this.$nextTick(() => {
             this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
+            this.getEdgeTerManStatus();
+
           });
+
 
         })
         .catch((err) => {
@@ -201,10 +205,15 @@ this.timer = setInterval(() => {
     },
 
     /** 勾选设备节点 */
-    handleCheckChange() {
+    handleCheckChange: _.debounce(function () {
       this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
+      if (this.secondLevelChecked.length === 0) {
+        this.tableData = [];
+        return;
+      }
       this.getEdgeTerManStatus();
-    },
+    }, 200)
+
   },
 
   beforeDestroy() {
@@ -312,12 +321,14 @@ this.timer = setInterval(() => {
 
   padding: 4px 12px;
 }
+
 .info-tag {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-left: 15px;
 }
+
 .info-content {
   margin: 5px;
   display: flex;

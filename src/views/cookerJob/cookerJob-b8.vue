@@ -158,8 +158,8 @@ export default {
 
   data() {
     return {
-      intervalId,
       inputDisabled: false,
+      intervalId: null,
 
       // 总进站数和不良品数
       inCount: [],
@@ -280,14 +280,12 @@ export default {
 
     },
 
-
-    watch: {
-      '$route.query.switchValue'(newValue, oldValue) {
+         '$route.query.switchValue'(newValue, oldValue) {
         console.log('$route.query.switchValue 发生改变', oldValue, newValue);
         // 这里可以对 switchValue 做相应的处理
         this.switchValue = newValue === 'true';
-      }
-    },
+      },
+
 
 
     "$route.query.location"(newLocation, oldLocation) {

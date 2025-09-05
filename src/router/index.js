@@ -45,6 +45,9 @@ const globalRoutes = [
 
   { path: '/modules/extProject/edgeTerManKanban', component: _import('modules/extProject/edgeTerManKanban'), name: 'edgeTerManKanban', meta: { title: 'edgeTerManKanban' } },
 
+  { path: '/modules/extProject/jipSerchPage', component: _import('modules/extProject/jipSerchPage'), name: 'jipSerchPage', meta: { title: 'jipSerchPage' } },
+
+
   { path: '/demo/test', component: _import('demo/test'), name: 'test', meta: { title: '看板测试' } }
 
 ]
