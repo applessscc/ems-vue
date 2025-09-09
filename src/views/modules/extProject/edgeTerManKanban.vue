@@ -521,6 +521,12 @@ export default {
                 return { ...series, dataList: diffData };
               });
               this.chatData.xAxis = this.chatData.xAxis.slice(1);
+
+              const totalY = yList.reduce((sum, series) => {
+                return sum + series.dataList.reduce((s, v) => s + v, 0);
+              }, 0);
+              console.log("Y轴总和:", totalY);
+
             }
             this.chatData.yList = yList;
             this.getEleData()

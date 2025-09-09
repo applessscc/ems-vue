@@ -186,9 +186,8 @@ export default {
     getEdgeTerManStatus() {
       this.loading = true;
       const deviceCodes = this.secondLevelChecked.map((node) => node.code).filter(code => code != null);
-
       this.$http({
-        url: 'http://localhost:8080/ems-admin/extProject/getEdgeTerManStatus',
+        url: this.$http.adornUrl('/extProject/getEdgeTerManStatus'),
         method: 'post',
         data: { stationCode: 'STATION_DEFAULT', deviceCode: deviceCodes },
       })
