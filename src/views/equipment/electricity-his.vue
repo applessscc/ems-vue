@@ -15,28 +15,44 @@
               <el-option label="月" value="month"></el-option>
               <el-option label="日" value="date"></el-option>
             </el-select>
-            <el-date-picker v-if="queryDataForm.date_type == 'year'" v-model="queryDataForm.year" type="year" value-format="yyyy" placeholder="选择年" />
-            <el-date-picker v-if="queryDataForm.date_type == 'month'" v-model="queryDataForm.month" type="month" value-format="yyyyMM" placeholder="选择月" />
-            <el-date-picker v-if="queryDataForm.date_type == 'date'" v-model="queryDataForm.date" type="date" value-format="yyyyMMdd" placeholder="选择日期" />
+            <el-date-picker v-if="queryDataForm.date_type == 'year'" v-model="queryDataForm.year" type="year"
+              value-format="yyyy" placeholder="选择年" />
+            <el-date-picker v-if="queryDataForm.date_type == 'month'" v-model="queryDataForm.month" type="month"
+              value-format="yyyyMM" placeholder="选择月" />
+            <el-date-picker v-if="queryDataForm.date_type == 'date'" v-model="queryDataForm.date" type="date"
+              value-format="yyyyMMdd" placeholder="选择日期" />
           </el-form-item>
+
+          <!-- BU -->
           <el-form-item label="BU" :label-width="formLabelWidth" class="item">
-            <el-select v-model="queryDataForm.bu_name" placeholder="请选择BU" @change="selectChange()" :clearable="true" multiple collapse-tags>
+
+            <el-select :value="queryDataForm.bu_name[0] || ''" placeholder="请选择BU" @input="handleInput" :clearable="false" @change="selectChange">
               <el-option v-for="op in buNameOptions" :key="op.item" :label="op.value" :value="op.item" />
             </el-select>
+
+
+            <!-- <el-select v-model="queryDataForm.bu_name" placeholder="请选择BU" @change="selectChange" :clearable="true"
+              multiple collapse-tags>
+              <el-option v-for="op in buNameOptions" :key="op.item" :label="op.value" :value="op.item" />
+            </el-select> -->
           </el-form-item>
           <el-form-item label="位置" :label-width="formLabelWidth" class="item">
-            <el-select v-model="queryDataForm.position_name" placeholder="请选择位置" :clearable="true" multiple collapse-tags>
+            <el-select v-model="queryDataForm.position_name" placeholder="请选择位置" :clearable="true" multiple
+              collapse-tags>
               <el-option v-for="op in positionNameOptions" :key="op.item" :label="op.value" :value="op.value" />
             </el-select>
           </el-form-item>
           <el-form-item label="类型" :label-width="formLabelWidth" class="item">
-            <el-select v-model="queryDataForm.counter_type" placeholder="请选择类型" :clearable="true" multiple collapse-tags>
+            <el-select v-model="queryDataForm.counter_type" placeholder="请选择类型" :clearable="true" multiple
+              collapse-tags>
               <el-option v-for="op in counterTypeOptions" :key="op.item" :label="op.value" :value="op.item" />
             </el-select>
           </el-form-item>
           <el-form-item label="设备" :label-width="formLabelWidth" class="item">
-            <el-select v-model="queryDataForm.counter_id" placeholder="请选择设备" @focus="queryCounterSelect()" :clearable="true" style="width:250px" multiple collapse-tags filterable>
-              <el-option v-for="op in counterIdOptions" :key="op.counterId" :label="op.counterName" :value="op.counterId" />
+            <el-select v-model="queryDataForm.counter_id" placeholder="请选择设备" @focus="queryCounterSelect()"
+              :clearable="true" style="width:250px" multiple collapse-tags filterable>
+              <el-option v-for="op in counterIdOptions" :key="op.counterId" :label="op.counterName"
+                :value="op.counterId" />
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -97,52 +113,106 @@ export default {
     this.getDictParams({ code: this.optionsCode.position_name });
     this.getDictParams({ code: this.optionsCode.counter_type });
 
-    //获取跳转url参数
+    // 获取路由传参
     if (this.$route.query.date_type) {
-      this.queryDataForm.date_type = this.$route.query.date_type;
-      this.queryDataForm.year = this.$route.query.year;
-      this.queryDataForm.month = this.$route.query.month;
-      this.queryDataForm.date = this.$route.query.date;
-      this.queryDataForm.query_type = this.$route.query.query_type;
-
-      let bu_name_param = this.$route.query.bu_name;
-      let position_name_param = this.$route.query.position_name;
-      let counter_type_param = this.$route.query.counter_type;
-      let counter_id_param = this.$route.query.counter_id;
-      let counter_name_param = this.$route.query.counter_name;
-      this.queryDataForm.bu_name = (bu_name_param instanceof Array) ? bu_name_param : (bu_name_param ? [bu_name_param] : []);
-      this.queryDataForm.position_name = (position_name_param instanceof Array) ? position_name_param : (position_name_param ? [position_name_param] : []);
-      this.queryDataForm.counter_type = (counter_type_param instanceof Array) ? counter_type_param : (counter_type_param ? [counter_type_param] : []);
-      this.queryDataForm.counter_id = (counter_id_param instanceof Array) ? counter_id_param : (counter_id_param ? [counter_id_param] : []);
-      this.queryDataForm.counter_name = (counter_name_param instanceof Array) ? counter_name_param : (counter_name_param ? [counter_name_param] : []);
-      console.log(this.queryDataForm);
+      Object.keys(this.queryDataForm).forEach(key => {
+        if (this.$route.query[key] !== undefined) {
+          const val = this.$route.query[key]
+          this.queryDataForm[key] = Array.isArray(val) ? val : [val]
+        }
+      })
+      this.queryDataForm.date_type = this.$route.query.date_type
+      this.queryDataForm.year = this.$route.query.year || ''
+      this.queryDataForm.month = this.$route.query.month || ''
+      this.queryDataForm.date = this.$route.query.date || moment().format('YYYYMMDD')
+      this.queryDataForm.query_type = this.$route.query.query_type || '1'
     }
+
     this.$nextTick(() => {
       setTimeout(this.onSubmit, 100);
     })
   },
   methods: {
+        handleInput(val) {
+      // 强制变成数组
+      this.queryDataForm.bu_name = val ? [val] : [];
+      this.selectChange();
+    },
     onSubmit() {
       if (this.queryDataForm.date_type == 'year') {
         this.queryDataForm.title = this.getChartTitle('月');
+
+        // 缓存key
+        const currentYear = new Date().getFullYear();
+        this.queryDataForm.cacheKey =
+          this.queryDataForm.year + ':' +
+          (this.queryDataForm.year === currentYear
+            ? String(new Date().getDate()).padStart(2, '0') + ':'
+            : '') +
+          this.queryDataForm.query_type + ':' +
+          this.queryDataForm.bu_name + ':' +
+          this.queryDataForm.counter_id + ':' +
+          this.queryDataForm.counter_type + ':' +
+          this.queryDataForm.position_name;
+
         this.queryDataForm.url = '/report/electricitybu/queryElectricityConsumptionByMonth'
       } else if (this.queryDataForm.date_type == 'month') {
         this.queryDataForm.title = this.getChartTitle('日');
+
+        // 缓存key
+        const now = new Date();
+        const currentMonth = now.getFullYear().toString() +
+          String(now.getMonth() + 1).padStart(2, '0'); // 当前年月，格式"YYYYMM"
+        const { month, query_type, bu_name } = this.queryDataForm;
+        if (month === currentMonth) {
+          const currentDate = currentMonth + String(now.getDate()).padStart(2, '0'); // 20250709
+          this.queryDataForm.cacheKey = query_type + ':' + currentDate + ':' + bu_name + ':'
+            + this.queryDataForm.counter_id + ':'
+            + this.queryDataForm.counter_type + ':'
+            + this.queryDataForm.position_name;
+        } else {
+          this.queryDataForm.cacheKey = query_type + ':' + month + ':' + bu_name + ':'
+            + this.queryDataForm.counter_id + ':'
+            + this.queryDataForm.counter_type + ':'
+            + this.queryDataForm.position_name;
+        }
+
         this.queryDataForm.url = '/report/electricitybu/queryElectricityConsumptionByDay'
       } else {
         this.queryDataForm.title = this.getChartTitle('小时');
         this.queryDataForm.url = '/report/electricitybu/queryElectricityConsumptionByHour'
       }
-      this.$refs.topChart1.getDataList(this.queryDataForm, this.queryDataForm.url);
+
+      // 深拷贝保证响应式
+      const params = JSON.parse(JSON.stringify(this.queryDataForm))
+      if (this.$refs.topChart1 && this.$refs.topChart1.getDataList) {
+        this.$refs.topChart1.getDataList(params, params.url)
+      } else {
+        console.warn('topChart1 未挂载或 getDataList 不存在')
+      }
     },
-    getChartTitle(titleKey) {
-      return '每' + titleKey + (this.queryDataForm.query_type == '1' ? '用电' : '用水') + '量';
+    getChartTitle(key) {
+      return '每' + key + (this.queryDataForm.query_type == '1' ? '用电' : '用水') + '量'
     },
     selectChange() {
-      if (this.queryDataForm.bu_name.length == 0) {
-        this.queryDataForm.bu_name = this.oldForm.bu_name;
+      if (this.queryDataForm.bu_name.length === 0) {
+        this.queryDataForm.bu_name = this.oldForm.bu_name
       }
-      this.oldForm.bu_name = this.queryDataForm.bu_name;
+      this.oldForm.bu_name = [...this.queryDataForm.bu_name]
+      this.refreshData()
+    },
+    refreshData() {
+      this.onSubmit()
+    },
+    queryTypeChange(val) {
+      this.queryDataForm.counter_type = []
+      this.queryDataForm.counter_id = []
+      if (val == '1') {
+        this.optionsCode = { bu_name: '1001', position_name: '1002', counter_type: '1003', counter_id: '1004' }
+      } else {
+        this.optionsCode = { bu_name: '1001', position_name: '1002', counter_type: '1006', counter_id: '1005' }
+      }
+      this.getDictParams({ code: this.optionsCode.counter_type })
       this.refreshData()
     },
     getDictParams(params) {
@@ -154,37 +224,17 @@ export default {
         params: this.$http.adornParams(params)
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          if (params.code == this.optionsCode.bu_name) {
+          if (params.code == this.optionsCode.bu_name)
             this.buNameOptions = data.page.list;
-          } else if (params.code == this.optionsCode.position_name) {
-            this.positionNameOptions = data.page.list;
-          } else if (params.code == this.optionsCode.counter_type) {
-            this.counterTypeOptions = data.page.list;
-          } else {
-            console.log("params.code:" + params.code)
-          }
+          else if (params.code == this.optionsCode.position_name) this.positionNameOptions = data.page.list
+          else if (params.code == this.optionsCode.counter_type) this.counterTypeOptions = data.page.list
         } else {
-          console.log(data);
+          console.log('获取字典失败', data)
         }
       })
     },
-    queryTypeChange($event) {
-      this.queryDataForm.counter_type = [];
-      this.queryDataForm.counter_id = [];
-      if ($event == '1') {
-        //用电
-        this.optionsCode = { 'bu_name': '1001', 'position_name': '1002', 'counter_type': '1003', 'counter_id': '1004' }
-      } else {
-        //用水
-        this.optionsCode = { 'bu_name': '1001', 'position_name': '1002', 'counter_type': '1006', 'counter_id': '1005' }
-      }
-      //刷新下拉框和数据
-      this.getDictParams({ code: this.optionsCode.counter_type });
-      this.refreshData();
-    },
-    //查询电表下拉选项
     queryCounterSelect() {
-      let params = { ...this.queryDataForm };
+      const params = JSON.parse(JSON.stringify(this.queryDataForm))
       this.$http({
         url: this.$http.adornUrl('/report/electricitybu/selectCounterName'),
         method: 'post',

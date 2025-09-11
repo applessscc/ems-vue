@@ -38,7 +38,7 @@
                       <i class="el-icon-s-data" style="color: #2980b9; margin-right: 4px;"></i>
                       <span class="label">用电:</span>
                       <span class="value" :style="{ color: '#2980b9' }">{{ item.todayDiff == null ? 0 : item.todayDiff
-                        }}
+                      }}
                         kWh</span>
                     </div>
 
@@ -152,6 +152,7 @@ export default {
               nodeKey: item.id,
               parentId: item.parentId,
               code: item.code,
+              level: 1,
               children: [],
             };
           });
@@ -166,7 +167,7 @@ export default {
             }
           });
 
-          this.treeData = [{ label: 'CMS', nodeKey: 'cms-root', children: tree }];
+          this.treeData = [{ level: 0, label: 'CMS', nodeKey: 'cms-root', children: tree }];
           this.defaultExpandedKeys = ['cms-root'];
           this.defaultCheckedKeys = ['cms-root', ...list.map((item) => item.id)];
           this.$nextTick(() => {
@@ -205,7 +206,8 @@ export default {
 
     /** 勾选设备节点 */
     handleCheckChange: _.debounce(function () {
-      this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
+      this.secondLevelChecked = this.$refs.tree.getCheckedNodes().filter(node => node.level === 1);
+      console.log('勾选的二级节点:', this.secondLevelChecked);
       if (this.secondLevelChecked.length === 0) {
         this.tableData = [];
         return;
