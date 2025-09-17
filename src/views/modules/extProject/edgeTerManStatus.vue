@@ -70,6 +70,8 @@
 </template>
 
 <script>
+import { name } from 'file-loader';
+
 export default {
 
   mounted() {
@@ -145,52 +147,124 @@ export default {
       })
         .then((res) => {
           const list = res.data.data || [];
-          const map = {};
+
+          const rootNode = {
+            label: 'CMS',
+            nodeKey: 'cms-root',
+            children: [],
+            level: 0,
+          };
+
+          const stationMap = {}; // 用于查找已有节点
+
           list.forEach((item) => {
-            map[item.id] = {
+            const parts = item.stationCode.split('_'); // 根据 _ 分层
+            let currentLevel = rootNode.children;
+
+            let pathKey = ''; // 拼接生成唯一 key，避免重复
+            parts.forEach((part, index) => {
+              pathKey += (pathKey ? '_' : '') + part;
+              let node = currentLevel.find((n) => n.nodeKey === pathKey);
+              if (!node) {
+                node = {
+                  label: part,
+                  nodeKey: pathKey,
+                  children: [],
+                  level: index + 1,
+                };
+                currentLevel.push(node);
+              }
+              currentLevel = node.children;
+            });
+
+            // 最末层挂设备
+            currentLevel.push({
               label: item.name,
               nodeKey: item.id,
               parentId: item.parentId,
               code: item.code,
-              level: 1,
-              children: [],
-            };
+              isLeaf: true,
+              code: item.code,
+              stationCode: item.stationCode,
+              dbname: item.dbname,
+              name: item.name,
+              level: parts.length + 1,
+            });
           });
 
-          const tree = [];
-          list.forEach((item) => {
-            const node = map[item.id];
-            if (node.parentId && map[node.parentId]) {
-              map[node.parentId].children.push(node);
-            } else {
-              tree.push(node);
-            }
-          });
-
-          this.treeData = [{ level: 0, label: 'CMS', nodeKey: 'cms-root', children: tree }];
-          this.defaultExpandedKeys = ['cms-root'];
+          this.treeData = [rootNode];
+          this.defaultExpandedKeys = this.collectExpandedKeys(this.treeData);
           this.defaultCheckedKeys = ['cms-root', ...list.map((item) => item.id)];
+
           this.$nextTick(() => {
             this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
             this.getEdgeTerManStatus();
-
           });
-
-
         })
         .catch((err) => {
           console.error('获取树失败:', err);
         });
     },
 
+    collectExpandedKeys(nodes) {
+      let keys = [];
+      nodes.forEach(node => {
+        if (node.children && node.children.length > 0) {
+          // 如果子节点不是全部叶子，就展开这个节点
+          const allChildrenAreLeaf = node.children.every(c => c.isLeaf === true);
+          if (!allChildrenAreLeaf) {
+            keys.push(node.nodeKey);
+          }
+          // 递归子节点
+          keys = keys.concat(this.collectExpandedKeys(node.children));
+        }
+      });
+      return keys;
+    },
+
+
     /** 获取传感器状态 */
     getEdgeTerManStatus() {
       this.loading = true;
-      const deviceCodes = this.secondLevelChecked.map((node) => node.code).filter(code => code != null);
+      const dbList = this.secondLevelChecked.reduce((acc, node) => {
+        if (!node.dbname || !node.code) return acc; // 过滤空值
+
+        // 找到对应的 dbname 分组
+        let dbGroup = acc.find(item => item.dbname === node.dbname);
+        if (!dbGroup) {
+          dbGroup = {
+            dbname: node.dbname,
+            stations: []
+          };
+          acc.push(dbGroup);
+        }
+
+        // 找到对应的 stationCode 分组
+        let stationGroup = dbGroup.stations.find(s => s.stationCode === node.stationCode);
+        if (!stationGroup) {
+          stationGroup = {
+            stationCode: node.stationCode || null,
+            codes: []
+          };
+          dbGroup.stations.push(stationGroup);
+        }
+
+        // 加入对象 { code, name }
+        stationGroup.codes.push({
+          code: node.code,
+          name: node.name || node.code
+        });
+
+        return acc;
+      }, []);
+
+
       this.$http({
         url: this.$http.adornUrl('/extProject/getEdgeTerManStatus'),
         method: 'post',
-        data: { stationCode: 'STATION_DEFAULT', deviceCode: deviceCodes },
+        data: {
+          dbList: dbList,
+        },
       })
         .then((response) => {
           const data = response.data.data;
@@ -206,7 +280,7 @@ export default {
 
     /** 勾选设备节点 */
     handleCheckChange: _.debounce(function () {
-      this.secondLevelChecked = this.$refs.tree.getCheckedNodes().filter(node => node.level === 1);
+      this.secondLevelChecked = this.$refs.tree.getCheckedNodes().filter(node => node.isLeaf == true);
       console.log('勾选的二级节点:', this.secondLevelChecked);
       if (this.secondLevelChecked.length === 0) {
         this.tableData = [];
