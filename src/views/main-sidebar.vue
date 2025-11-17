@@ -237,6 +237,15 @@ export default {
         this.$router.push('/home')
         this.openNew('modules/extProject/jipSerchPage')
         return
+      }else if (routePath === '/extProject-tempZoneStatus') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/tempZoneStatus')
+        return
+      }
+      else if (routePath === '/extProject-equipmentStatus') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/equipmentStatus')
+        return
       }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加

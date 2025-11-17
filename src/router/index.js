@@ -46,7 +46,9 @@ const globalRoutes = [
   { path: '/modules/extProject/edgeTerManKanban', component: _import('modules/extProject/edgeTerManKanban'), name: 'edgeTerManKanban', meta: { title: 'edgeTerManKanban' } },
 
   { path: '/modules/extProject/jipSerchPage', component: _import('modules/extProject/jipSerchPage'), name: 'jipSerchPage', meta: { title: 'jipSerchPage' } },
+  { path: '/modules/extProject/tempZoneStatus', component: _import('modules/extProject/tempZoneStatus'), name: 'tempZoneStatus', meta: { title: 'tempZoneStatus' } },
 
+  { path: '/modules/extProject/equipmentStatus', component: _import('modules/extProject/equipmentStatus'), name: 'equipmentStatus', meta: { title: 'equipmentStatus' } },
 
   { path: '/demo/test', component: _import('demo/test'), name: 'test', meta: { title: '看板测试' } }
 
