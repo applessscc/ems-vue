@@ -247,6 +247,11 @@ export default {
         this.openNew('modules/extProject/equipmentStatus')
         return
       }
+      else if (routePath === '/extProject-solderOpsCentral') {
+        this.$router.push('/home')
+        this.openNew('modules/extProject/solderOpsCentral')
+        return
+      }
       if (route.meta.isTab) {
         // tab选中, 不存在先添加
         var tab = this.mainTabs.filter(item => item.name === route.name)[0]
