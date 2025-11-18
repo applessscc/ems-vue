@@ -39,33 +39,41 @@ export default {
     if (this.chart) this.chart.dispose();
   },
   methods: {
-    async fetchData() {
-      try {
-        const res = await fetch('http://localhost:8080/ems-admin/extProject/getEquipmentStatus?equipment=S2-G00000-003-0600');
-        const json = await res.json();
-        const dataJSON = JSON.parse(json.data.dataJSON);
-        this.deviceNo = json.data.equipment;   // 取设备号
+async fetchData() {
+  try {
+    // 使用 this.$http 发起 POST 请求
+    const response = await this.$http({
+      url: this.$http.adornUrl('/extProject/getEquipmentStatus'),
+      method: 'get',
+      params: { equipment: 'S2-G00000-003-0600' } // 或者用 params？看后端要求
+    });
 
-        for (let i = 0; i < this.zoneCount; i++) {
-          this.topSetValues[i] = dataJSON[i].sv;
-          this.topActualValues[i] = dataJSON[i].pv;
-          this.bottomSetValues[i] = dataJSON[i + this.zoneCount].sv;
-          this.bottomActualValues[i] = dataJSON[i + this.zoneCount].pv;
-        }
+    // 假设返回结构为 { code: 200, data: { ... } }
+    const json = response.data; // $http 通常已解析 JSON，无需再 .json()
+    
+    // 如果后端返回的是 { data: { dataJSON: "...", equipment: "..." } }
+    const dataJSON = JSON.parse(json.data.dataJSON);
+    this.deviceNo = json.data.equipment;
 
-        // 解析 speed（第21项，索引20）
-        const speedData = dataJSON[20]; // {"name":"speed","sv":"75","pv":"75"}
-        if (speedData && speedData.name === 'speed') {
-          this.speedSV = speedData.sv;
-          this.speedPV = speedData.pv;
-        }
+    for (let i = 0; i < this.zoneCount; i++) {
+      this.topSetValues[i] = dataJSON[i].sv;
+      this.topActualValues[i] = dataJSON[i].pv;
+      this.bottomSetValues[i] = dataJSON[i + this.zoneCount].sv;
+      this.bottomActualValues[i] = dataJSON[i + this.zoneCount].pv;
+    }
 
+    // 解析 speed（第21项，索引20）
+    const speedData = dataJSON[20];
+    if (speedData && speedData.name === 'speed') {
+      this.speedSV = speedData.sv;
+      this.speedPV = speedData.pv;
+    }
 
-        this.drawChart();
-      } catch (err) {
-        console.error('获取设备数据失败:', err);
-      }
-    },
+    this.drawChart();
+  } catch (err) {
+    console.error('获取设备数据失败:', err);
+  }
+},
     drawChart() {
       const graphics = [];
 
