@@ -113,8 +113,8 @@ export default {
 
         // 上下层温区框
         graphics.push(
-          { type: 'rect', shape: { x, y: this.topY + 10, width: this.zoneWidth - 5, height: 40 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER, lineWidth: 1 } },
-          { type: 'rect', shape: { x, y: this.bottomY + 10, width: this.zoneWidth - 5, height: 40 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER, lineWidth: 1 } }
+          { type: 'rect', shape: { x, y: this.topY + 20, width: this.zoneWidth - 5, height: 30 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER, lineWidth: 1 } },
+          { type: 'rect', shape: { x, y: this.bottomY + 45, width: this.zoneWidth - 5, height: 30 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER, lineWidth: 1 } }
         );
 
         // 左侧标签（仅第一区）
@@ -122,14 +122,14 @@ export default {
           const labelStyle = { font: '12px ' + FONT_FAMILY, fill: '#333' };
           graphics.push(
             // 上层
-            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 25, text: '设定值' } },
             { type: 'rect', shape: { x: x - 60, y: this.topY + 30, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)', stroke: 'rgba(200,200,200,0.2)', lineWidth: 0.5, radius: 3 } },
-            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 45, text: '实际值' } },
+            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 30, text: '设定值' } },
+            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 55, text: '实际值' } },
 
             // 下层
             { type: 'rect', shape: { x: x - 60, y: this.bottomY + 10, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)', stroke: 'rgba(200,200,200,0.2)', lineWidth: 0.5, radius: 3 } },
-            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 25, text: '实际值' } },
-            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 45, text: '设定值' } }
+            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 30, text: '实际值' } },
+            { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 60, text: '设定值' } }
           );
         }
 
@@ -140,8 +140,8 @@ export default {
           { type: 'text', style: { x: x + 10, y: this.topY + 55, text: `${this.topActualValues[i]}℃`, font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR } },
 
           // 下层
-          { type: 'text', style: { x: x + 10, y: this.bottomY + 30, text: `${this.bottomSetValues[i]}℃`, font: LABEL_FONT, fill: SET_VALUE_COLOR } },
-          { type: 'text', style: { x: x + 10, y: this.bottomY + 55, text: `${this.bottomActualValues[i]}℃`, font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR } }
+          { type: 'text', style: { x: x + 10, y: this.bottomY + 25, text: `${this.bottomSetValues[i]}℃`,  font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR} },
+          { type: 'text', style: { x: x + 10, y: this.bottomY + 55, text: `${this.bottomActualValues[i]}℃`, font: LABEL_FONT, fill: SET_VALUE_COLOR } }
         );
       }
 
