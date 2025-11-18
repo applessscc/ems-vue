@@ -96,7 +96,7 @@ export default {
       // === 传送带 ===
       graphics.push(
         { type: 'rect', shape: { x: this.startX - 40, y: this.topY + 110, width: this.zoneCount * this.zoneWidth + 80, height: 10 }, style: { fill: CONVEYOR_COLOR } },
-        { type: 'rect', shape: { x: this.startX - 40, y: this.bottomY - 10, width: this.zoneCount * this.zoneWidth + 80, height: 10 }, style: { fill: CONVEYOR_COLOR } }
+        { type: 'rect', shape: { x: this.startX - 40, y: this.bottomY -20, width: this.zoneCount * this.zoneWidth + 80, height: 10 }, style: { fill: CONVEYOR_COLOR } }
       );
 
       // === 信号灯柱 ===
