@@ -127,14 +127,14 @@ export default {
         graphics.push({ type: 'text', style: { x: x + 10, y: this.bottomY + 55, text: `${this.bottomActualValues[i]}℃`, font: 'bold 14px monospace', fill: '#00aa00' } });
       }
 
-// ========== 传送带速度显示（上下+左右完全居中） ==========
+// 传送带速度显示
 const totalWidth = this.zoneCount * this.zoneWidth;
 const centerX = this.startX + totalWidth / 2; // 炉体中心 X
 const speedY = this.bottomY + 150; // 垂直位置（可根据需要微调）
 
 // 格式化数值
 const sv = parseFloat(this.speedSV).toFixed(1); // 如: "75.0"
-const pv = parseInt(this.speedPV, 10);         // 如: 75
+const pv = parseFloat(this.speedPV).toFixed(1);         // 如: 75
 
 // 元素尺寸
 const labelWidth = 80;   // "传送带 1"
