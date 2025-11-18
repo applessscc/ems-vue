@@ -23,7 +23,10 @@ export default {
       topActualValues: Array(10).fill(0),
       bottomSetValues: Array(10).fill(0),
       bottomActualValues: Array(10).fill(0),
-      timer: null
+      timer: null,
+      speedSV: '0',   // 新增
+      speedPV: '0',   // 新增
+
     };
   },
   mounted() {
@@ -49,6 +52,14 @@ export default {
           this.bottomSetValues[i] = dataJSON[i + this.zoneCount].sv;
           this.bottomActualValues[i] = dataJSON[i + this.zoneCount].pv;
         }
+
+        // 解析 speed（第21项，索引20）
+        const speedData = dataJSON[20]; // {"name":"speed","sv":"75","pv":"75"}
+        if (speedData && speedData.name === 'speed') {
+          this.speedSV = speedData.sv;
+          this.speedPV = speedData.pv;
+        }
+
 
         this.drawChart();
       } catch (err) {
@@ -95,10 +106,13 @@ export default {
 
         if (i === 0) {
           // 上层标签
-          
+
           graphics.push({ type: 'text', style: { x: x - 55, y: this.topY + 25, text: '设定值', font: '12px monospace', fill: '#333' } });
           graphics.push({ type: 'rect', shape: { x: x - 60, y: this.topY + 30, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)', stroke: 'rgba(200,200,200,0.2)', lineWidth: 0.5, radius: 3 } });
           graphics.push({ type: 'text', style: { x: x - 55, y: this.topY + 45, text: '实际值', font: '12px monospace', fill: '#333' } });
+
+
+
 
           graphics.push({ type: 'rect', shape: { x: x - 60, y: this.bottomY + 10, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)', stroke: 'rgba(200,200,200,0.2)', lineWidth: 0.5, radius: 3 } });
           graphics.push({ type: 'text', style: { x: x - 55, y: this.bottomY + 25, text: '实际值', font: '12px monospace', fill: '#333' } });
@@ -113,6 +127,137 @@ export default {
         graphics.push({ type: 'text', style: { x: x + 10, y: this.bottomY + 55, text: `${this.bottomActualValues[i]}℃`, font: 'bold 14px monospace', fill: '#00aa00' } });
       }
 
+// ========== 传送带速度显示（上下+左右完全居中） ==========
+const totalWidth = this.zoneCount * this.zoneWidth;
+const centerX = this.startX + totalWidth / 2; // 炉体中心 X
+const speedY = this.bottomY + 150; // 垂直位置（可根据需要微调）
+
+// 格式化数值
+const sv = parseFloat(this.speedSV).toFixed(1); // 如: "75.0"
+const pv = parseInt(this.speedPV, 10);         // 如: 75
+
+// 元素尺寸
+const labelWidth = 80;   // "传送带 1"
+const svWidth = 60;      // 设定值框
+const pvWidth = 60;      // 实际值框
+const unitWidth = 80;    // "厘米/min"
+
+const itemHeight = 28;   // 所有元素统一高度（含 padding）
+const startY = speedY - itemHeight / 2; // 矩形的 top Y（使整体垂直居中于 speedY）
+
+// 整体起始 X（用于水平居中）
+const startX = centerX - (labelWidth + svWidth + pvWidth + unitWidth) / 2;
+
+// 背景底框（可选，提升视觉层次）
+graphics.push({
+  type: 'rect',
+  shape: {
+    x: startX - 10,
+    y: startY - 4,
+    width: labelWidth + svWidth + pvWidth + unitWidth + 20,
+    height: itemHeight + 8
+  },
+  style: {
+    fill: 'rgba(245, 245, 245, 0.4)',
+    stroke: '#ddd',
+    lineWidth: 0.8,
+    radius: 5
+  }
+});
+
+// 1. "传送带 1" 文字（蓝色，居中）
+graphics.push({
+  type: 'text',
+  style: {
+    x: startX + labelWidth / 2,
+    y: speedY,
+    text: '传送带 1',
+    font: 'bold 14px Microsoft YaHei',
+    fill: '#0066cc',
+    textAlign: 'center',
+    textBaseline: 'middle'
+  }
+});
+
+// 2. 设定值框 [75.0]
+graphics.push(
+  // 白色背景矩形
+  {
+    type: 'rect',
+    shape: {
+      x: startX + labelWidth,
+      y: startY,
+      width: svWidth,
+      height: itemHeight
+    },
+    style: {
+      fill: '#ffffff',
+      stroke: '#cccccc',
+      lineWidth: 1,
+      radius: 4
+    }
+  },
+  // 数值文本
+  {
+    type: 'text',
+    style: {
+      x: startX + labelWidth + svWidth / 2,
+      y: speedY,
+      text: sv,
+      font: '14px monospace',
+      fill: '#333333',
+      textAlign: 'center',
+      textBaseline: 'middle'
+    }
+  }
+);
+
+// 3. 实际值框 [75]
+graphics.push(
+  // 绿色背景矩形
+  {
+    type: 'rect',
+    shape: {
+      x: startX + labelWidth + svWidth,
+      y: startY,
+      width: pvWidth,
+      height: itemHeight
+    },
+    style: {
+      fill: '#90ee90', // 浅绿色
+      stroke: '#66cc66',
+      lineWidth: 1,
+      radius: 4
+    }
+  },
+  // 数值文本（白色加粗）
+  {
+    type: 'text',
+    style: {
+      x: startX + labelWidth + svWidth + pvWidth / 2,
+      y: speedY,
+      text: pv.toString(),
+      font: 'bold 14px monospace',
+      fill: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle'
+    }
+  }
+);
+
+// 4. 单位 "厘米/min"
+graphics.push({
+  type: 'text',
+  style: {
+    x: startX + labelWidth + svWidth + pvWidth,
+    y: speedY,
+    text: '厘米/min',
+    font: '14px Microsoft YaHei',
+    fill: '#666666',
+    textAlign: 'left',
+    textBaseline: 'middle'
+  }
+});
       // 标题
       graphics.push({
         type: 'text',
