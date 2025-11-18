@@ -11,8 +11,7 @@ export default {
   name: 'ReflowFurnaceChart',
   data() {
     return {
-      deviceNo: ''
-      ,
+      deviceNo: '',
       chart: null,
       zoneCount: 10,
       zoneWidth: 80,
@@ -24,56 +23,68 @@ export default {
       bottomSetValues: Array(10).fill(0),
       bottomActualValues: Array(10).fill(0),
       timer: null,
-      speedSV: '0',   // 新增
-      speedPV: '0',   // 新增
+      speedSV: '0',
+      speedPV: '0',
 
+      // 动画相关
+      conveyorOffset: 0,
+      animationFrameId: null,
     };
   },
   mounted() {
     this.chart = echarts.init(this.$refs.chart);
     this.fetchData();
     this.timer = setInterval(this.fetchData, 5000);
+    this.animateConveyor();
   },
   beforeDestroy() {
     if (this.timer) clearInterval(this.timer);
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     if (this.chart) this.chart.dispose();
   },
   methods: {
-async fetchData() {
-  try {
-    // 使用 this.$http 发起 POST 请求
-    const response = await this.$http({
-      url: this.$http.adornUrl('/extProject/getEquipmentStatus'),
-      method: 'get',
-      params: { equipment: 'S2-G00000-003-0600' } // 或者用 params？看后端要求
-    });
+    async fetchData() {
+      try {
+        const response = await this.$http({
+          url: this.$http.adornUrl('/extProject/getEquipmentStatus'),
+          method: 'get',
+          params: { equipment: 'S2-G00000-003-0600' }
+        });
 
-    // 假设返回结构为 { code: 200, data: { ... } }
-    const json = response.data; // $http 通常已解析 JSON，无需再 .json()
-    
-    // 如果后端返回的是 { data: { dataJSON: "...", equipment: "..." } }
-    const dataJSON = JSON.parse(json.data.dataJSON);
-    this.deviceNo = json.data.equipment;
+        const json = response.data;
+        const dataJSON = JSON.parse(json.data.dataJSON);
+        this.deviceNo = json.data.equipment;
 
-    for (let i = 0; i < this.zoneCount; i++) {
-      this.topSetValues[i] = dataJSON[i].sv;
-      this.topActualValues[i] = dataJSON[i].pv;
-      this.bottomSetValues[i] = dataJSON[i + this.zoneCount].sv;
-      this.bottomActualValues[i] = dataJSON[i + this.zoneCount].pv;
-    }
+        for (let i = 0; i < this.zoneCount; i++) {
+          this.topSetValues[i] = dataJSON[i].sv || 0;
+          this.topActualValues[i] = dataJSON[i].pv || 0;
+          this.bottomSetValues[i] = dataJSON[i + this.zoneCount].sv || 0;
+          this.bottomActualValues[i] = dataJSON[i + this.zoneCount].pv || 0;
+        }
 
-    // 解析 speed（第21项，索引20）
-    const speedData = dataJSON[20];
-    if (speedData && speedData.name === 'speed') {
-      this.speedSV = speedData.sv;
-      this.speedPV = speedData.pv;
-    }
+        const speedData = dataJSON[20];
+        if (speedData && speedData.name === 'speed') {
+          this.speedSV = String(speedData.sv || '0');
+          this.speedPV = String(speedData.pv || '0');
+        }
 
-    this.drawChart();
-  } catch (err) {
-    console.error('获取设备数据失败:', err);
-  }
-},
+        this.drawChart();
+      } catch (err) {
+        console.error('获取设备数据失败:', err);
+      }
+    },
+
+    animateConveyor() {
+      const animate = () => {
+        const baseSpeed = parseFloat(this.speedPV) || 0;
+        const animSpeed = Math.min(3, Math.max(0.3, baseSpeed / 20)); // 更平滑的速度映射
+        this.conveyorOffset = (this.conveyorOffset + animSpeed) % 20;
+        if (this.chart) this.drawChart();
+        this.animationFrameId = requestAnimationFrame(animate);
+      };
+      this.animationFrameId = requestAnimationFrame(animate);
+    },
+
     drawChart() {
       const graphics = [];
 
@@ -83,16 +94,30 @@ async fetchData() {
       const VALUE_FONT = 'bold 14px monospace';
       const TITLE_FONT = 'bold 22px ' + FONT_FAMILY;
       const SET_VALUE_COLOR = '#666';
-      const ACTUAL_VALUE_COLOR = '#2e8b57'; // 深一点的绿色，更稳重
+      const ACTUAL_VALUE_COLOR = '#2e8b57';
       const ZONE_BG = '#fff';
       const ZONE_BORDER = '#999';
       const FURNACE_BODY_FILL = '#d9d9d9';
       const FURNACE_BODY_STROKE = '#555';
-      const CONVEYOR_COLOR = '#0044cc';
+
+      // === 灰色金属传送带配色 ===
+      const CONVEYOR_DARK = '#5a5a5a';   // 深灰（金属暗部）
+      const CONVEYOR_LIGHT = '#a0a0a0';  // 浅灰（金属亮部）
+      const CONVEYOR_STROKE = '#333';    // 描边，增强立体感
 
       // === 炉体结构 ===
-      const leftWing = [[this.startX - 120, this.topY + 20], [this.startX - 60, this.topY], [this.startX - 60, this.bottomY + 100], [this.startX - 120, this.bottomY + 80]];
-      const rightWing = [[this.startX + this.zoneCount * this.zoneWidth + 60, this.topY], [this.startX + this.zoneCount * this.zoneWidth + 120, this.topY + 20], [this.startX + this.zoneCount * this.zoneWidth + 120, this.bottomY + 80], [this.startX + this.zoneCount * this.zoneWidth + 60, this.bottomY + 100]];
+      const leftWing = [
+        [this.startX - 120, this.topY + 20],
+        [this.startX - 60, this.topY],
+        [this.startX - 60, this.bottomY + 100],
+        [this.startX - 120, this.bottomY + 80]
+      ];
+      const rightWing = [
+        [this.startX + this.zoneCount * this.zoneWidth + 60, this.topY],
+        [this.startX + this.zoneCount * this.zoneWidth + 120, this.topY + 20],
+        [this.startX + this.zoneCount * this.zoneWidth + 120, this.bottomY + 80],
+        [this.startX + this.zoneCount * this.zoneWidth + 60, this.bottomY + 100]
+      ];
 
       graphics.push(
         { type: 'polygon', shape: { points: leftWing }, style: { fill: '#bbb', stroke: '#666', lineWidth: 2 } },
@@ -101,13 +126,53 @@ async fetchData() {
         { type: 'rect', shape: { x: this.startX - 60, y: this.bottomY, width: this.zoneCount * this.zoneWidth + 120, height: 100 }, style: { fill: FURNACE_BODY_FILL, stroke: FURNACE_BODY_STROKE, lineWidth: 2 } }
       );
 
-      // === 传送带 ===
-      graphics.push(
-        { type: 'rect', shape: { x: this.startX - 40, y: this.topY + 110, width: this.zoneCount * this.zoneWidth + 80, height: 10 }, style: { fill: CONVEYOR_COLOR } },
-        { type: 'rect', shape: { x: this.startX - 40, y: this.bottomY -20, width: this.zoneCount * this.zoneWidth + 80, height: 10 }, style: { fill: CONVEYOR_COLOR } }
-      );
+      // === 逼真灰色动态传送带 ===
+      const beltTopY = this.topY + 110;
+      const beltBottomY = this.bottomY - 20;
+      const beltHeight = 10;
+      const beltTotalWidth = this.zoneCount * this.zoneWidth + 80;
+      const segmentWidth = 20;
+      const totalSegments = Math.ceil(beltTotalWidth / segmentWidth) + 5; // 多画几节防止空白
 
-      // === 信号灯柱 ===
+      // 计算可见区域的起始索引（避免锯齿）
+      const startX = this.startX - 40;
+      const endX = startX + beltTotalWidth;
+
+      for (let i = 0; i < totalSegments; i++) {
+        const x = startX + (i * segmentWidth - this.conveyorOffset) % (totalSegments * segmentWidth);
+
+        // 只绘制在可视范围内的部分
+        if (x > endX || x + segmentWidth < startX) continue;
+
+        graphics.push({
+          type: 'rect',
+          shape: { x, y: beltTopY, width: segmentWidth, height: beltHeight },
+          style: {
+            fill: i % 2 === 0 ? '#5a5a5a' : '#a0a0a0', // 深浅灰交替
+            stroke: '#333',
+            lineWidth: 0.8
+          }
+        });
+      }
+
+      // 下层传送带
+      for (let i = 0; i < totalSegments; i++) {
+        const x = startX + (i * segmentWidth - this.conveyorOffset) % (totalSegments * segmentWidth);
+
+        if (x > endX || x + segmentWidth < startX) continue;
+
+        graphics.push({
+          type: 'rect',
+          shape: { x, y: beltBottomY, width: segmentWidth, height: beltHeight },
+          style: {
+            fill: i % 2 === 0 ? '#5a5a5a' : '#a0a0a0',
+            stroke: '#333',
+            lineWidth: 0.8
+          }
+        });
+      }
+
+      //信号灯柱
       graphics.push(
         { type: 'rect', shape: { x: this.startX - 140, y: this.topY - 100, width: 10, height: 100 }, style: { fill: '#666' } },
         { type: 'rect', shape: { x: this.startX - 145, y: this.topY - 120, width: 20, height: 20 }, style: { fill: '#00ff00', stroke: '#333' } },
@@ -119,36 +184,29 @@ async fetchData() {
       for (let i = 0; i < this.zoneCount; i++) {
         const x = this.startX + i * this.zoneWidth;
 
-        // 上下层温区框
         graphics.push(
           { type: 'rect', shape: { x, y: this.topY + 20, width: this.zoneWidth - 5, height: 30 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER, lineWidth: 1 } },
           { type: 'rect', shape: { x, y: this.bottomY + 45, width: this.zoneWidth - 5, height: 30 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER, lineWidth: 1 } }
         );
 
-        // 左侧标签（仅第一区）
         if (i === 0) {
           const labelStyle = { font: '12px ' + FONT_FAMILY, fill: '#333' };
           graphics.push(
-            // 上层
             { type: 'rect', shape: { x: x - 60, y: this.topY + 30, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)', stroke: 'rgba(200,200,200,0.2)', lineWidth: 0.5, radius: 3 } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 30, text: '设定值' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 55, text: '实际值' } },
 
-            // 下层
             { type: 'rect', shape: { x: x - 60, y: this.bottomY + 10, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)', stroke: 'rgba(200,200,200,0.2)', lineWidth: 0.5, radius: 3 } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 30, text: '实际值' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 60, text: '设定值' } }
           );
         }
 
-        // 温度数值
         graphics.push(
-          // 上层
           { type: 'text', style: { x: x + 10, y: this.topY + 30, text: `${this.topSetValues[i]}℃`, font: LABEL_FONT, fill: SET_VALUE_COLOR } },
           { type: 'text', style: { x: x + 10, y: this.topY + 55, text: `${this.topActualValues[i]}℃`, font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR } },
 
-          // 下层
-          { type: 'text', style: { x: x + 10, y: this.bottomY + 25, text: `${this.bottomSetValues[i]}℃`,  font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR} },
+          { type: 'text', style: { x: x + 10, y: this.bottomY + 25, text: `${this.bottomSetValues[i]}℃`, font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR } },
           { type: 'text', style: { x: x + 10, y: this.bottomY + 55, text: `${this.bottomActualValues[i]}℃`, font: LABEL_FONT, fill: SET_VALUE_COLOR } }
         );
       }
@@ -166,10 +224,7 @@ async fetchData() {
       const unitWidth = 80;
       const itemHeight = 28;
       const startY = speedY - itemHeight / 2;
-      const startX = centerX - (labelWidth + svWidth + pvWidth + unitWidth) / 2;
-
-
-      // "传送带 1"
+      const textStartX = centerX - (labelWidth + svWidth + pvWidth + unitWidth) / 2; // ✅ 改名
       graphics.push({
         type: 'text',
         style: {
@@ -177,18 +232,17 @@ async fetchData() {
           y: speedY,
           text: '传送带',
           font: 'bold 14px ' + FONT_FAMILY,
-          fill: '#0066cc',
+          fill: '#555',
           textAlign: 'center',
           textBaseline: 'middle'
         }
       });
 
-      // 设定值框
       graphics.push(
         {
           type: 'rect',
-          shape: { x: startX + labelWidth, y: startY+5, width: svWidth, height: itemHeight },
-          style: { fill: '#ffffff', stroke: '#cccccc', lineWidth: 1, radius: 4 }
+          shape: { x: startX + labelWidth, y: startY + 5, width: svWidth, height: itemHeight },
+          style: { fill: '#f5f5f5', stroke: '#ccc', lineWidth: 1, radius: 4 }
         },
         {
           type: 'text',
@@ -204,12 +258,11 @@ async fetchData() {
         }
       );
 
-      // 实际值框（绿色背景 + 白字）
       graphics.push(
         {
           type: 'rect',
-          shape: { x: startX + labelWidth + svWidth, y: startY +5, width: pvWidth, height: itemHeight },
-          style: { fill: '#90ee90', stroke: '#66cc66', lineWidth: 1, radius: 4 }
+          shape: { x: startX + labelWidth + svWidth, y: startY + 5, width: pvWidth, height: itemHeight },
+          style: { fill: '#d0f0d0', stroke: '#88cc88', lineWidth: 1, radius: 4 }
         },
         {
           type: 'text',
@@ -225,7 +278,6 @@ async fetchData() {
         }
       );
 
-      // 单位
       graphics.push({
         type: 'text',
         style: {
