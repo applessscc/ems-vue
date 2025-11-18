@@ -219,7 +219,7 @@ export default {
       });
 
       for (let i = 0; i < totalSegments; i++) {
-        const x = startX + (i * segmentWidth - this.conveyorOffset) % (totalSegments * segmentWidth);
+        const x = startX + (i * segmentWidth + this.conveyorOffset) % (totalSegments * segmentWidth);
         if (x > endX || x + segmentWidth < startX) continue;
 
         graphics.push({
@@ -234,7 +234,7 @@ export default {
       }
 
       for (let i = 0; i < totalSegments; i++) {
-        const x = startX + (i * segmentWidth - this.conveyorOffset) % (totalSegments * segmentWidth);
+        const x = startX + (i * segmentWidth + this.conveyorOffset) % (totalSegments * segmentWidth);
         if (x > endX || x + segmentWidth < startX) continue;
 
         graphics.push({
@@ -397,7 +397,6 @@ graphics.push({
 
 
       
-
 
       // ===== 标题 =====
       graphics.push({
