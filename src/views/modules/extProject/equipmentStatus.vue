@@ -160,22 +160,6 @@ export default {
       const startY = speedY - itemHeight / 2;
       const startX = centerX - (labelWidth + svWidth + pvWidth + unitWidth) / 2;
 
-      // 背景底框
-      graphics.push({
-        type: 'rect',
-        shape: {
-          x: startX - 10,
-          y: startY - 4,
-          width: labelWidth + svWidth + pvWidth + unitWidth + 20,
-          height: itemHeight + 8
-        },
-        style: {
-          fill: 'rgba(245, 245, 245, 0.6)',
-          stroke: '#ddd',
-          lineWidth: 0.8,
-          radius: 5
-        }
-      });
 
       // "传送带 1"
       graphics.push({
@@ -195,7 +179,7 @@ export default {
       graphics.push(
         {
           type: 'rect',
-          shape: { x: startX + labelWidth, y: startY, width: svWidth, height: itemHeight },
+          shape: { x: startX + labelWidth, y: startY+5, width: svWidth, height: itemHeight },
           style: { fill: '#ffffff', stroke: '#cccccc', lineWidth: 1, radius: 4 }
         },
         {
@@ -216,7 +200,7 @@ export default {
       graphics.push(
         {
           type: 'rect',
-          shape: { x: startX + labelWidth + svWidth, y: startY, width: pvWidth, height: itemHeight },
+          shape: { x: startX + labelWidth + svWidth, y: startY +5, width: pvWidth, height: itemHeight },
           style: { fill: '#90ee90', stroke: '#66cc66', lineWidth: 1, radius: 4 }
         },
         {
