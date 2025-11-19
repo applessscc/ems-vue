@@ -20,8 +20,8 @@ export default {
       zoneCount: 10,
       zoneWidth: 60,
       startX: 145,
-      topY: 170,
-      bottomY: 360,
+      topY: 50,
+      bottomY: 240,
 
       topSetValues: Array(10).fill(0),
       topActualValues: Array(10).fill(0),
@@ -257,10 +257,10 @@ export default {
 
       // ===== 信号灯 =====
       graphics.push(
-        { type: 'rect', shape: { x: this.startX - 140, y: this.topY - 100, width: 10, height: 100 }, style: { fill: '#666' } },
-        { type: 'rect', shape: { x: this.startX - 145, y: this.topY - 120, width: 20, height: 20 }, style: { fill: '#00ff00', stroke: '#333' } },
-        { type: 'rect', shape: { x: this.startX - 145, y: this.topY - 140, width: 20, height: 20 }, style: { fill: '#ffff00', stroke: '#333' } },
-        { type: 'rect', shape: { x: this.startX - 145, y: this.topY - 160, width: 20, height: 20 }, style: { fill: '#ff0000', stroke: '#333' } }
+        { type: 'rect', shape: { x: this.startX + 753.5, y: this.topY - 0, width: 10, height: 100 }, style: { fill: '#666' } },
+        { type: 'rect', shape: { x: this.startX + 750, y: this.topY - 50, width: 20, height: 20 }, style: { fill: '#00ff00', stroke: '#333' } },
+        { type: 'rect', shape: { x: this.startX + 750, y: this.topY - 30, width: 20, height: 20 }, style: { fill: '#ffff00', stroke: '#333' } },
+        { type: 'rect', shape: { x: this.startX + 750, y: this.topY - 10, width: 20, height: 20 }, style: { fill: '#ff0000', stroke: '#333' } }
       );
 
       // ===== 温区显示 =====
@@ -379,16 +379,16 @@ export default {
 
 
       // ===== 标题 =====
-      graphics.push({
-        type: 'text',
-        left: 'center',
-        top: 30,
-        style: {
-          text: `回流焊炉温区（${this.deviceNo}）`,
-          font: TITLE_FONT,
-          fill: '#333'
-        }
-      });
+      // graphics.push({
+      //   type: 'text',
+      //   left: 'center',
+      //   top: 30,
+      //   style: {
+      //     text: `回流焊炉温区（${this.deviceNo}）`,
+      //     font: TITLE_FONT,
+      //     fill: '#333'
+      //   }
+      // });
       this.chart.setOption({ graphic: graphics });
     }
 
@@ -398,8 +398,8 @@ export default {
 
 <style scoped>
 .chart-container {
-  width: 1100PX;
-  height: 550px;
+  width: 950px;
+  height: 420px;
   /* background: #e5f0f7; */
   display: flex;
   justify-content: center;

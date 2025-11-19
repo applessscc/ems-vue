@@ -21,8 +21,12 @@
       <div class="table-card eqp-info-card" v-if="eqpInfoData">
         <h3 class="table-title">设备信息</h3>
         <el-descriptions border column=1>
-          <el-descriptions-item label="设备编号">{{ eqpInfoData.eqpCode }}</el-descriptions-item>
           <el-descriptions-item label="设备名称">{{ eqpInfoData.eqpName }}</el-descriptions-item>
+          <el-descriptions-item label="设备编号">{{ eqpInfoData.eqpCode }}</el-descriptions-item>
+          <el-descriptions-item label="SAP编号">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
+          <el-descriptions-item label="IP地址">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
+          <el-descriptions-item label="线体名称">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
+          <el-descriptions-item label="工序名称">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
           </el-descriptions-item>
@@ -32,10 +36,9 @@
     </div>
 
     <div class="bottom-container">
-
     <!-- 报工记录 -->
     <div class="table-card snWork-card">
-      <h3 class="table-title">前 10 报工记录</h3>
+      <h3 class="table-title">报工记录</h3>
       <el-table :data="snWorkListTop10Data" border>
         <el-table-column label="SN">
           <template slot-scope="scope">
@@ -161,6 +164,7 @@ export default {
 
 .eqp-info-card {
   min-width: 300px;
+  max-width: 400px;
   flex: 1;
 }
 .snWork-card {
