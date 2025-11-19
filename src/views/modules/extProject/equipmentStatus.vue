@@ -1,7 +1,6 @@
 <template>
   <el-container>
-    <el-header
-      style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
+    <el-header style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
              text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
              letter-spacing: 2px; background: #1f78d1;">
       CMS 能耗集中监控管理系统
@@ -11,40 +10,52 @@
     </el-header>
 
     <div class="reflowFurnaceWeld-container">
-      <equipmentStatus2/>
-        <div class="table-card">
-        <h3 class="table-title">设备信息</h3>
-        <el-table :data="[eqpInfoData]" border v-if="eqpInfoData">
-          <el-table-column prop="eqpCode" label="设备编号" width="120" />
-          <el-table-column prop="eqpName" label="设备名称" />
-          <el-table-column prop="eqpStatus" label="状态" width="120" />
-          <el-table-column prop="cardImageName" label="图片" />
-        </el-table>
+
+      <!-- 回流焊状态 -->
+      <div class="table-card">
+        <h3 class="table-title">回流焊实时状态</h3>
+        <equipmentStatus2 />
       </div>
+
+      <!-- 设备信息 -->
+      <div class="table-card eqp-info-card" v-if="eqpInfoData">
+        <h3 class="table-title">设备信息</h3>
+        <el-descriptions border column=1>
+          <el-descriptions-item label="设备编号">{{ eqpInfoData.eqpCode }}</el-descriptions-item>
+          <el-descriptions-item label="设备名称">{{ eqpInfoData.eqpName }}</el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+
     </div>
 
-      <div class="table-card">
-        <h3 class="table-title">前 10 报工记录</h3>
-        <el-table :data="snWorkListTop10Data" border>
-          <el-table-column label="SN">
-            <template slot-scope="scope">
-              <span v-html="scope.row[0]"></span>
-            </template>
-          </el-table-column>
-          <el-table-column label="工单号">
-            <template slot-scope="scope">
-              {{ scope.row[1] }}
-            </template>
-          </el-table-column>
-          <el-table-column label="时间">
-            <template slot-scope="scope">
-              {{ scope.row[2] }}
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
+    <div class="bottom-container">
 
+    <!-- 报工记录 -->
+    <div class="table-card snWork-card">
+      <h3 class="table-title">前 10 报工记录</h3>
+      <el-table :data="snWorkListTop10Data" border>
+        <el-table-column label="SN">
+          <template slot-scope="scope">
+            <span v-html="scope.row[0]"></span>
+          </template>
+        </el-table-column>
+        <el-table-column label="工单号">
+          <template slot-scope="scope">
+            {{ scope.row[1] }}
+          </template>
+        </el-table-column>
+        <el-table-column label="时间">
+          <template slot-scope="scope">
+            {{ scope.row[2] }}
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
 
+    </div>
   </el-container>
 </template>
 
@@ -59,8 +70,6 @@ export default {
     return {
       eqpInfoData: null,
       snWorkListTop10Data: [],
-      eqpStatus: null,
-      cardImageName: null,
       eqpCode: this.$route.query.sap_no,
     };
   },
@@ -84,9 +93,7 @@ export default {
         params: this.$http.adornParams({ eqpCode })
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.eqpInfoData = data.result
-          this.eqpStatus = data.status
-          this.cardImageName = data.image
+          this.eqpInfoData = data.result;
         }
       })
     },
@@ -107,34 +114,57 @@ export default {
         }
       })
     },
+
+    // 根据设备状态返回 tag 类型
+    getStatusType(status) {
+      switch (status) {
+        case '运行': return 'success';
+        case '停机': return 'danger';
+        case '待机': return 'warning';
+        default: return 'info';
+      }
+    }
   }
 };
 </script>
 
 <style scoped>
-.reflowFurnaceWeld-container{
+.reflowFurnaceWeld-container {
   display: flex;
-  gap: 20px;
-  margin: 20px;
 }
-.table-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 20px;
+.bottom-container {
+  display: flex;
 }
 
 .table-card {
-  background: #fff;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
   border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.table-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .table-title {
   margin-bottom: 12px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f78d1;
+  border-left: 4px solid #1f78d1;  /* 改为左边彩色条 */
+  padding-left: 8px;               /* 文字与左条保持间距 */
+}
+
+.eqp-info-card {
+  min-width: 300px;
+  flex: 1;
+}
+.snWork-card {
+  min-width: 300px;
+  flex: 2;
 }
 </style>

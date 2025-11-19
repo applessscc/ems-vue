@@ -423,10 +423,8 @@ graphics.push({
 <style scoped>
 .chart-container {
   width: 1100PX;
-  height: 550PX;
-  /* margin: auto; */
-  /* margin-top: 20px; */
-  background: #e5f0f7;
+  height: 550px;
+  /* background: #e5f0f7; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -435,8 +433,8 @@ graphics.push({
 .chart {
   width: 100%;
   height: 100%;
-  background: #fff;
+  /* background: #fff; */
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); */
 }
 </style>
