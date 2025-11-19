@@ -6,7 +6,6 @@
 
 <script>
 import * as echarts from 'echarts';
-import { create } from 'lodash';
 
 export default {
   name: 'ReflowFurnaceChart',
@@ -375,20 +374,6 @@ export default {
         }
       });
 
-
-
-
-      // ===== 标题 =====
-      // graphics.push({
-      //   type: 'text',
-      //   left: 'center',
-      //   top: 30,
-      //   style: {
-      //     text: `回流焊炉温区（${this.deviceNo}）`,
-      //     font: TITLE_FONT,
-      //     fill: '#333'
-      //   }
-      // });
       this.chart.setOption({ graphic: graphics });
     }
 
