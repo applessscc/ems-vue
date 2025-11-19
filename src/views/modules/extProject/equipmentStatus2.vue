@@ -422,9 +422,10 @@ graphics.push({
 
 <style scoped>
 .chart-container {
-  width: 1200px;
-  height: 650px;
+  width: 1100PX;
+  height: 550PX;
   margin: auto;
+  margin-top: 20px;
   background: #e5f0f7;
   display: flex;
   justify-content: center;
