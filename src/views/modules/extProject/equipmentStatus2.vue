@@ -16,31 +16,31 @@ export default {
     return {
       deviceNo: '',
       chart: null,
-      zoneCount: 10,
-      zoneWidth: 60,
-      startX: 145,
-      topY: 50,
-      bottomY: 240,
+      zoneCount: 10,          // 温区数量
+      zoneWidth: 60,          // 每个温区宽度
+      startX: 145,            // 炉体起始X坐标
+      topY: 50,               // 顶部炉体Y坐标
+      bottomY: 240,           // 底部炉体Y坐标
 
-      topSetValues: Array(10).fill(0),
-      topActualValues: Array(10).fill(0),
-      bottomSetValues: Array(10).fill(0),
-      bottomActualValues: Array(10).fill(0),
+      topSetValues: Array(10).fill(0),      // 顶部温区设定值
+      topActualValues: Array(10).fill(0),   // 顶部温区实际值
+      bottomSetValues: Array(10).fill(0),   // 底部温区设定值
+      bottomActualValues: Array(10).fill(0),// 底部温区实际值
 
-      timer: null,
-      speedSV: '0',
-      speedPV: '0',
+      timer: null,             // 数据刷新定时器
+      speedSV: '0',            // 传送带设定速度
+      speedPV: '0',            // 传送带实际速度
 
-      conveyorOffset: 0,
-      animationFrameId: null,
+      conveyorOffset: 0,       // 传送带动画偏移
+      animationFrameId: null,  // requestAnimationFrame ID
     };
   },
 
   mounted() {
     this.chart = echarts.init(this.$refs.chart);
-    this.fetchData();
-    this.timer = setInterval(this.fetchData, 5000);
-    this.animateConveyor();
+    this.fetchData();              // 初次获取数据
+    this.timer = setInterval(this.fetchData, 5000);  // 定时刷新数据
+    this.animateConveyor();        // 启动传送带动画
   },
 
   beforeDestroy() {
@@ -50,6 +50,7 @@ export default {
   },
 
   methods: {
+    // ========================== 数据获取 ==========================
     async fetchData() {
       try {
         const response = await this.$http({
@@ -62,6 +63,7 @@ export default {
         const dataJSON = JSON.parse(json.data.dataJSON);
         this.deviceNo = json.data.equipment;
 
+        // 更新温区数据
         for (let i = 0; i < this.zoneCount; i++) {
           this.topSetValues[i] = dataJSON[i].sv || 0;
           this.topActualValues[i] = dataJSON[i].pv || 0;
@@ -69,6 +71,7 @@ export default {
           this.bottomActualValues[i] = dataJSON[i + this.zoneCount].pv || 0;
         }
 
+        // 更新传送带速度
         const speedData = dataJSON[20];
         if (speedData && speedData.name === 'speed') {
           this.speedSV = String(speedData.sv || '0');
@@ -81,6 +84,7 @@ export default {
       }
     },
 
+    // ========================== 传送带动画 ==========================
     animateConveyor() {
       const animate = () => {
         const baseSpeed = parseFloat(this.speedPV) || 0;
@@ -92,10 +96,11 @@ export default {
       this.animationFrameId = requestAnimationFrame(animate);
     },
 
+    // ========================== 绘制图表 ==========================
     drawChart() {
       const graphics = [];
 
-      // === 样式 ===
+      // ==== 样式常量 ====
       const FONT_FAMILY = 'Microsoft YaHei, sans-serif';
       const LABEL_FONT = '14px ' + FONT_FAMILY;
       const VALUE_FONT = 'bold 14px monospace';
@@ -110,10 +115,10 @@ export default {
       const FURNACE_BODY_FILL = '#d9d9d9';
       const FURNACE_BODY_STROKE = '#555';
 
-      // 灰色金属传送带
       const CONVEYOR_DARK = '#5a5a5a';
       const CONVEYOR_LIGHT = '#a0a0a0';
 
+      // ========================== 入口区域 ==========================
       // 入口阴影
       graphics.push({
         type: 'rect',
@@ -123,9 +128,7 @@ export default {
           width: 30,
           height: this.bottomY - this.topY + 20
         },
-        style: {
-          fill: 'rgba(0,0,0,0.25)'
-        }
+        style: { fill: 'rgba(0,0,0,0.25)' }
       });
 
       // 黑色进板口
@@ -137,13 +140,10 @@ export default {
           width: 20,
           height: this.bottomY - this.topY - 10
         },
-        style: {
-          fill: '#111'
-        }
+        style: { fill: '#111' }
       });
 
-
-      // =====  炉体结构  =====
+      // ========================== 炉体结构 ==========================
       const leftWing = [
         [this.startX - 120, this.topY + 20],
         [this.startX - 60, this.topY],
@@ -165,7 +165,7 @@ export default {
         { type: 'rect', shape: { x: this.startX - 60, y: this.bottomY, width: this.zoneCount * this.zoneWidth + 120, height: 100 }, style: { fill: FURNACE_BODY_FILL, stroke: FURNACE_BODY_STROKE, lineWidth: 2 } }
       );
 
-      // ===== 动态传送带 =====
+      // ========================== 动态传送带 ==========================
       const beltTopY = this.topY + 110;
       const beltBottomY = this.bottomY - 20;
       const beltHeight = 10;
@@ -177,84 +177,26 @@ export default {
       const startX = this.startX - 40;
       const endX = startX + beltTotalWidth;
 
-      // 顶部导轨线
-      graphics.push({
-        type: 'line',
-        shape: { x1: startX, y1: beltTopY - 5, x2: endX, y2: beltTopY - 5 },
-        style: { stroke: '#444', lineWidth: 2 }
-      });
-      graphics.push({
-        type: 'line',
-        shape: { x1: startX, y1: beltTopY + 15, x2: endX, y2: beltTopY + 15 },
-        style: { stroke: '#444', lineWidth: 2 }
-      });
+      // 导轨线
+      graphics.push({ type: 'line', shape: { x1: startX, y1: beltTopY - 5, x2: endX, y2: beltTopY - 5 }, style: { stroke: '#444', lineWidth: 2 } });
+      graphics.push({ type: 'line', shape: { x1: startX, y1: beltTopY + 15, x2: endX, y2: beltTopY + 15 }, style: { stroke: '#444', lineWidth: 2 } });
+      graphics.push({ type: 'line', shape: { x1: startX, y1: beltBottomY - 5, x2: endX, y2: beltBottomY - 5 }, style: { stroke: '#444', lineWidth: 2 } });
+      graphics.push({ type: 'line', shape: { x1: startX, y1: beltBottomY + 15, x2: endX, y2: beltBottomY + 15 }, style: { stroke: '#444', lineWidth: 2 } });
 
-      // 底部导轨线
-      graphics.push({
-        type: 'line',
-        shape: { x1: startX, y1: beltBottomY - 5, x2: endX, y2: beltBottomY - 5 },
-        style: { stroke: '#444', lineWidth: 2 }
-      });
-      graphics.push({
-        type: 'line',
-        shape: { x1: startX, y1: beltBottomY + 15, x2: endX, y2: beltBottomY + 15 },
-        style: { stroke: '#444', lineWidth: 2 }
-      });
-
+      // 传送带条纹
       for (let i = 0; i < totalSegments; i++) {
         const x = startX + (i * segmentWidth + this.conveyorOffset) % (totalSegments * segmentWidth);
         if (x > endX || x + segmentWidth < startX) continue;
 
-        graphics.push({
-          type: 'rect',
-          shape: { x, y: beltTopY, width: segmentWidth, height: beltHeight },
-          style: {
-            fill: i % 2 === 0 ? CONVEYOR_DARK : CONVEYOR_LIGHT,
-            stroke: '#333',
-            lineWidth: 0.8
-          }
-        });
+        graphics.push({ type: 'rect', shape: { x, y: beltTopY, width: segmentWidth, height: beltHeight }, style: { fill: i % 2 === 0 ? CONVEYOR_DARK : CONVEYOR_LIGHT, stroke: '#333', lineWidth: 0.8 } });
+        graphics.push({ type: 'rect', shape: { x, y: beltBottomY, width: segmentWidth, height: beltHeight }, style: { fill: i % 2 === 0 ? CONVEYOR_DARK : CONVEYOR_LIGHT, stroke: '#333', lineWidth: 0.8 } });
       }
 
-      for (let i = 0; i < totalSegments; i++) {
-        const x = startX + (i * segmentWidth + this.conveyorOffset) % (totalSegments * segmentWidth);
-        if (x > endX || x + segmentWidth < startX) continue;
+      // 出板口
+      graphics.push({ type: 'rect', shape: { x: this.startX + this.zoneCount * this.zoneWidth + 80, y: this.topY + 60, width: 20, height: this.bottomY - this.topY - 10 }, style: { fill: '#111' } });
+      graphics.push({ type: 'rect', shape: { x: this.startX + this.zoneCount * this.zoneWidth + 100, y: this.topY + 60, width: 10, height: this.bottomY - this.topY - 10 }, style: { fill: 'rgba(255,255,255,0.1)' } });
 
-        graphics.push({
-          type: 'rect',
-          shape: { x, y: beltBottomY, width: segmentWidth, height: beltHeight },
-          style: {
-            fill: i % 2 === 0 ? CONVEYOR_DARK : CONVEYOR_LIGHT,
-            stroke: '#333',
-            lineWidth: 0.8
-          }
-        });
-      }
-
-      graphics.push({
-        type: 'rect',
-        shape: {
-          x: this.startX + this.zoneCount * this.zoneWidth + 80,
-          y: this.topY + 60,
-          width: 20,
-          height: this.bottomY - this.topY - 10
-        },
-        style: { fill: '#111' }
-      });
-
-      // 出口小光亮效果
-      graphics.push({
-        type: 'rect',
-        shape: {
-          x: this.startX + this.zoneCount * this.zoneWidth + 100,
-          y: this.topY + 60,
-          width: 10,
-          height: this.bottomY - this.topY - 10
-        },
-        style: { fill: 'rgba(255,255,255,0.1)' }
-      });
-
-      // ===== 信号灯 =====
+      // ========================== 信号灯区域 ==========================
       graphics.push(
         { type: 'rect', shape: { x: this.startX + 753.5, y: this.topY - 0, width: 10, height: 100 }, style: { fill: '#666' } },
         { type: 'rect', shape: { x: this.startX + 750, y: this.topY - 50, width: 20, height: 20 }, style: { fill: '#00ff00', stroke: '#333' } },
@@ -262,7 +204,7 @@ export default {
         { type: 'rect', shape: { x: this.startX + 750, y: this.topY - 10, width: 20, height: 20 }, style: { fill: '#ff0000', stroke: '#333' } }
       );
 
-      // ===== 温区显示 =====
+      // ========================== 温区显示 ==========================
       for (let i = 0; i < this.zoneCount; i++) {
         const x = this.startX + i * this.zoneWidth;
 
@@ -271,9 +213,9 @@ export default {
           { type: 'rect', shape: { x, y: this.bottomY + 45, width: this.zoneWidth - 5, height: 30 }, style: { fill: ZONE_BG, stroke: ZONE_BORDER } }
         );
 
+        // 第一区域左侧标签
         if (i === 0) {
           const labelStyle = { font: '12px ' + FONT_FAMILY, fill: '#333' };
-
           graphics.push(
             { type: 'rect', shape: { x: x - 60, y: this.topY + 30, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 30, text: '设定值' } },
@@ -288,13 +230,12 @@ export default {
         graphics.push(
           { type: 'text', style: { x: x + 10, y: this.topY + 30, text: `${this.topSetValues[i]}℃`, font: LABEL_FONT, fill: SET_VALUE_COLOR } },
           { type: 'text', style: { x: x + 10, y: this.topY + 55, text: `${this.topActualValues[i]}℃`, font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR } },
-
           { type: 'text', style: { x: x + 10, y: this.bottomY + 25, text: `${this.bottomSetValues[i]}℃`, font: VALUE_FONT, fill: ACTUAL_VALUE_COLOR } },
           { type: 'text', style: { x: x + 10, y: this.bottomY + 55, text: `${this.bottomActualValues[i]}℃`, font: LABEL_FONT, fill: SET_VALUE_COLOR } }
         );
       }
 
-      // ===== 速度显示 =====
+      // ========================== 传送带速度显示 ==========================
       const totalWidth = this.zoneCount * this.zoneWidth;
       const centerX = this.startX + totalWidth / 2;
       const speedY = this.bottomY + 150;
@@ -308,72 +249,31 @@ export default {
       const itemHeight = 28;
       const startY = speedY - itemHeight / 2;
 
+      // 标签
       graphics.push({
         type: 'text',
-        style: {
-          x: startX + labelWidth / 2,
-          y: speedY,
-          text: '传送带',
-          font: 'bold 14px ' + FONT_FAMILY,
-          fill: '#555',
-          textAlign: 'center',
-          textBaseline: 'middle'
-        }
+        style: { x: startX + labelWidth / 2, y: speedY, text: '传送带', font: 'bold 14px ' + FONT_FAMILY, fill: '#555', textAlign: 'center', textBaseline: 'middle' }
       });
 
+      // 设定值框
       graphics.push(
-        {
-          type: 'rect',
-          shape: { x: startX + labelWidth, y: startY + 5, width: svWidth, height: itemHeight },
-          style: { fill: '#f5f5f5', stroke: '#ccc', radius: 4 }
-        },
-        {
-          type: 'text',
-          style: {
-            x: startX + labelWidth + svWidth / 2,
-            y: speedY,
-            text: sv,
-            font: '14px monospace',
-            fill: SET_VALUE_COLOR,
-            textAlign: 'center',
-            textBaseline: 'middle'
-          }
-        }
+        { type: 'rect', shape: { x: startX + labelWidth, y: startY + 5, width: svWidth, height: itemHeight }, style: { fill: '#f5f5f5', stroke: '#ccc', radius: 4 } },
+        { type: 'text', style: { x: startX + labelWidth + svWidth / 2, y: speedY, text: sv, font: '14px monospace', fill: SET_VALUE_COLOR, textAlign: 'center', textBaseline: 'middle' } }
       );
 
+      // 实际值框
       graphics.push(
-        {
-          type: 'rect',
-          shape: { x: startX + labelWidth + svWidth, y: startY + 5, width: pvWidth, height: itemHeight },
-          style: { fill: '#d0f0d0', stroke: '#88cc88', radius: 4 }
-        },
-        {
-          type: 'text',
-          style: {
-            x: startX + labelWidth + svWidth + pvWidth / 2,
-            y: speedY,
-            text: pv,
-            font: 'bold 14px monospace',
-            fill: '#000',
-            textAlign: 'center',
-            textBaseline: 'middle'
-          }
-        }
+        { type: 'rect', shape: { x: startX + labelWidth + svWidth, y: startY + 5, width: pvWidth, height: itemHeight }, style: { fill: '#d0f0d0', stroke: '#88cc88', radius: 4 } },
+        { type: 'text', style: { x: startX + labelWidth + svWidth + pvWidth / 2, y: speedY, text: pv, font: 'bold 14px monospace', fill: '#000', textAlign: 'center', textBaseline: 'middle' } }
       );
 
+      // 单位
       graphics.push({
         type: 'text',
-        style: {
-          x: startX + labelWidth + svWidth + pvWidth + 5,
-          y: speedY,
-          text: '厘米/min',
-          font: '14px ' + FONT_FAMILY,
-          fill: '#666',
-          textAlign: 'left',
-          textBaseline: 'middle'
-        }
+        style: { x: startX + labelWidth + svWidth + pvWidth + 5, y: speedY, text: '厘米/min', font: '14px ' + FONT_FAMILY, fill: '#666', textAlign: 'left', textBaseline: 'middle' }
       });
 
+      // ========================== 最终渲染 ==========================
       this.chart.setOption({ graphic: graphics });
     }
 
@@ -385,7 +285,6 @@ export default {
 .chart-container {
   width: 950px;
   height: 420px;
-  /* background: #e5f0f7; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -394,8 +293,6 @@ export default {
 .chart {
   width: 100%;
   height: 100%;
-  /* background: #fff; */
   border-radius: 10px;
-  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); */
 }
 </style>
