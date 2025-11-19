@@ -18,9 +18,9 @@ export default {
       deviceNo: '',
       chart: null,
       zoneCount: 10,
-      zoneWidth: 80,
-      startX: 160,
-      topY: 180,
+      zoneWidth: 60,
+      startX: 145,
+      topY: 170,
       bottomY: 360,
 
       topSetValues: Array(10).fill(0),
@@ -111,19 +111,9 @@ export default {
       const FURNACE_BODY_FILL = '#d9d9d9';
       const FURNACE_BODY_STROKE = '#555';
 
-
-
-
-
-
-      
       // 灰色金属传送带
       const CONVEYOR_DARK = '#5a5a5a';
       const CONVEYOR_LIGHT = '#a0a0a0';
-
-
-
-
 
       // 入口阴影
       graphics.push({
@@ -152,13 +142,6 @@ export default {
           fill: '#111'
         }
       });
-
-
-
-
-
-
-
 
 
       // =====  炉体结构  =====
@@ -195,9 +178,6 @@ export default {
       const startX = this.startX - 40;
       const endX = startX + beltTotalWidth;
 
-
-    
-      
       // 顶部导轨线
       graphics.push({
         type: 'line',
@@ -252,34 +232,30 @@ export default {
         });
       }
 
-
       graphics.push({
-  type: 'rect',
-  shape: {
-    x: this.startX + this.zoneCount * this.zoneWidth + 80,
-    y: this.topY + 60,
-    width: 20,
-    height: this.bottomY - this.topY - 10
-  },
-  style: { fill: '#111' }
-});
+        type: 'rect',
+        shape: {
+          x: this.startX + this.zoneCount * this.zoneWidth + 80,
+          y: this.topY + 60,
+          width: 20,
+          height: this.bottomY - this.topY - 10
+        },
+        style: { fill: '#111' }
+      });
 
-// 出口小光亮效果
-graphics.push({
-  type: 'rect',
-  shape: {
-    x: this.startX + this.zoneCount * this.zoneWidth + 100,
-    y: this.topY + 60,
-    width: 10,
-    height: this.bottomY - this.topY - 10
-  },
-  style: { fill: 'rgba(255,255,255,0.1)' }
-});
-
+      // 出口小光亮效果
+      graphics.push({
+        type: 'rect',
+        shape: {
+          x: this.startX + this.zoneCount * this.zoneWidth + 100,
+          y: this.topY + 60,
+          width: 10,
+          height: this.bottomY - this.topY - 10
+        },
+        style: { fill: 'rgba(255,255,255,0.1)' }
+      });
 
       // ===== 信号灯 =====
-
-      
       graphics.push(
         { type: 'rect', shape: { x: this.startX - 140, y: this.topY - 100, width: 10, height: 100 }, style: { fill: '#666' } },
         { type: 'rect', shape: { x: this.startX - 145, y: this.topY - 120, width: 20, height: 20 }, style: { fill: '#00ff00', stroke: '#333' } },
@@ -400,7 +376,7 @@ graphics.push({
       });
 
 
-      
+
 
       // ===== 标题 =====
       graphics.push({
