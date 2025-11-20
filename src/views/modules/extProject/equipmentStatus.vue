@@ -1,14 +1,6 @@
 <template>
   <el-container>
-    <el-header style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
-             text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
-             letter-spacing: 2px; background: #1f78d1;">
-      CMS 能耗集中监控管理系统
-      <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
-        <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
-      </span>
-    </el-header>
-
+      <vtech-head />
     <div class="reflowFurnaceWeld-container">
 
       <!-- 回流焊状态 -->
@@ -81,10 +73,12 @@
 
 <script>
 import equipmentStatus2 from '@/views/modules/extProject/equipmentStatus2.vue';
+import VtechHead from '@/views/modules/extProject/vtechHead.vue';
+
 import { saveVisitLog } from '@/utils/commonUtils.js'
 
 export default {
-  components: { equipmentStatus2 },
+  components: { equipmentStatus2 ,VtechHead   },
 
   data() {
     return {
@@ -187,5 +181,9 @@ export default {
 .snWork-card {
   min-height: 330px;
   flex: 2;
+}
+.el-container {
+  display: flex;
+  flex-direction: column; /* 垂直排列子元素 */
 }
 </style>
