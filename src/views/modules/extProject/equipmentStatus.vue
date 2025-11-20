@@ -34,7 +34,7 @@
       </div>
 
 
-           <div class="table-card eqp-info-card" >
+          <div class="table-card eqp-info-card" >
         <h3 class="table-title">安灯信息</h3>
         <el-descriptions border column=1>
           <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData.eqpName:"" }}</el-descriptions-item>
@@ -56,7 +56,7 @@
     <!-- 报工记录 -->
     <div class="table-card snWork-card">
       <h3 class="table-title">报工记录</h3>
-      <el-table :data="snWorkListTop10Data" border>
+      <el-table :data="snWorkListTop10Data" border  style="height: 250px;">
         <el-table-column label="SN">
           <template slot-scope="scope">
             <span v-html="scope.row[0]"></span>
@@ -185,7 +185,7 @@ export default {
   flex: 1;
 }
 .snWork-card {
-  min-width: 300px;
+  min-height: 330px;
   flex: 2;
 }
 </style>

@@ -294,7 +294,7 @@ export default {
 
 <style scoped>
 .chart-container {
-  width: 950px;
+  width: 1000px;
   height: 420px;
   display: flex;
   justify-content: center;
