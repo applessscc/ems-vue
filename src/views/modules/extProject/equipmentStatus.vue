@@ -18,18 +18,18 @@
       </div>
 
       <!-- 设备信息 -->
-      <div class="table-card eqp-info-card" v-if="eqpInfoData">
+      <div class="table-card eqp-info-card" >
         <h3 class="table-title">设备信息</h3>
         <el-descriptions border column=1>
-          <el-descriptions-item label="设备名称">{{ eqpInfoData.eqpName }}</el-descriptions-item>
-          <el-descriptions-item label="设备编号">{{ eqpInfoData.eqpCode }}</el-descriptions-item>
-          <el-descriptions-item label="SAP编号">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
-          <el-descriptions-item label="IP地址">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
-          <el-descriptions-item label="线体名称">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
-          <el-descriptions-item label="工序名称">{{ eqpInfoData.eqpModel }}</el-descriptions-item>
-          <el-descriptions-item label="状态">
+          <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData.eqpName:"" }}</el-descriptions-item>
+          <el-descriptions-item label="设备编号">{{ eqpInfoData?eqpInfoData.eqpCode :"" }}</el-descriptions-item>
+          <el-descriptions-item label="SAP编号">{{ eqpInfoData?eqpInfoData.eqpModel:""  }}</el-descriptions-item>
+          <el-descriptions-item label="IP地址">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
+          <el-descriptions-item label="线体名称">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
+          <el-descriptions-item label="工序名称">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
+          <!-- <el-descriptions-item label="状态">
             <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
-          </el-descriptions-item>
+          </el-descriptions-item> -->
         </el-descriptions>
       </div>
 
