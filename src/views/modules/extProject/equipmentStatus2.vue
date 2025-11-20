@@ -229,14 +229,13 @@ export default {
         if (i === 0) {
           const labelStyle = { font: '12px ' + FONT_FAMILY, fill: '#333' };
           graphics.push(
-            { type: 'rect', shape: { x: x - 60, y: this.topY + 30, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 30, text: '设定值' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.topY + 55, text: '实际值' } },
 
-            { type: 'rect', shape: { x: x - 60, y: this.bottomY + 10, width: 55, height: 20 }, style: { fill: 'rgba(200,200,200,0.2)' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 30, text: '实际值' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 60, text: '设定值' } }
           );
+          
         }
 
         graphics.push(
