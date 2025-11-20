@@ -192,6 +192,18 @@ export default {
         graphics.push({ type: 'rect', shape: { x, y: beltBottomY, width: segmentWidth, height: beltHeight }, style: { fill: i % 2 === 0 ? CONVEYOR_DARK : CONVEYOR_LIGHT, stroke: '#333', lineWidth: 0.8 } });
       }
 
+      // 调节刻度线
+      const railY = this.topY + 100;
+      const railLeft = this.startX - 40;
+      const railRight = this.startX + this.zoneCount * this.zoneWidth + 50;
+      for (let i = 0; i < 6; i++) {
+        const y = railY + 10 + i * 12;
+        graphics.push({ type: 'line', shape: { x1: railLeft - 6, y1: y, x2: railLeft, y2: y }, style: { stroke: '#666', lineWidth: 1 } });
+        graphics.push({ type: 'line', shape: { x1: railRight, y1: y, x2: railRight + 6, y2: y }, style: { stroke: '#666', lineWidth: 1 } });
+      }
+
+      
+
       // 出板口
       graphics.push({ type: 'rect', shape: { x: this.startX + this.zoneCount * this.zoneWidth + 80, y: this.topY + 60, width: 20, height: this.bottomY - this.topY - 10 }, style: { fill: '#111' } });
       graphics.push({ type: 'rect', shape: { x: this.startX + this.zoneCount * this.zoneWidth + 100, y: this.topY + 60, width: 10, height: this.bottomY - this.topY - 10 }, style: { fill: 'rgba(255,255,255,0.1)' } });

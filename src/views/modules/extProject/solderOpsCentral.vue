@@ -23,7 +23,7 @@
               :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
               :class="['marquee-border', getBorderColor(item).animationClass]">
               <div class="right-status-container" style="margin-top: 8px;">
-                <div class="item-desc">{{ item.groupName }}</div>
+                <div class="item-desc">{{ item.equipmentInfo.eqp_name }}</div>
 
                 <div class="info-content">
                   <div style="display: flex; flex-direction: column; text-align: left;">
@@ -34,9 +34,13 @@
                       <span class="value" style="color: #2980b9;">{{ item.t || '-' }} ℃</span>
                     </div>
 
-       
-    
-  
+                    <div class="info-item">
+                      <i class="el-icon-odometer" style="color: #2980b9; margin-right: 4px;"></i>
+                      <span class="label">温度:</span>
+                      <span class="value" style="color: #2980b9;">{{ item.t || '-' }} ℃</span>
+                    </div>
+
+
                   </div>
 
                   <div class="info-tag">
@@ -161,12 +165,7 @@ export default {
           this.tableData = list.map(item => {
             return {
               groupName: item.equipment,
-              t: '-',
-              h: '-',
-              workCalendarStatus: item.status === 'on' ? 'on' : (item.status === 'off' ? 'off' : 'unknown'),
-              airStatus: item.status,
-              currentTotal: item.data.length
-            };
+              equipmentInfo: item.equipmentInfo,};
           });
         })
         .finally(() => this.loading = false);
