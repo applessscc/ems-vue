@@ -72,7 +72,8 @@ export default {
         }
 
         // 更新传送带速度
-        const speedData = dataJSON[20];
+        const speedData = dataJSON[19];
+        console.log('speedData:', dataJSON);
         if (speedData && speedData.name === 'speed') {
           this.speedSV = String(speedData.sv || '0');
           this.speedPV = String(speedData.pv || '0');
