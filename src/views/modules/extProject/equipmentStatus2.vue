@@ -87,15 +87,23 @@ export default {
 
     // ========================== 传送带动画 ==========================
     animateConveyor() {
+      const beltTotalWidth = this.zoneCount * this.zoneWidth + 80; // 图上传送带总宽度
+      const realLengthCm = 600; // 传送带对应的现实长度（可按实际调整）
+      const cmPerPixel = realLengthCm / beltTotalWidth; // 每像素对应厘米
+
       const animate = () => {
-        const baseSpeed = parseFloat(this.speedPV) || 0;
-        const animSpeed = Math.min(3, Math.max(0.3, baseSpeed / 20));
+        const baseSpeed = parseFloat(this.speedPV) || 0; // cm/min
+        // 每帧偏移像素 = 每分钟厘米 / 60秒 / 每帧像素换算
+        let animSpeed = (baseSpeed / 60) / cmPerPixel;
+        animSpeed = Math.max(0.1, Math.min(3, animSpeed)); // 限制偏移速度，防止过快或过慢
+
         this.conveyorOffset = (this.conveyorOffset + animSpeed) % 20;
         if (this.chart) this.drawChart();
         this.animationFrameId = requestAnimationFrame(animate);
       };
       this.animationFrameId = requestAnimationFrame(animate);
     },
+
 
     // ========================== 绘制图表 ==========================
     drawChart() {
@@ -203,7 +211,7 @@ export default {
         graphics.push({ type: 'line', shape: { x1: railRight, y1: y, x2: railRight + 6, y2: y }, style: { stroke: '#666', lineWidth: 1 } });
       }
 
-      
+
 
       // 出板口
       graphics.push({ type: 'rect', shape: { x: this.startX + this.zoneCount * this.zoneWidth + 80, y: this.topY + 60, width: 20, height: this.bottomY - this.topY - 10 }, style: { fill: '#111' } });
@@ -236,7 +244,7 @@ export default {
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 30, text: '实际值' } },
             { type: 'text', style: { ...labelStyle, x: x - 55, y: this.bottomY + 60, text: '设定值' } }
           );
-          
+
         }
 
         graphics.push(
