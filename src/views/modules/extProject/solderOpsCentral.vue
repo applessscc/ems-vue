@@ -21,7 +21,7 @@
           <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
             <div class="custom-card"
               :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
-              :class="['marquee-border', getBorderColor(item).animationClass]">
+              :class="['marquee-border', getBorderColor(item).animationClass]" @click="openNew('equipmentStatus',item.groupName)">
               <div class="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{ item.equipmentInfo.eqp_name }}</div>
 
@@ -30,19 +30,13 @@
 
                     <div class="info-item">
                       <i class="el-icon-odometer" style="color: #2980b9; margin-right: 4px;"></i>
-                      <span class="label">温度:</span>
-                      <span class="value" style="color: #2980b9;">{{ item.t || '-' }} ℃</span>
+                      <span class="label">部门:</span>
+                      <span class="value" style="color: #2980b9;">{{ item.equipmentInfo.mdbpartner_keeper_pm || '-' }}</span>
                     </div>
 
-                    <div class="info-item">
-                      <i class="el-icon-odometer" style="color: #2980b9; margin-right: 4px;"></i>
-                      <span class="label">温度:</span>
-                      <span class="value" style="color: #2980b9;">{{ item.t || '-' }} ℃</span>
-                    </div>
 
 
                   </div>
-
                   <div class="info-tag">
                     <el-tag :type="getStatusType(item)" class="status-tag">
                       {{ getStatusText(item) }}
@@ -85,6 +79,18 @@ export default {
   },
 
   methods: {
+
+    openNew(path, eqpCode ) {
+      const newUrl = this.$router.resolve({
+        path: path,
+        query: {
+          eqpCode: eqpCode,
+        }
+      });
+      console.log('打开新页面的URL:', newUrl.href);
+      window.open(newUrl.href, '_blank');
+    },
+
     /** 状态颜色 */
     getBorderColor(item) {
       if (item.workCalendarStatus === 'off') {
@@ -165,7 +171,8 @@ export default {
           this.tableData = list.map(item => {
             return {
               groupName: item.equipment,
-              equipmentInfo: item.equipmentInfo,};
+              equipmentInfo: item.equipmentInfo,
+            };
           });
         })
         .finally(() => this.loading = false);
