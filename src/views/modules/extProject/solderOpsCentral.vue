@@ -21,7 +21,8 @@
           <div v-for="(item, index) in tableData" :key="index" class="card-wrapper">
             <div class="custom-card"
               :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
-              :class="['marquee-border', getBorderColor(item).animationClass]" @click="openNew('equipmentStatus',item.groupName)">
+              :class="['marquee-border', getBorderColor(item).animationClass]"
+              @click="openNew('equipmentStatus', item.groupName)">
               <div class="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{ item.equipmentInfo.eqp_name }}</div>
 
@@ -31,7 +32,8 @@
                     <div class="info-item">
                       <i class="el-icon-odometer" style="color: #2980b9; margin-right: 4px;"></i>
                       <span class="label">部门:</span>
-                      <span class="value" style="color: #2980b9;">{{ item.equipmentInfo.mdbpartner_keeper_pm || '-' }}</span>
+                      <span class="value" style="color: #2980b9;">{{ item.equipmentInfo.mdbpartner_keeper_pm || '-'
+                      }}</span>
                     </div>
 
 
@@ -54,7 +56,6 @@
 </template>
 
 <script>
-import { name } from 'file-loader';
 
 export default {
   mounted() {
@@ -80,7 +81,7 @@ export default {
 
   methods: {
 
-    openNew(path, eqpCode ) {
+    openNew(path, eqpCode) {
       const newUrl = this.$router.resolve({
         path: path,
         query: {
@@ -91,26 +92,39 @@ export default {
       window.open(newUrl.href, '_blank');
     },
 
-    /** 状态颜色 */
-    getBorderColor(item) {
-      if (item.workCalendarStatus === 'off') {
-        return { color: '#F56C6C', animationClass: 'alarm-border-animation' };
-      } else if (item.workCalendarStatus === 'on') {
-        return { color: '#67C23A', animationClass: 'marquee-border-testing' };
-      }
-      return { color: '#c0c4cc', animationClass: 'leave-border-animation' };
-    },
-
     getStatusType(item) {
-      if (item.workCalendarStatus === 'off') return 'danger';
-      if (item.workCalendarStatus === 'on') return 'success';
-      return 'info';
+            console.log('item status:', item);
+
+      console.log('item status:', item.status, 'offline:', item.offline);
+      if (item.offline === 'offline') return 'info'; // 离线灰色
+      switch (item.status) {
+        case '001': return 'success'; // 正常
+        case '002': return 'warning'; // 警告
+        case '003': return 'danger';  // 报警
+        default: return 'info';       // 未知
+      }
     },
 
     getStatusText(item) {
-      if (item.workCalendarStatus === 'off') return '异常';
-      if (item.workCalendarStatus === 'on') return '正常';
-      return '未知';
+      if (item.offline === 'offline') return '离线';
+      switch (item.status) {
+        case '001': return '正常';
+        case '002': return '警告';
+        case '003': return '报警';
+        default: return '未知';
+      }
+    },
+
+    getBorderColor(item) {
+      if (item.offline === 'offline') {
+        return { color: '#c0c4cc', animationClass: 'leave-border-animation' };
+      }
+      switch (item.status) {
+        case '001': return { color: '#67C23A', animationClass: 'marquee-border-testing' }; // 正常绿
+        case '002': return { color: '#E6A23C', animationClass: 'marquee-border-testing' }; // 警告黄
+        case '003': return { color: '#F56C6C', animationClass: 'alarm-border-animation' }; // 报警红
+        default: return { color: '#c0c4cc', animationClass: 'leave-border-animation' };
+      }
     },
 
     /** 获取设备树 */
@@ -168,12 +182,15 @@ export default {
         .then((res) => {
           const list = res.data.data && res.data.data.equipmentStatusList ? res.data.data.equipmentStatusList : [];
 
-          this.tableData = list.map(item => {
-            return {
-              groupName: item.equipment,
-              equipmentInfo: item.equipmentInfo,
-            };
-          });
+          // this.tableData = list.map(item => {
+          //   return {
+          //     groupName: item.equipment,
+          //     equipmentInfo: item.equipmentInfo,
+          //   };
+          // });
+
+         this.tableData = list;
+
         })
         .finally(() => this.loading = false);
     },
