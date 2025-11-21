@@ -84,7 +84,7 @@ export default {
       const newUrl = this.$router.resolve({
         path: path,
         query: {
-          eqpCode: eqpCode,
+          sap_no: eqpCode,
         }
       });
       console.log('打开新页面的URL:', newUrl.href);

@@ -13,12 +13,12 @@
       <div class="table-card eqp-info-card" >
         <h3 class="table-title">设备信息</h3>
         <el-descriptions border column=1>
-          <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData.eqpName:"" }}</el-descriptions-item>
-          <el-descriptions-item label="设备编号">{{ eqpInfoData?eqpInfoData.eqpCode :"" }}</el-descriptions-item>
-          <el-descriptions-item label="SAP编号">{{ eqpInfoData?eqpInfoData.eqpModel:""  }}</el-descriptions-item>
-          <el-descriptions-item label="IP地址">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
-          <el-descriptions-item label="线体名称">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
-          <el-descriptions-item label="工序名称">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
+          <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData[0][1]:"" }}</el-descriptions-item>
+          <el-descriptions-item label="设备编号">{{ eqpInfoData?eqpInfoData[1][1] :"" }}</el-descriptions-item>
+          <el-descriptions-item label="SAP编号">{{ eqpInfoData?eqpInfoData[2][1]:""  }}</el-descriptions-item>
+          <el-descriptions-item label="IP地址">{{ eqpInfoData?eqpInfoData[3][1] :"" }}</el-descriptions-item>
+          <el-descriptions-item label="线体名称">{{ eqpInfoData?eqpInfoData[4][1] :"" }}</el-descriptions-item>
+          <el-descriptions-item label="工序名称">{{ eqpInfoData?eqpInfoData[5][1] :"" }}</el-descriptions-item>
           <!-- <el-descriptions-item label="状态">
             <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
           </el-descriptions-item> -->
@@ -29,15 +29,6 @@
           <div class="table-card eqp-info-card" >
         <h3 class="table-title">安灯信息</h3>
         <el-descriptions border column=1>
-          <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData.eqpName:"" }}</el-descriptions-item>
-          <el-descriptions-item label="设备编号">{{ eqpInfoData?eqpInfoData.eqpCode :"" }}</el-descriptions-item>
-          <el-descriptions-item label="SAP编号">{{ eqpInfoData?eqpInfoData.eqpModel:""  }}</el-descriptions-item>
-          <el-descriptions-item label="IP地址">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
-          <el-descriptions-item label="线体名称">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
-          <el-descriptions-item label="工序名称">{{ eqpInfoData?eqpInfoData.eqpModel :"" }}</el-descriptions-item>
-          <!-- <el-descriptions-item label="状态">
-            <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
-          </el-descriptions-item> -->
         </el-descriptions>
       </div>
 
@@ -108,6 +99,7 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.eqpInfoData = data.result;
+          console.log('eqpInfoData:', this.eqpInfoData[0][1]);
         }
       })
     },
