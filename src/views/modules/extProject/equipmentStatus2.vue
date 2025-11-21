@@ -91,10 +91,12 @@ export default {
       const realLengthCm = 600; // 传送带对应的现实长度（可按实际调整）
       const cmPerPixel = realLengthCm / beltTotalWidth; // 每像素对应厘米
 
+      const speedFactor = 0.5; // 新增速度权重比例，默认 1
+
       const animate = () => {
         const baseSpeed = parseFloat(this.speedPV) || 0; // cm/min
-        // 每帧偏移像素 = 每分钟厘米 / 60秒 / 每帧像素换算
-        let animSpeed = (baseSpeed / 60) / cmPerPixel;
+        // 每帧偏移像素 = 每分钟厘米 / 60秒 / 每帧像素换算 * 速度权重
+        let animSpeed = ((baseSpeed / 60) / cmPerPixel) * speedFactor;
         animSpeed = Math.max(0.1, Math.min(3, animSpeed)); // 限制偏移速度，防止过快或过慢
 
         this.conveyorOffset = (this.conveyorOffset + animSpeed) % 20;
