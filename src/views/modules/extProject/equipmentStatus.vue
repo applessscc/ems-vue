@@ -12,7 +12,7 @@
       <!-- 设备信息 -->
       <div class="table-card eqp-info-card" >
         <h3 class="table-title">设备信息</h3>
-        <el-descriptions border column=1>
+        <el-descriptions border :column=1>
           <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData[0][1]:"" }}</el-descriptions-item>
           <el-descriptions-item label="设备编号">{{ eqpInfoData?eqpInfoData[1][1] :"" }}</el-descriptions-item>
           <el-descriptions-item label="SAP编号">{{ eqpInfoData?eqpInfoData[2][1]:""  }}</el-descriptions-item>
@@ -28,7 +28,7 @@
 
           <div class="table-card eqp-info-card" >
         <h3 class="table-title">安灯信息</h3>
-        <el-descriptions border column=1>
+        <el-descriptions border :column=1>
         </el-descriptions>
       </div>
 
@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import equipmentStatus2 from '@/views/modules/extProject/equipmentStatus2.vue';
+import equipmentStatus2 from '@/views/modules/extProject/equipmentStatus3.vue';
 import VtechHead from '@/views/modules/extProject/vtechHead.vue';
 
 import { saveVisitLog } from '@/utils/commonUtils.js'

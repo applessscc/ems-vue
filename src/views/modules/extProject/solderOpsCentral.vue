@@ -22,7 +22,7 @@
             <div class="custom-card"
               :style="{ padding: '0px', paddingBottom: '3px', borderColor: getBorderColor(item).color }"
               :class="['marquee-border', getBorderColor(item).animationClass]"
-              @click="openNew('equipmentStatus', item.groupName)">
+              @click="openNew('equipmentStatus', item.equipmentInfo.eqp_code)">
               <div class="right-status-container" style="margin-top: 8px;">
                 <div class="item-desc">{{ item.equipmentInfo.eqp_name }}</div>
 
@@ -93,9 +93,6 @@ export default {
     },
 
     getStatusType(item) {
-            console.log('item status:', item);
-
-      console.log('item status:', item.status, 'offline:', item.offline);
       if (item.offline === 'offline') return 'info'; // 离线灰色
       switch (item.status) {
         case '001': return 'success'; // 正常
