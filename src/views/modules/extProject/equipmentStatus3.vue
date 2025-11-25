@@ -98,8 +98,7 @@ export default {
 }
 
 .machine-image {
-  width: 100%;
-  width: 950px;
+  width: 885px;
   height: auto;
   display: block;
 }

@@ -178,18 +178,18 @@ export default {
 
 .eqp-info-card {
   min-width: 300px;
-  max-width: 400px;
+  max-width: 450px;
   flex: 1;
 }
 
 .snWork-card {
-  height: 330px;
-  max-width: 50%;
+  height: 340px;
+  width: 45%;
   flex: 2;
 }
 .chart-card {
-  height: 330px;
-  max-width: 50%;
+  height: 340px;
+  width: 45%;
   flex: 2;
 }
 
