@@ -50,7 +50,9 @@ const globalRoutes = [
 
   { path: '/modules/extProject/equipmentStatus', component: _import('modules/extProject/equipmentStatus'), name: 'equipmentStatus', meta: { title: 'equipmentStatus' } },
   { path: '/modules/extProject/solderOpsCentral', component: _import('modules/extProject/solderOpsCentral'), name: 'solderOpsCentral', meta: { title: 'solderOpsCentral' } },
+  { path: '/modules/extProject/equipmentStatusHitory', component: _import('modules/extProject/equipmentStatusHitory'), name: 'equipmentStatusHitory', meta: { title: 'equipmentStatusHitory' } },
 
+  
   { path: '/demo/test', component: _import('demo/test'), name: 'test', meta: { title: '看板测试' } }
 
 ]

@@ -1,6 +1,6 @@
 <template>
   <el-container>
-      <vtech-head />
+    <vtech-head />
     <div class="reflowFurnaceWeld-container">
 
       <!-- 回流焊状态 -->
@@ -10,15 +10,15 @@
       </div>
 
       <!-- 设备信息 -->
-      <div class="table-card eqp-info-card" >
+      <div class="table-card eqp-info-card">
         <h3 class="table-title">设备信息</h3>
         <el-descriptions border :column=1>
-          <el-descriptions-item label="设备名称">{{ eqpInfoData?eqpInfoData[0][1]:"" }}</el-descriptions-item>
-          <el-descriptions-item label="设备编号">{{ eqpInfoData?eqpInfoData[1][1] :"" }}</el-descriptions-item>
-          <el-descriptions-item label="SAP编号">{{ eqpInfoData?eqpInfoData[2][1]:""  }}</el-descriptions-item>
-          <el-descriptions-item label="IP地址">{{ eqpInfoData?eqpInfoData[3][1] :"" }}</el-descriptions-item>
-          <el-descriptions-item label="线体名称">{{ eqpInfoData?eqpInfoData[4][1] :"" }}</el-descriptions-item>
-          <el-descriptions-item label="工序名称">{{ eqpInfoData?eqpInfoData[5][1] :"" }}</el-descriptions-item>
+          <el-descriptions-item label="设备名称">{{ eqpInfoData ? eqpInfoData[0][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="设备编号">{{ eqpInfoData ? eqpInfoData[1][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="SAP编号">{{ eqpInfoData ? eqpInfoData[2][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="IP地址">{{ eqpInfoData ? eqpInfoData[3][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="线体名称">{{ eqpInfoData ? eqpInfoData[4][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="工序名称">{{ eqpInfoData ? eqpInfoData[5][1] : "" }}</el-descriptions-item>
           <!-- <el-descriptions-item label="状态">
             <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
           </el-descriptions-item> -->
@@ -26,7 +26,7 @@
       </div>
 
 
-          <div class="table-card eqp-info-card" >
+      <div class="table-card eqp-info-card">
         <h3 class="table-title">安灯信息</h3>
         <el-descriptions border :column=1>
         </el-descriptions>
@@ -36,27 +36,33 @@
     </div>
 
     <div class="bottom-container">
-    <!-- 报工记录 -->
-    <div class="table-card snWork-card">
-      <h3 class="table-title">报工记录</h3>
-      <el-table :data="snWorkListTop10Data" border  style="height: 250px;">
-        <el-table-column label="SN">
-          <template slot-scope="scope">
-            <span v-html="scope.row[0]"></span>
-          </template>
-        </el-table-column>
-        <el-table-column label="工单号">
-          <template slot-scope="scope">
-            {{ scope.row[1] }}
-          </template>
-        </el-table-column>
-        <el-table-column label="时间">
-          <template slot-scope="scope">
-            {{ scope.row[2] }}
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
+      <!-- 报工记录 -->
+      <div class="table-card snWork-card">
+        <h3 class="table-title">报工记录</h3>
+        <el-table :data="snWorkListTop10Data" border style="height: 240px;">
+          <el-table-column label="SN">
+            <template slot-scope="scope">
+              <span v-html="scope.row[0]"></span>
+            </template>
+          </el-table-column>
+          <el-table-column label="工单号">
+            <template slot-scope="scope">
+              {{ scope.row[1] }}
+            </template>
+          </el-table-column>
+          <el-table-column label="时间">
+            <template slot-scope="scope">
+              {{ scope.row[2] }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+
+      <div class="table-card chart-card">
+        <h3 class="table-title">历史温区温度</h3>
+<LineChart width="100%" height="100%" />
+      </div>
 
     </div>
   </el-container>
@@ -64,12 +70,14 @@
 
 <script>
 import equipmentStatus2 from '@/views/modules/extProject/equipmentStatus3.vue';
+import LineChart from '@/views/modules/extProject/equipmentStatusHitory.vue';
+
 import VtechHead from '@/views/modules/extProject/vtechHead.vue';
 
 import { saveVisitLog } from '@/utils/commonUtils.js'
 
 export default {
-  components: { equipmentStatus2 ,VtechHead   },
+  components: { equipmentStatus2, VtechHead ,LineChart},
 
   data() {
     return {
@@ -138,6 +146,7 @@ export default {
 .reflowFurnaceWeld-container {
   display: flex;
 }
+
 .bottom-container {
   display: flex;
 }
@@ -161,8 +170,10 @@ export default {
   font-size: 20px;
   font-weight: 600;
   color: #1f78d1;
-  border-left: 4px solid #1f78d1;  /* 改为左边彩色条 */
-  padding-left: 8px;               /* 文字与左条保持间距 */
+  border-left: 4px solid #1f78d1;
+  /* 改为左边彩色条 */
+  padding-left: 8px;
+  /* 文字与左条保持间距 */
 }
 
 .eqp-info-card {
@@ -170,12 +181,21 @@ export default {
   max-width: 400px;
   flex: 1;
 }
+
 .snWork-card {
-  min-height: 330px;
+  height: 330px;
+  max-width: 50%;
   flex: 2;
 }
+.chart-card {
+  height: 330px;
+  max-width: 50%;
+  flex: 2;
+}
+
 .el-container {
   display: flex;
-  flex-direction: column; /* 垂直排列子元素 */
+  flex-direction: column;
+  /* 垂直排列子元素 */
 }
 </style>

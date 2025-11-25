@@ -1,10 +1,11 @@
-
 <template>
   <div class="machine-container">
     <img :src="require('@/assets/img/123.jpg')" alt="回流焊设备" class="machine-image" />
 
     <!-- 温区标签 -->
-    <div v-for="(zone, index) in zones" :key="index" :style="getPositionStyle(zone)" class="temperature-zone">
+    <div v-for="(zone, index) in zones" :key="index" :style="getPositionStyle(zone)" class="temperature-zone"
+      @click="openNew('equipmentStatusHitory', zone.name, equipment)">
+      {{ zone.name }}:
       {{ zone.temperature }}°C
     </div>
 
@@ -34,12 +35,25 @@ export default {
         { name: 'Zone 10', temperature: 0, position: { top: '32%', left: '78%' }, rotate: -3 }
       ],
       speedPV: null, // 初始化传送带速度为null
+      equipment: ''
     };
   },
   mounted() {
     this.fetchEquipmentStatus();
   },
   methods: {
+    openNew(path, name,equipment) {
+      const newUrl = this.$router.resolve({
+        path: path,
+        query: {
+          name: name,
+          equipment: equipment,
+
+        }
+      });
+      console.log('打开新页面的URL:', newUrl.href);
+      window.open(newUrl.href, '_blank');
+    },
     async fetchEquipmentStatus() {
       const response = await this.$http({
         url: this.$http.adornUrl('/extProject/getEquipmentStatus'),
@@ -48,14 +62,16 @@ export default {
       });
 
       console.log('Equipment status response:', response.data.data.dataJSON);
-      if (response.data && response.data.data&& response.data.data.dataJSON) {
+      if (response.data && response.data.data && response.data.data.dataJSON) {
         const parsedData = JSON.parse(response.data.data.dataJSON);
 
         console.log('parsedData:', parsedData);
         // 更新每个温区的温度
         parsedData.slice(0, 10).forEach((item, index) => {
           this.zones[index].temperature = item.pv;
+          this.zones[index].name = item.name;
         });
+        this.equipment = response.data.data.equipment;
 
         // 更新传送带速度
         this.speedPV = parsedData.find(item => item.name === 'speed').pv;
@@ -83,6 +99,7 @@ export default {
 
 .machine-image {
   width: 100%;
+  width: 950px;
   height: auto;
   display: block;
 }
