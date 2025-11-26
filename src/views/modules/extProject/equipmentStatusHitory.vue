@@ -1,8 +1,8 @@
 <template>
   <div
     ref="chart"
-    :style="{ width: width, height: height }"
-  ></div>
+    :style="{ width: width, height: height }">
+  </div>
 </template>
 
 <script>
@@ -50,7 +50,7 @@ export default {
           endDate: "2025-11-25"
         })
 
-        const data = response.data.data
+        const data = response.data.data.zones
 
         if (!Array.isArray(data)) {
           console.error('接口返回数据格式错误，应为数组')
