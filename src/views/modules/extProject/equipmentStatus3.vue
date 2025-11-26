@@ -63,7 +63,8 @@ export default {
   },
   methods: {
     handleZoneClick(zone) {
-      this.$emit('zone-click', zone.name);  // 发给父组件
+      console.log('点击的温区:', zone,this.time);
+      this.$emit('zone-click', zone.name,this.time);  // 发给父组件
       // this.openNew('equipmentStatusHitory', zone.name, this.equipment);
     },
     openNew(path, name, equipment) {

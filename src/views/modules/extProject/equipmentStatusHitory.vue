@@ -25,6 +25,11 @@ export default {
             type: String,
             default: ''
         },
+        time: {
+            type: String,
+            default: () => new Date().toISOString().slice(0, 10)
+        }
+
 
     },
 
@@ -64,73 +69,59 @@ export default {
 
         async fetchDataAndSetChart() {
             try {
-                const response = await axios.post('http://localhost:8080/ems-admin/extProject/getEquipmentStatusHistory', {
-                    equipment: this.equipment,
-                    name: this.zoneName,
-                    startDate: new Date().toISOString().slice(0, 10),
-                    endDate: new Date().toISOString().slice(0, 10),
-                })
+                const { data } = await this.$http({
+                    url: this.$http.adornUrl('/extProject/getEquipmentStatusHistory'),
+                    method: 'post',
+                    data: this.$http.adornData({
+                        equipment: this.equipment,
+                        name: this.zoneName,
+                        startDate: this.time.slice(0, 10),
+                        endDate: this.time.slice(0, 10)
+                    })
+                });
 
-                const data = response.data.data.zones
+                const zones = data.data.zones;
 
-                if (!Array.isArray(data)) {
-                    console.error('接口返回数据格式错误，应为数组')
-                    this.chartInstance.hideLoading()
-                    return
+                if (!Array.isArray(zones)) {
+                    console.error('接口返回数据格式错误，应为数组');
+                    this.chartInstance.hideLoading();
+                    return;
                 }
 
-                // 提取时间、SV、PV
-                const times = data.map(item => item.time.split(' ')[1]) // 如 "03:12:43"
-                const svValues = data.map(item => parseFloat(item.sv))
-                const pvValues = data.map(item => parseFloat(item.pv))
+                const times = zones.map(item => item.time.split(' ')[1]);
+                const svValues = zones.map(item => parseFloat(item.sv));
+                const pvValues = zones.map(item => parseFloat(item.pv));
 
                 const option = {
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: {
-                            type: 'cross'
-                        }
-                    },
-                    legend: {
-                        data: ['设定值 (SV)', '实际值 (PV)']
-                    },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+                    legend: { data: ['设定值 (SV)', '实际值 (PV)'] },
                     xAxis: {
                         type: 'category',
                         data: times,
-                        axisLabel: {
-                            rotate: 45,
-                            fontSize: 10
-                        }
+                        axisLabel: { rotate: 45, fontSize: 10 }
                     },
-                    yAxis: {
-                        type: 'value',
-                        name: '温度 (°C)'
-                    },
+                    yAxis: { type: 'value', name: '温度 (°C)' },
                     series: [
                         {
                             name: '设定值 (SV)',
                             type: 'line',
                             smooth: true,
-                            lineStyle: {
-                                color: '#FFA500' // 橙色
-                            },
+                            lineStyle: { color: '#FFA500' },
                             data: svValues
                         },
                         {
                             name: '实际值 (PV)',
                             type: 'line',
                             smooth: true,
-                            lineStyle: {
-                                color: '#1E90FF' // 道奇蓝
-                            },
+                            lineStyle: { color: '#1E90FF' },
                             data: pvValues
                         }
                     ]
-                }
+                };
 
-                this.chartInstance.setOption(option)
-            } catch (error) {
-                console.error('获取设备历史数据失败:', error)
+                this.chartInstance.setOption(option);
+            } catch (err) {
+                console.error('获取设备历史数据失败:', err);
                 this.chartInstance.setOption({
                     title: {
                         text: '数据加载失败',
@@ -138,11 +129,12 @@ export default {
                         y: 'middle',
                         textStyle: { color: '#999' }
                     }
-                })
+                });
             } finally {
-                this.chartInstance.hideLoading()
+                this.chartInstance.hideLoading();
             }
         }
+
     },
 
     created() {

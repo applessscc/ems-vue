@@ -62,8 +62,8 @@
 
 
       <div class="table-card chart-card">
-        <h3 class="table-title">温区温度</h3>
-        <LineChart width="100%" height="90%" :zoneName = "zoneName" :equipment = "eqpCode"/>
+        <h3 class="table-title">温区温度（{{zoneName}}）</h3>
+        <LineChart width="100%" height="90%" :zoneName = "zoneName" :equipment = "eqpCode" :time="time"/>
       </div>
 
     </div>
@@ -77,6 +77,7 @@ import LineChart from '@/views/modules/extProject/equipmentStatusHitory.vue';
 import VtechHead from '@/views/modules/extProject/vtechHead.vue';
 
 import { saveVisitLog } from '@/utils/commonUtils.js'
+import { time } from 'echarts';
 
 export default {
   components: { equipmentStatus2, VtechHead, LineChart },
@@ -87,6 +88,7 @@ export default {
       snWorkListTop10Data: [],
       eqpCode: this.$route.query.sap_no,
       zoneName: "",
+      time: '',
     };
   },
 
@@ -97,9 +99,10 @@ export default {
   },
 
   methods: {
-    onZoneClick(name) {
-      console.log('子组件点击的温区:', name);
+    onZoneClick(name,time) {
+      console.log('子组件点击的温区:', name,time);
       this.zoneName = name;
+      this.time = time;
       // 想干啥都行
     },
     refreshData() {
