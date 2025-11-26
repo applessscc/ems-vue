@@ -1,10 +1,11 @@
 <template>
-  <div class="machine-container" >
-    <img :src="require('@/assets/img/123.jpg')" alt="回流焊设备" class="machine-image" :style="{ width: width, height: height }"/>
+  <div class="machine-container">
+    <img :src="require('@/assets/img/123.jpg')" alt="回流焊设备" class="machine-image"
+      :style="{ width: width, height: height }" />
 
     <!-- 温区标签 -->
     <div v-for="(zone, index) in zones" :key="index" :style="getPositionStyle(zone)" class="temperature-zone"
-      @click="openNew('equipmentStatusHitory', zone.name, equipment)">
+      @click="handleZoneClick(zone)">
       {{ zone.name }}:
       {{ zone.temperature }}°C
     </div>
@@ -13,18 +14,29 @@
     <div class="speed-label" :style="{ top: '80%', left: '75%' }">
       传送带速度: {{ speedPV }} cm/min
     </div>
+
+
+    <!-- 更新时间 -->
+    <div class="time-label" :style="{ top: '3%', left: '77%' }">
+      time: {{ time }}
+    </div>
   </div>
 </template>
 
 
 <script>
+import { time } from 'echarts';
+
 export default {
   name: 'ReflowOvenDisplay',
-      props: {
+  props: {
     width: {
       type: String,
     },
     height: {
+      type: String,
+    },
+    equipment: {
       type: String,
     }
   },
@@ -43,14 +55,18 @@ export default {
         { name: 'Zone 10', temperature: 0, position: { top: '32%', left: '78%' }, rotate: -3 }
       ],
       speedPV: null, // 初始化传送带速度为null
-      equipment: ''
+      time: '',
     };
   },
   mounted() {
     this.fetchEquipmentStatus();
   },
   methods: {
-    openNew(path, name,equipment) {
+    handleZoneClick(zone) {
+      this.$emit('zone-click', zone.name);  // 发给父组件
+      // this.openNew('equipmentStatusHitory', zone.name, this.equipment);
+    },
+    openNew(path, name, equipment) {
       const newUrl = this.$router.resolve({
         path: path,
         query: {
@@ -61,12 +77,14 @@ export default {
       });
       console.log('打开新页面的URL:', newUrl.href);
       window.open(newUrl.href, '_blank');
+
+
     },
     async fetchEquipmentStatus() {
       const response = await this.$http({
         url: this.$http.adornUrl('/extProject/getEquipmentStatus'),
         method: 'get',
-        params: { equipment: 'S2-G00000-003-0600' }
+        params: { equipment: this.equipment }
       });
 
       console.log('Equipment status response:', response.data.data.dataJSON);
@@ -80,6 +98,8 @@ export default {
           this.zones[index].name = item.name;
         });
         this.equipment = response.data.data.equipment;
+        this.time = response.data.data.time;
+
 
         // 更新传送带速度
         this.speedPV = parsedData.find(item => item.name === 'speed').pv;
@@ -124,6 +144,20 @@ export default {
 }
 
 .speed-label {
+  position: absolute;
+  color: white;
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+
+.time-label {
   position: absolute;
   color: white;
   font-weight: bold;

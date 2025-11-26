@@ -6,7 +6,7 @@
       <!-- 回流焊状态 -->
       <div class="table-card equipment-status-card">
         <h3 class="table-title">回流焊实时状态</h3>
-        <equipmentStatus2 width="850px" height="auto" />
+        <equipmentStatus2 width="850px" height="auto" :equipment="eqpCode" @zone-click="onZoneClick" />
       </div>
       <!-- 设备信息 -->
       <div class="table-card eqp-info-card">
@@ -63,7 +63,7 @@
 
       <div class="table-card chart-card">
         <h3 class="table-title">温区温度</h3>
-        <LineChart width="100%" height="90%" />
+        <LineChart width="100%" height="90%" :zoneName = "zoneName" :equipment = "eqpCode"/>
       </div>
 
     </div>
@@ -86,6 +86,7 @@ export default {
       eqpInfoData: null,
       snWorkListTop10Data: [],
       eqpCode: this.$route.query.sap_no,
+      zoneName: "",
     };
   },
 
@@ -96,6 +97,11 @@ export default {
   },
 
   methods: {
+    onZoneClick(name) {
+      console.log('子组件点击的温区:', name);
+      this.zoneName = name;
+      // 想干啥都行
+    },
     refreshData() {
       this.getEqpInfoData(this.eqpCode);
       this.getSnWorkListTop10Data(this.eqpCode);
