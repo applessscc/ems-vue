@@ -5,7 +5,7 @@
 
     <!-- 温区标签 -->
     <div v-for="(zone, index) in zones" :key="index" :style="getPositionStyle(zone)" class="temperature-zone"
-      @click="handleZoneClick(zone)">
+      @click="handleZoneClick(zone.name,time)">
       {{ zone.name }}:
       {{ zone.temperature }}°C
     </div>
@@ -62,9 +62,8 @@ export default {
     this.fetchEquipmentStatus();
   },
   methods: {
-    handleZoneClick(zone) {
-      console.log('点击的温区:', zone,this.time);
-      this.$emit('zone-click', zone.name,this.time);  // 发给父组件
+    handleZoneClick(name,time) {
+      this.$emit('zone-click', name,time);  // 发给父组件
       // this.openNew('equipmentStatusHitory', zone.name, this.equipment);
     },
     openNew(path, name, equipment) {
