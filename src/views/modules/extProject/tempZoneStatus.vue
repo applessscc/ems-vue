@@ -120,47 +120,55 @@ export default {
     },
 
     /** 颜色状态样式 */
-getBorderColor(item) {
-  if (item.workCalendarStatus === 'off') {
-    // 日历异常（关闭）
-    return {
-      color: '#F56C6C',
-      animationClass: 'alarm-border-animation',
-    };
-  } else if (item.workCalendarStatus === 'on') {
-    // 正常状态
-    return {
-      color: '#67C23A',
-      animationClass: 'marquee-border-testing',
-    };
-  } else {
-    // 其它情况（例如空值）
-    return {
-      color: '#c0c4cc',
-      animationClass: 'leave-border-animation',
-    };
-  }
-},
+    getBorderColor(item) {
+      if (item.expMaxTem !== null && (item.t > item.expMaxTem || item.t < item.expMinTem)) {
+        // 温度异常
+        return {
+          color: '#F56C6C',
+          animationClass: 'alarm-border-animation',
+        };
+      } else {
+        // 正常状态
+        return {
+          color: '#67C23A',
+          animationClass: 'marquee-border-testing',
+        };
+      }
+    },
 
-getStatusType(item) {
-  if (item.workCalendarStatus === 'off') {
-    return 'danger';   // 异常 → 红色
-  } else if (item.workCalendarStatus === 'on') {
-    return 'success';  // 正常 → 绿色
-  } else {
-    return 'info';     // 其它（例如空值或未知）→ 灰色
-  }
-},
+    getStatusType(item) {
+      if (item.expMaxTem !== null && (item.t > item.expMaxTem || item.t < item.expMinTem)) {
+        // 温度异常
+        return 'danger';   // 异常 → 红色 
+      } else{
+        return 'success';  // 正常 → 绿色
+      }
 
-getStatusText(item) {
-  if (item.workCalendarStatus === 'off') {
-    return '异常';
-  } else if (item.workCalendarStatus === 'on') {
-    return '正常';
-  } else {
-    return '未知';
-  }
-},
+      // if (item.workCalendarStatus === 'off') {
+      //   return 'danger';   // 异常 → 红色
+      // } else if (item.workCalendarStatus === 'on') {
+      //   return 'success';  // 正常 → 绿色
+      // } else {
+      //   return 'info';     // 其它（例如空值或未知）→ 灰色
+      // }
+    },
+
+    getStatusText(item) {
+
+      if (item.expMaxTem !== null && (item.t > item.expMaxTem || item.t < item.expMinTem)) {
+        // 温度异常
+        return '异常';
+      } else{
+        return '正常';
+      }
+      // if (item.workCalendarStatus === 'off') {
+      //   return '异常';
+      // } else if (item.workCalendarStatus === 'on') {
+      //   return '正常';
+      // } else {
+      //   return '未知';
+      // }
+    },
 
 
     /** 获取所有设备树 */
