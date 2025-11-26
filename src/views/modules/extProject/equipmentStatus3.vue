@@ -1,6 +1,6 @@
 <template>
-  <div class="machine-container">
-    <img :src="require('@/assets/img/123.jpg')" alt="回流焊设备" class="machine-image" />
+  <div class="machine-container" >
+    <img :src="require('@/assets/img/123.jpg')" alt="回流焊设备" class="machine-image" :style="{ width: width, height: height }"/>
 
     <!-- 温区标签 -->
     <div v-for="(zone, index) in zones" :key="index" :style="getPositionStyle(zone)" class="temperature-zone"
@@ -20,6 +20,14 @@
 <script>
 export default {
   name: 'ReflowOvenDisplay',
+      props: {
+    width: {
+      type: String,
+    },
+    height: {
+      type: String,
+    }
+  },
   data() {
     return {
       zones: [
@@ -98,8 +106,6 @@ export default {
 }
 
 .machine-image {
-  width: 885px;
-  height: auto;
   display: block;
 }
 
@@ -110,7 +116,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.6);
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 11px;
   white-space: nowrap;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
