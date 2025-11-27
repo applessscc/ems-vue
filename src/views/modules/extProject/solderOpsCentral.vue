@@ -30,9 +30,15 @@
                   <div style="display: flex; flex-direction: column; text-align: left;">
 
                     <div class="info-item">
-                      <i class="el-icon-odometer" style="color: #2980b9; margin-right: 4px;"></i>
+                      <i class="el-icon-office-building" style="color: #4b8cf7; margin-right: 4px;"></i>
                       <span class="label">部门:</span>
-                      <span class="value" style="color: #2980b9;">{{ item.equipmentInfo.mdbpartner_keeper_pm || '-'
+                      <span class="value" style="color: #4b8cf7;">{{ item.equipmentInfo.mdbpartner_keeper_pm || '-'
+                      }}</span>
+                    </div>
+                    <div class="info-item">
+                      <i class="el-icon-time" style="color: #e67e22; margin-right: 4px;"></i>
+                      <span class="label">更新时间:</span>
+                      <span class="value" style="color: #e67e22;">{{ (item.time || '-').toString().slice(5, 16)
                       }}</span>
                     </div>
 
@@ -158,8 +164,11 @@ export default {
           });
 
           this.treeData = [rootNode];
-          this.defaultExpandedKeys = ['cms-root'];
-          this.defaultCheckedKeys = ['cms-root'].concat(list.map(x => `CMS_VTC_LB_SBU2_${x.id}`));
+          this.defaultExpandedKeys = [
+            'cms-root',
+            'VTC',
+            'VTC_LB'
+          ]; this.defaultCheckedKeys = ['cms-root'].concat(list.map(x => `CMS_VTC_LB_SBU2_${x.id}`));
 
           this.$nextTick(() => {
             this.secondLevelChecked = this.$refs.tree.getCheckedNodes();
@@ -186,7 +195,7 @@ export default {
           //   };
           // });
 
-         this.tableData = list;
+          this.tableData = list;
 
         })
         .finally(() => this.loading = false);
@@ -258,7 +267,7 @@ export default {
 }
 
 .card-wrapper {
-  min-width: 260px;
+  min-width: 280px;
 }
 
 .custom-card {
