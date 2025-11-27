@@ -142,6 +142,11 @@ export default {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   z-index: 5;
 }
+/* 可选：鼠标悬停时微微放大 */
+.temperature-zone:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
 
 .speed-label {
   position: absolute;
@@ -155,18 +160,33 @@ export default {
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
-
+/* 可选：鼠标悬停时微微放大 */
+.speed-label:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
 
 .time-label {
   position: absolute;
-  color: white;
-  font-weight: bold;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 13px;
+  top: 3%;
+  left: 77%;
+  color: #fff;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
   white-space: nowrap;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px); /* 轻微模糊背景，使文字更突出 */
+  transition: all 0.3s ease;
 }
+
+/* 可选：鼠标悬停时微微放大 */
+.time-label:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
 </style>
