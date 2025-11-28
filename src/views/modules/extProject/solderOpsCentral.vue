@@ -71,7 +71,7 @@ export default {
     });
     this.timer = setInterval(() => {
       this.getAllEquipmentStatus();
-    }, 60000);
+    }, 30000);
   },
 
   data() {
