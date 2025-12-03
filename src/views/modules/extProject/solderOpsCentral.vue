@@ -262,7 +262,7 @@ export default {
 .card-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, 240px);
-  grid-gap: 60px;
+  grid-gap: 100px;
   justify-content: center;
 }
 
