@@ -431,6 +431,12 @@ export default {
 
   },
   created() {
+
+
+    const routeGroupId = this.$route.query.groupId;
+    if (routeGroupId) {
+      this.groupId = routeGroupId; // 自动选中该温区
+    }
     this.getAppInfoList();
 
     this.getThRecord();
@@ -441,20 +447,20 @@ export default {
     // saveVisitLog('温度系数比值');
   },
   mounted() {
-if (!this.selectedTimezone) {
-  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log("localTz：", localTz);
+    if (!this.selectedTimezone) {
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log("localTz：", localTz);
 
-  const found = this.timezones.find(tz => tz.value === localTz);
+      const found = this.timezones.find(tz => tz.value === localTz);
 
-  if (found) {
-    this.selectedTimezone = found.value;
-  } else {
-    const newLabel = `本地时区 (${localTz})`;
-    this.timezones.unshift({ value: localTz, label: newLabel });
-    this.selectedTimezone = localTz;
-  }
-}
+      if (found) {
+        this.selectedTimezone = found.value;
+      } else {
+        const newLabel = `本地时区 (${localTz})`;
+        this.timezones.unshift({ value: localTz, label: newLabel });
+        this.selectedTimezone = localTz;
+      }
+    }
 
     this.intervalId = setInterval(() => {
       this.getExceptionThKvRecord()
@@ -888,7 +894,7 @@ if (!this.selectedTimezone) {
         this.form.eEndTime = data[0].eEndTime;
         this.form.appGroup = data[0].appGroup;
         this.form.extT = data[0].extT
-        this.selectedTimezone = data[0].selectedTimezone || this.selectedTimezone; 
+        this.selectedTimezone = data[0].selectedTimezone || this.selectedTimezone;
       }).catch((error) => {
         console.log('Error:', error);
       });
