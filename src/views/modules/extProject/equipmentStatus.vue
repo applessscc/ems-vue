@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <vtech-head />
+    <vtech-head title="CMS 回流焊集中监控管理系统"/>
     <div class="reflowFurnaceWeld-container">
 
       <!-- 回流焊状态 -->
@@ -40,14 +40,14 @@
     <div class="bottom-container">
       <!-- 报工记录 -->
       <div class="table-card snWork-card">
-        <h3 class="table-title">报工记录</h3>
+        <h3 class="table-title">报工记录（Top10）</h3>
         <el-table :data="snWorkListTop10Data" border style="height: 300px;">
           <el-table-column label="SN">
             <template slot-scope="scope">
               <span v-html="scope.row[0]"></span>
             </template>
           </el-table-column>
-          <el-table-column label="工单号">
+          <el-table-column label="状态">
             <template slot-scope="scope">
               {{ scope.row[1] }}
             </template>

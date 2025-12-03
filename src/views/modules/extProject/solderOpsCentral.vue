@@ -3,7 +3,7 @@
     <el-header style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
              text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
              letter-spacing: 2px; background: #1f78d1;">
-      CMS 温区集中监控管理系统
+      CMS 回流焊集中监控管理系统
       <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
         <img src="~@/assets/img/logo.jpg" alt="NEXIM Logo" style="height: 40px;" />
       </span>

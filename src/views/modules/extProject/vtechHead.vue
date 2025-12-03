@@ -15,7 +15,7 @@
     </span>
 
     <!-- 中间标题 -->
-    CMS 能耗集中监控管理系统
+   {{title}}
 
     <!-- 右侧 LOGO -->
     <span style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);">
@@ -27,6 +27,12 @@
 <script>
 export default {
   name: "VtechHead",
+  props: {
+    title: {
+      type: String,
+      default: "CMS XXX管理系统"
+    }
+  },
   data() {
     return {
       currentTime: ""
