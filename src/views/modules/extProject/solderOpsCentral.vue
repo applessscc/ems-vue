@@ -24,7 +24,7 @@
               :class="['marquee-border', getBorderColor(item).animationClass]"
               @click="openNew('equipmentStatus', item.equipmentInfo.eqp_code)">
               <div class="right-status-container" style="margin-top: 8px;">
-                <div class="item-desc">{{ item.equipmentInfo.eqp_name }}</div>
+                <div class="item-desc">{{ item.equipment }}</div>
 
                 <div class="info-content">
                   <div style="display: flex; flex-direction: column; text-align: left;">

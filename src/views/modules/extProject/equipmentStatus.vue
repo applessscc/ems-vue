@@ -13,11 +13,12 @@
         <h3 class="table-title">设备信息</h3>
         <el-descriptions border :column=1>
           <el-descriptions-item label="设备名称">{{ eqpInfoData ? eqpInfoData[0][1] : "" }}</el-descriptions-item>
-          <el-descriptions-item label="设备编号">{{ eqpInfoData ? eqpInfoData[1][1] : "" }}</el-descriptions-item>
-          <el-descriptions-item label="SAP编号">{{ eqpInfoData ? eqpInfoData[2][1] : "" }}</el-descriptions-item>
-          <el-descriptions-item label="IP地址">{{ eqpInfoData ? eqpInfoData[3][1] : "" }}</el-descriptions-item>
-          <el-descriptions-item label="线体名称">{{ eqpInfoData ? eqpInfoData[4][1] : "" }}</el-descriptions-item>
-          <el-descriptions-item label="工序名称">{{ eqpInfoData ? eqpInfoData[5][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="设备型号">{{ eqpInfoData ? eqpInfoData[1][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="设备品牌">{{ eqpInfoData ? eqpInfoData[2][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="SAP编号">{{ eqpInfoData ? eqpInfoData[3][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="IP地址">{{ eqpInfoData ? eqpInfoData[4][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="线体名称">{{ eqpInfoData ? eqpInfoData[5][1] : "" }}</el-descriptions-item>
+          <el-descriptions-item label="工序名称">{{ eqpInfoData ? eqpInfoData[6][1] : "" }}</el-descriptions-item>
           <!-- <el-descriptions-item label="状态">
             <el-tag :type="getStatusType(eqpInfoData.eqpStatus)">{{ eqpInfoData.eqpStatus }}</el-tag>
           </el-descriptions-item> -->
@@ -78,6 +79,8 @@ import VtechHead from '@/views/modules/extProject/vtechHead.vue';
 
 import { saveVisitLog } from '@/utils/commonUtils.js'
 import { time } from 'echarts';
+import { eq } from 'lodash';
+import { get } from 'jquery';
 
 export default {
   components: { equipmentStatus2, VtechHead, LineChart },
@@ -181,6 +184,8 @@ export default {
 .snWork-card {
   height: 410px;
   flex: 1.04;
+  overflow-y: auto;
+
 }
 
 .chart-card {
