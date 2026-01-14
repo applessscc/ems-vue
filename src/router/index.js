@@ -83,6 +83,8 @@ const mainRoutes = {
     { path: '/repair-reply', component: _import('repair/repair-reply'), name: 'repair-reply', meta: { title: '报修表单' } },
     { path: '/video-naintenance', component: _import('modules/extProject/video-naintenance'), name: 'video-naintenance', meta: { title: '视频设备维护' } },
     { path: '/repair-jobDetail', component: _import('repair/repair-jobDetail'), name: 'repair-jobDetail', meta: { title: '任务详情' } },
+    { path: '/video-tempWarninge', component: _import('modules/extProject/video-tempWarninge'), name: 'video-tempWarninge', meta: { title: '高温告警' } },
+
 
   ],
   beforeEnter(to, from, next) {
