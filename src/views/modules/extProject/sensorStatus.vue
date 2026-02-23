@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    
+
     <el-header style="position: relative; height: 60px; line-height: 60px; text-align: center; font-size: 26px; font-weight: bold; color: white;
              text-shadow: 1px 1px 2px rgba(0,0,0,0.6), 0 0 5px rgba(255,255,255,0.8);
              letter-spacing: 2px; background: #1f78d1;">
@@ -100,7 +100,7 @@
                     </div>
                   </div>
                 </div>
-                
+
               </div>
             </el-tooltip>
           </div>
@@ -162,11 +162,11 @@ export default {
       return '#f39c12'; // 正常时橙色
     },
     getDampColor(item) {
-  if (!item) return '#3498db';       // 默认蓝色
-  if (item.status === 3) return '#909399'; // 离线灰色
-  if (item.status === 2) return '#F56C6C'; // 异常红色
-  return '#3498db';                  // 正常蓝色
-},
+      if (!item) return '#3498db';       // 默认蓝色
+      if (item.status === 3) return '#909399'; // 离线灰色
+      if (item.status === 2) return '#F56C6C'; // 异常红色
+      return '#3498db';                  // 正常蓝色
+    },
 
     getSensorTreeData() {
       this.$http({
@@ -327,15 +327,19 @@ export default {
 
 
     openNew(path, groupName, deviceName) {
-      const newUrl = this.$router.resolve({
+      const routeData = this.$router.resolve({
         path: path,
-        query: {
-          groupName: groupName,
-          deviceName: deviceName
-        }
+        query: { groupName, deviceName }
       });
-      console.log('打开新页面的URL:', newUrl.href);
-      window.open(newUrl.href, '_blank');
+
+      let baseUrl = process.env.VUE_APP_BASE_URL
+
+      let fullUrl = `${baseUrl}${routeData.href}`;
+
+      fullUrl = fullUrl.replace(/([^:])\/\//g, '$1/');
+
+      console.log('跳转路径:', fullUrl);
+      window.open(fullUrl, '_blank');
     },
 
     // openNew(path) {
