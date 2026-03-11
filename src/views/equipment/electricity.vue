@@ -187,16 +187,43 @@ export default {
     goHistory(date_type) {
       if (date_type == 'date' && this.dateParams) {
         this.setCounterIdByCode(this.dateParams);
-        let newUrl = this.$router.resolve({ path: 'electricity-his', query: this.dateParams });
-        window.open(newUrl.href, '_blank');
+        const routeData = this.$router.resolve({
+          path: 'electricity-his',
+          query: this.dateParams
+        });
+        let baseUrl = process.env.VUE_APP_BASE_URL;
+        let fullUrl = `${baseUrl}${routeData.href}`;
+        fullUrl = fullUrl.replace(/([^:])\/\//g, '$1/');
+        console.log('跳转路径:', fullUrl);
+        window.open(fullUrl, '_blank');
+
+        // let newUrl = this.$router.resolve({ path: 'electricity-his', query: this.dateParams });
+        // window.open(newUrl.href, '_blank');
       } else if (date_type == 'month' && this.monthParams) {
         this.setCounterIdByCode(this.monthParams);
-        let newUrl = this.$router.resolve({ path: 'electricity-his', query: this.monthParams });
-        window.open(newUrl.href, '_blank');
+
+        const routeData = this.$router.resolve({
+          path: 'electricity-his',
+          query: this.monthParams
+        });
+        let baseUrl = process.env.VUE_APP_BASE_URL;
+        let fullUrl = `${baseUrl}${routeData.href}`;
+        fullUrl = fullUrl.replace(/([^:])\/\//g, '$1/');
+        console.log('跳转路径:', fullUrl);
+        window.open(fullUrl, '_blank');
+        // let newUrl = this.$router.resolve({ path: 'electricity-his', query: this.monthParams });
+        // window.open(newUrl.href, '_blank');
       } else if (date_type == 'year' && this.yearParams) {
         this.setCounterIdByCode(this.yearParams);
-        let newUrl = this.$router.resolve({ path: 'electricity-his', query: this.yearParams });
-        window.open(newUrl.href, '_blank');
+        const routeData = this.$router.resolve({
+          path: 'electricity-his',
+          query: this.yearParams
+        });
+        let baseUrl = process.env.VUE_APP_BASE_URL;
+        let fullUrl = `${baseUrl}${routeData.href}`;
+        fullUrl = fullUrl.replace(/([^:])\/\//g, '$1/');
+        console.log('跳转路径:', fullUrl);
+        window.open(fullUrl, '_blank');
       } else {
         console.log(date_type);
       }
@@ -298,7 +325,7 @@ export default {
         this.yearParams.date_type = "year";
         this.yearParams.title = this.getChartTitle('月') + '(' + this.yearParams.year + ')';
         this.yearParams.t = null;
-        
+
         const currentYear = new Date().getFullYear();
 
         this.yearParams.cacheKey =
